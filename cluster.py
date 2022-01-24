@@ -37,7 +37,7 @@ except:
     #not running under ASA loader
     graspi.tprint("========================")
     graspi.tprint("ASA server is starting up.")
-    graspi.tprint("========================")≠
+    graspi.tprint("========================")
 
 
 #########################
@@ -93,3 +93,4 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA):
         
 def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
+

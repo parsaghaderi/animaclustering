@@ -100,7 +100,6 @@ create a thread for each neighbor
 # #TODO add loop count
 # #it stops by itself.
 def listener(tagged):
-    print(tagged[0].objective)
     while True:
             err, result = graspi.synchronize(
                             tagged[0].source, 

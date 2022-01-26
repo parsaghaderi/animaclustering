@@ -24,7 +24,7 @@ RCV_NEIGHBORS = dict((RCV_NEIGHBORS,0) for RCV_NEIGHBORS in NEIGHBORS)
 # '''
 # registering ASA named cluster
 # '''
-cluster = ASA_REG("cluster")
+err, cluster = ASA_REG("cluster")
 
 
 def get_node_value():
@@ -99,6 +99,7 @@ create a thread for each neighbor
 # #TODO add loop count
 # #it stops by itself.
 def listener(tagged):
+    print(tagged.objective)
     while True:
             err, result = graspi.synchronize(
                             tagged.source, 
@@ -122,7 +123,7 @@ print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 print(neighbor_weight)
 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 for i in threads:
-    threads[i] = threading.Thread(target=listener, args = neighbor_weight[i])
+    threads[i] = threading.Thread(target=listener, args = [neighbor_weight[i]])
 
 for i in threads:
     threads[i].start()

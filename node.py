@@ -123,7 +123,8 @@ threads= dict((tmp,None) for tmp in NEIGHBORS)
 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 print(neighbor_weight)
 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-for key,value in threads:
+
+for key in threads:
     threads[key] = threading.Thread(target=listener, args = [neighbor_weight[key]])
 
 for i in threads:

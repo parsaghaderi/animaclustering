@@ -75,7 +75,7 @@ flooding_thread = threading.Thread(target=flooder, args=[tagged])
 flooding_thread.start()
 # #TODO stop
 
-
+sleep(5)
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
     tmp, err = OBJ_REG(key, None, False, True, 10, cluster)
@@ -112,21 +112,22 @@ create a thread for each neighbor
 # #it stops by itself.
 def listener(tagged):
     while True:
-            err, result = graspi.synchronize(
-                            tagged.source, 
-                            tagged.objective,
-                            None, 
-                            5000)
-            if not err:
-                mprint("neighbor {} weight received".format(tagged.objective.name))
-                RCV_NEIGHBORS[tagged.objective.name] = result.value
-                exit()
-                #TODO check if this works
-            else:
+        mprint("listening for objective {}".format(tagged.objective.name))
+        err, result = graspi.synchronize(
+                        tagged.source, 
+                        tagged.objective,
+                        None, 
+                        5000)
+        if not err:
+            mprint("neighbor {} weight received".format(tagged.objective.name))
+            RCV_NEIGHBORS[tagged.objective.name] = result.value
+            exit()
+            #TODO check if this works
+        else:
 
-                mprint("can't get weight from {}".format(
-                                        graspi.etext[err]))
-                sleep(5)
+            mprint("can't get weight from {}".format(
+                                    graspi.etext[err]))
+            sleep(5)
 '''
 create threads for all neighbors
 '''

@@ -118,6 +118,9 @@ def listener(tagged):
 create threads for all neighbors
 '''
 threads= dict((tmp,None) for tmp in NEIGHBORS)
+print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+print(neighbor_weight)
+print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 for i in threads:
     threads[i] = threading.Thread(target=listener, args = [neighbor_weight[i]])
 

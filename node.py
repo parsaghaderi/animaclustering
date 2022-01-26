@@ -45,7 +45,7 @@ it's only for sync.
 @param loop-count 
 '''
 node = OBJ_REG(NODE_ID, get_node_value(), False, True, 10, cluster)
-tagged = TAG_OBJ(node, cluster)
+tagged,err = TAG_OBJ(node, cluster)
 '''
 flooding weight
 stops when info from all neighbors is received
@@ -69,21 +69,9 @@ node_info_flooder.start()
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
     tmp, err = OBJ_REG(key, None, False, True, 10, cluster)
-    if tmp.synch == True:
-        print("@@@@@@@@@@@@@@")
-        print("hooray")
-        print("@@@@@@@@@@@@@@")
     neighbor_weight[key] = TAG_OBJ(tmp, cluster)
     
-    # if neighbor_weight[key].objective.synch == True:
-    #     print("@@@@@@@@@@@@@@")
-    #     print("YES")
-    #     print("@@@@@@@@@@@@@@")
-    # else:
-    #     print("@@@@@@@@@@@@@@")
-    #     print("NO")
-    #     print("@@@@@@@@@@@@@@")
-
+    
 '''
 listen to neighbor weight
 create a thread for each neighbor
@@ -113,9 +101,6 @@ create a thread for each neighbor
 # #TODO add loop count
 # #it stops by itself.
 def listener(tagged):
-    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print(tagged)
-    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     while True:
             err, result = graspi.synchronize(
                             tagged.source, 

@@ -113,8 +113,9 @@ def listener(tagged):
                 exit()
                 #TODO check if this works
             else:
+
                 mprint("can't get weight from {}".format(
-                                        tagged.objective.name))
+                                        graspi.etext[err]))
                 sleep(5)
 '''
 create threads for all neighbors

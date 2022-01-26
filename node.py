@@ -44,8 +44,8 @@ it's only for sync.
 @param asa
 @param loop-count 
 '''
-node = OBJ_REG(NODE_ID, get_node_value(), False, True, 10, cluster)
-tagged,err = TAG_OBJ(node, cluster)
+node, err = OBJ_REG(NODE_ID, get_node_value(), False, True, 10, cluster)
+tagged = TAG_OBJ(node, cluster)
 '''
 flooding weight
 stops when info from all neighbors is received

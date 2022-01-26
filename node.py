@@ -122,7 +122,7 @@ print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 print(neighbor_weight)
 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 for i in threads:
-    threads[i] = threading.Thread(target=listener, args = [neighbor_weight[i]])
+    threads[i] = threading.Thread(target=listener, args = neighbor_weight[i])
 
 for i in threads:
     threads[i].start()

@@ -69,10 +69,12 @@ node_info_flooder.start()
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
     tmp = OBJ_REG(key, None, False, True, 10, cluster)
+    if tmp.synch == True:
+        print("@@@@@@@@@@@@@@")
+        print("hooray")
+        print("@@@@@@@@@@@@@@")
     neighbor_weight[key] = TAG_OBJ(tmp, cluster)
-    print("@@@@@@@@@@@@@@")
-    print(neighbor_weight[key])
-    print("@@@@@@@@@@@@@@")
+    
     # if neighbor_weight[key].objective.synch == True:
     #     print("@@@@@@@@@@@@@@")
     #     print("YES")

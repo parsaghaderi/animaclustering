@@ -66,6 +66,10 @@ stops when info from all neighbors is received
 def flooder(tagged):
     while True:
             err = graspi.flood(tagged.source, 59000, [graspi.tagged_objective(tagged.objective, None)])
+            if not err:
+                mprint("flooding objective")
+            else:
+                mprint("can't flood becuase {}".format(graspi.etext[err]))
             sleep(5)
 flooding_thread = threading.Thread(target=flooder, args=[tagged])
 flooding_thread.start()

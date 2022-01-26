@@ -100,6 +100,9 @@ create a thread for each neighbor
 # #TODO add loop count
 # #it stops by itself.
 def listener(tagged):
+    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print(tagged)
+    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     while True:
             err, result = graspi.synchronize(
                             tagged.source, 
@@ -119,9 +122,7 @@ def listener(tagged):
 create threads for all neighbors
 '''
 threads= dict((tmp,None) for tmp in NEIGHBORS)
-print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-print(neighbor_weight)
-print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
 
 for key in threads:
     threads[key] = threading.Thread(target=listener, args = [neighbor_weight[key]])

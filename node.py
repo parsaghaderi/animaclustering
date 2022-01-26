@@ -70,6 +70,10 @@ neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in neighbor_weight:
     tmp = OBJ_REG(key, None, False, True, 10, cluster)
     neighbor_weight[key] = TAG_OBJ(tmp, cluster)
+    if neighbor_weight[key].objective.synch == True:
+        print("@@@@@@@@@@@@@@")
+        print("YES")
+        print("@@@@@@@@@@@@@@")
 
 '''
 listen to neighbor weight

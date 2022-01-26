@@ -50,19 +50,25 @@ tagged = TAG_OBJ(node, cluster)
 flooding weight
 stops when info from all neighbors is received
 '''
-class flooder(threading.Thread):
-    def __init__(self, tagged):
-        threading.Thread.__init__(self)
-        self.tagged = tagged
+# class flooder(threading.Thread):
+#     def __init__(self, tagged):
+#         threading.Thread.__init__(self)
+#         self.tagged = tagged
     
-    def run(self):
-        while True:
-            err = graspi.flood(self.tagged.source, 59000, [graspi.tagged_objective(self.tagged.objective, None)])
-            sleep(5)
-        return err
+#     def run(self):
+#         while True:
+#             err = graspi.flood(self.tagged.source, 59000, [graspi.tagged_objective(self.tagged.objective, None)])
+#             sleep(5)
+#         return err
+# node_info_flooder = flooder(tagged)
+# node_info_flooder.start()
 
-node_info_flooder = flooder(tagged)
-node_info_flooder.start()
+def flooder(tagged):
+    while True:
+            err = graspi.flood(tagged.source, 59000, [graspi.tagged_objective(tagged.objective, None)])
+            sleep(5)
+flooding_thread = threading.Thread(target=flooder, args=[tagged])
+flooding_thread.start()
 # #TODO stop
 
 

@@ -63,15 +63,15 @@ stops when info from all neighbors is received
 # node_info_flooder = flooder(tagged)
 # node_info_flooder.start()
 
-def flooder(tagged):
+def flooder(tagged, asa):
     while True:
-        err = graspi.flood(tagged.source, 59000, [graspi.tagged_objective(tagged.objective, None)])
+        err = graspi.flood(asa, 59000, [graspi.tagged_objective(tagged.objective, None)])
         if not err:
             mprint("flooding objective")
         else:
             mprint("can't flood becuase {}".format(graspi.etext[err]))
         sleep(5)
-flooding_thread = threading.Thread(target=flooder, args=[tagged])
+flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
 flooding_thread.start()
 # #TODO stop
 

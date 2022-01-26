@@ -57,11 +57,12 @@ class flooder(threading.Thread):
     
     def run(self):
         while True:
-            err = graspi.flood(self.tagged.source, 59000, [graspi.tagged_objective(self.obj.objective, None)])
+            err = graspi.flood(self.tagged.source, 59000, [graspi.tagged_objective(self.tagged.objective, None)])
             sleep(5)
         return err
 
-node_info_flooder = flooder(tagged).start()
+node_info_flooder = flooder(tagged)
+node_info_flooder.start()
 # #TODO stop
 
 

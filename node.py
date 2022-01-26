@@ -102,8 +102,8 @@ create a thread for each neighbor
 def listener(tagged):
     while True:
             err, result = graspi.synchronize(
-                            tagged[0].source, 
-                            tagged[0].objective,
+                            tagged.source, 
+                            tagged.objective,
                             None, 
                             5000)
             if not err:

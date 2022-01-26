@@ -68,7 +68,7 @@ node_info_flooder.start()
 
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
-    tmp = OBJ_REG(key, None, False, True, 10, cluster)
+    tmp, err = OBJ_REG(key, None, False, True, 10, cluster)
     if tmp.synch == True:
         print("@@@@@@@@@@@@@@")
         print("hooray")

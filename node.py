@@ -74,6 +74,10 @@ for key in neighbor_weight:
         print("@@@@@@@@@@@@@@")
         print("YES")
         print("@@@@@@@@@@@@@@")
+    else:
+        print("@@@@@@@@@@@@@@")
+        print("NO")
+        print("@@@@@@@@@@@@@@")
 
 '''
 listen to neighbor weight

@@ -159,7 +159,7 @@ def listener(tagged, asa):
 
             mprint("can't get weight from {}".format(
                                     graspi.etext[err]))
-            sleep(5)
+            # sleep(5)
 '''
 create threads for all neighbors
 '''

@@ -255,5 +255,27 @@ def flooder(tagged, asa):
         sleep(1)
 
 a = threading.Thread(target=flooder, args=[tagged, asa])
-a.start()
 
+
+
+obj2, err = OBJ_REG("2", None, False, True, 10, asa)
+tagged2 = TAG_OBJ(obj, asa)
+
+def listener(tagged, asa):
+    while True:
+        mprint("synchronizing obj {}".format(tagged.objective.name))
+        err, result = graspi.synchronize(
+            asa, tagged.objective, None, 5000
+        )
+        if not err:
+            mprint("value of obj {} is being synch".format(tagged.objective.name))
+            mprint("peer offered {}".format(result.value))
+            exit()
+        else:
+            mprint("there is an error, {}".format(graspi.etext[err]))
+
+b = threading.Thread(target = listener, args=[tagged2, asa])
+
+
+b.start()
+a.start()

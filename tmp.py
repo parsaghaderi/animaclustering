@@ -267,6 +267,7 @@
 ###############################################################
 
 from cluster import *
+from time import sleep
 
 err, asa = ASA_REG("asa")
 
@@ -274,6 +275,16 @@ obj, err =OBJ_REG("1", None, False, True, 10, asa)
 
 tagged = TAG_OBJ(obj, asa)
 
+obj2, err = OBJ_REG("2", 20, False, True, 10, asa)
+tagged2 = TAG_OBJ(obj2, asa)
+
+def flooder(tagged, asa):
+    while True:
+        mprint("flooding objective {}".format(tagged.objective.name))
+        err = graspi.flood(
+            asa, 59000,  [graspi.tagged_objective(tagged.objective, None)]
+        )
+        sleep(1)
 
 def synching(tagged, asa):
     while True:
@@ -289,4 +300,6 @@ def synching(tagged, asa):
             mprint("there is an error, {}".format(graspi.etext[err]))
 
 a = threading.Thread(target=synching, args=[tagged, asa])
+b = threading.Thread(target=flooder, args=[tagged2, asa])
 a.start()
+b.start()

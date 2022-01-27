@@ -255,4 +255,5 @@ def flooder(tagged, asa):
         sleep(1)
 
 a = threading.Thread(target=flooder, args=[tagged, asa])
+a.start()
 

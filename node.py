@@ -70,12 +70,12 @@ def flooder(tagged, asa):
             mprint("flooding objective")
         else:
             mprint("can't flood because {}".format(graspi.etext[err]))
-        sleep(5)
+        sleep(1)
 flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
 flooding_thread.start()
 # #TODO stop
 
-sleep(5)
+sleep(1)
 # neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 # for key in NEIGHBORS:
 #     mprint(key)

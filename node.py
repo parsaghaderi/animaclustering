@@ -70,7 +70,7 @@ def flooder(tagged, asa):
             mprint("flooding objective")
         else:
             mprint("can't flood because {}".format(graspi.etext[err]))
-
+        sleep(0.5)
 flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
 flooding_thread.start()
 # #TODO stop

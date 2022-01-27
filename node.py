@@ -78,6 +78,7 @@ flooding_thread.start()
 sleep(5)
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
+    mprint(key)
     tmp, err = OBJ_REG(key, None, False, True, 10, cluster)
     neighbor_weight[key] = TAG_OBJ(tmp, cluster)
     

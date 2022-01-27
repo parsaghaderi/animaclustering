@@ -241,12 +241,18 @@
 from cluster import *
 from time import sleep
 
-from tmp import flooder
 
 err, asa = ASA_REG('asa')
 obj, err = OBJ_REG(1, 10, False, True, 10, asa)
 tagged = TAG_OBJ(obj, asa)
 
-flooder(tagged, asa).start()
+def flooder(tagged, asa):
+    while True:
+        mprint("flooding objective {}".format(tagged.objective.name))
+        err = graspi.flood(
+            asa, 59000,  [graspi.tagged_objective(tagged.objective, None)]
+        )
+        sleep(1)
 
+a = threading.Thread(target=flooder, args=[tagged, asa])
 

@@ -302,5 +302,5 @@ def synching(tagged, asa):
 a = threading.Thread(target=synching, args=[tagged, asa])
 b = threading.Thread(target=flooder, args=[tagged2, asa])
 
-# a.start()
-b.start()
+a.start()
+# b.start()

@@ -76,11 +76,11 @@ flooding_thread.start()
 # #TODO stop
 
 sleep(5)
-neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
-for key in NEIGHBORS:
-    mprint(key)
-    tmp, err = OBJ_REG(key, None, False, True, 10, cluster)
-    neighbor_weight[key] = TAG_OBJ(tmp, cluster)
+# neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
+# for key in NEIGHBORS:
+#     mprint(key)
+#     tmp, err = OBJ_REG(key, None, False, True, 10, cluster)
+#     neighbor_weight[key] = TAG_OBJ(tmp, cluster)
     
     
 '''
@@ -132,14 +132,14 @@ def listener(tagged, asa):
 '''
 create threads for all neighbors
 '''
-threads= dict((tmp,None) for tmp in NEIGHBORS)
+# threads= dict((tmp,None) for tmp in NEIGHBORS)
 
 
-for key in threads:
-    threads[key] = threading.Thread(target=listener, args = [neighbor_weight[key], cluster])
+# for key in threads:
+#     threads[key] = threading.Thread(target=listener, args = [neighbor_weight[key], cluster])
 
-for i in threads:
-    threads[i].start()
+# for i in threads:
+#     threads[i].start()
 
 # '''
 # Update messages can be:

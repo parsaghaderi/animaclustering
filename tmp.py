@@ -165,7 +165,6 @@ create threads for all neighbors
 '''
 threads= dict((tmp,None) for tmp in NEIGHBORS)
 
-
 for key in threads:
     threads[key] = threading.Thread(target=listener, args = [neighbor_weight[key], cluster])
 

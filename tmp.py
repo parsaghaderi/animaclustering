@@ -1,3 +1,34 @@
+# def init():
+#     max_neighbor = max(RCV_NEIGHBORS, key=RCV_NEIGHBORS.get)
+#     if node.value > RCV_NEIGHBORS[max_neighbor]:
+#         #send CH(node_ID) msg
+#         CLUSTER_SET.append[NODE_ID]
+#         HEAD = True
+#         CLUSTER = NODE_ID
+#     else:
+#         #run join process 
+#         #join(node_ID, max_neighbor)
+#         pass
+
+# #can a node change weight midway?
+
+# '''
+# joining other clusters
+# '''
+# def join(obj):
+#     max_neighbor = max(RCV_NEIGHBORS, key=RCV_NEIGHBORS.get)
+#     if obj.value >= max_neighbor:
+#         HEAD = True
+#         CLUSTER = NODE_ID
+#         CH()
+#         return
+#     for neighbor, weight in RCV_NEIGHBORS.items():
+#         if weight == max_neighbor:
+#             pass
+
+# #testing broadcast
+
+
 from time import sleep
 from cluster import *
 import random
@@ -71,11 +102,11 @@ def flooder(tagged, asa):
         else:
             mprint("can't flood because {}".format(graspi.etext[err]))
         sleep(5)
-flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
-flooding_thread.start()
+# flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
+# flooding_thread.start()
 # #TODO stop
 
-sleep(5)
+# sleep(5)
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
     mprint(key)

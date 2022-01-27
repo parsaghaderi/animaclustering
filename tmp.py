@@ -270,7 +270,7 @@ from cluster import *
 
 err, asa = ASA_REG("asa")
 
-obj, err =OBJ_REG(1, None, False, True, 10, asa)
+obj, err =OBJ_REG("1", None, False, True, 10, asa)
 
 tagged = TAG_OBJ(obj, asa)
 

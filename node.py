@@ -243,7 +243,7 @@ from time import sleep
 
 
 err, asa = ASA_REG('asa')
-obj, err = OBJ_REG(1, 10, False, True, 10, asa)
+obj, err = OBJ_REG("1", 10, False, True, 10, asa)
 tagged = TAG_OBJ(obj, asa)
 
 def flooder(tagged, asa):

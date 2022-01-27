@@ -256,8 +256,6 @@ def flooder(tagged, asa):
 
 a = threading.Thread(target=flooder, args=[tagged, asa])
 
-
-
 obj2, err = OBJ_REG("2", None, False, True, 10, asa)
 tagged2 = TAG_OBJ(obj, asa)
 
@@ -278,4 +276,4 @@ b = threading.Thread(target = listener, args=[tagged2, asa])
 
 
 b.start()
-a.start()
+# a.start()

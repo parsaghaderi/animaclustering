@@ -154,6 +154,7 @@ def listener(tagged, asa):
             mprint("neighbor {} weight received".format(tagged.objective.name))
             RCV_NEIGHBORS[tagged.objective.name] = result.value
             exit()
+            
             #TODO check if this works
         else:
 

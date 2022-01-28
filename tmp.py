@@ -272,7 +272,6 @@ from time import sleep
 err, asa = ASA_REG("asa")
 
 obj, err =OBJ_REG("1", None, False, True, 10, asa)
-
 tagged = TAG_OBJ(obj, asa)
 
 obj2, err = OBJ_REG("2", 20, False, True, 10, asa)
@@ -303,4 +302,4 @@ a = threading.Thread(target=synching, args=[tagged, asa])
 b = threading.Thread(target=flooder, args=[tagged2, asa])
 
 a.start()
-# b.start()
+b.start()

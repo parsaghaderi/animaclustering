@@ -246,6 +246,10 @@ err, asa = ASA_REG('asa')
 obj, err = OBJ_REG("1", 10, False, True, 10, asa)
 tagged = TAG_OBJ(obj, asa)
 
+obj2, err = OBJ_REG("2", None, False, True, 10, asa)
+tagged2 = TAG_OBJ(obj2, asa)
+
+
 def flooder(tagged, asa):
     while True:
         mprint("flooding objective {}".format(tagged.objective.name))
@@ -256,8 +260,7 @@ def flooder(tagged, asa):
 
 a = threading.Thread(target=flooder, args=[tagged, asa])
 
-obj2, err = OBJ_REG("2", None, False, True, 10, asa)
-tagged2 = TAG_OBJ(obj, asa)
+
 
 def listener(tagged, asa):
     while True:
@@ -275,5 +278,5 @@ def listener(tagged, asa):
 b = threading.Thread(target = listener, args=[tagged2, asa])
 
 
-# b.start()
+b.start()
 a.start()

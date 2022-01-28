@@ -47,7 +47,7 @@ except:
 def readmap(path):
     file = open(path)
     l = file.readlines()
-    l = [int(item) for item in l]
+    l = [item for item in l]
     return l[0], l[1:]
 
 

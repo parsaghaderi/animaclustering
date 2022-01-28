@@ -6,24 +6,24 @@ import threading
 NODE_ID, NEIGHBORS = readmap(MAP_PATH)
 #TODO check readmap - remove cast
 NODE_ID = str(NODE_ID)
-NEIGHBORS = [str(tmp) for tmp in NEIGHBORS]
+# NEIGHBORS = [str(tmp) for tmp in NEIGHBORS]
+CLUSTER = False
+CLUSTER_SET = []
 
-# CLUSTER = False
-# CLUSTER_SET = []
+'''
+each time node receives an weight from neighbors
+the update will be saved in this dict.
+the values in dict are initialized to False.
+'''
 
-# '''
-# each time node receives an weight from neighbors
-# the update will be saved in this dict.
-# the values in dict are initialized to False.
-# '''
 RCV_NEIGHBORS = dict((RCV_NEIGHBORS,0) for RCV_NEIGHBORS in NEIGHBORS)
 
-# '''
-# received roles are stored here
-# * join(u, v) node u joins v
-# * join (v, v) node v is the cluster head  = ch(v)
-# '''
-# RCV_ROLES = dict((tmp,False) for tmp in NEIGHBORS)
+'''
+received roles are stored here
+* join(u, v) node u joins v
+* join (v, v) node v is the cluster head  = ch(v)
+'''
+RCV_ROLES = dict((tmp,False) for tmp in NEIGHBORS)
 
 # '''
 # registering ASA named cluster

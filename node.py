@@ -127,7 +127,7 @@ def listener(tagged, asa):
         if not err:
             mprint("neighbor {} weight received".format(tagged.objective.name))
             RCV_NEIGHBORS[tagged.objective.name] = result.value
-            mprint("&&&&&&&&&&&&&&&&&\n{}\n&&&&&&&&&&&&&&&&&".format(RCV_NEIGHBORS[tagged.objective.name]))
+            mprint("&&&&&&&&&&&&&&&&&\nfrom {} value {}\n&&&&&&&&&&&&&&&&&\n".format(tagged.objective.name, RCV_NEIGHBORS[tagged.objective.name]))
             exit()
             #TODO check if this works
         else:

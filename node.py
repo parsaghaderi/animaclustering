@@ -5,7 +5,7 @@ import threading
 # HEAD = False
 NODE_ID, NEIGHBORS = readmap(MAP_PATH)
 #TODO check readmap - remove cast
-NODE_ID = str(NODE_ID)
+# NODE_ID = str(NODE_ID)
 # NEIGHBORS = [str(tmp) for tmp in NEIGHBORS]
 CLUSTER = False
 CLUSTER_SET = []

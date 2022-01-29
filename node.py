@@ -157,7 +157,7 @@ def role_listener(tagged, asa):
         if not err:
             mprint("neighbor {} role received".format(tagged.objective.name))
             RCV_ROLES[tagged.objective.name] = result.value
-            mprint("&&&&&&&&&&&&&&&&&\nfrom {} role is {}\n&&&&&&&&&&&&&&&&&\n".format(tagged.objective.name, RCV_NEIGHBORS[tagged.objective.name]))
+            mprint("&&&&&&&&&&&&&&&&&\nfrom {} role is {}\n&&&&&&&&&&&&&&&&&\n".format(tagged.objective.name, RCV_ROLES[tagged.objective.name]))
             mprint(RCV_ROLES)
             exit()
             #TODO check if this works

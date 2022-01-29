@@ -216,7 +216,7 @@ a_subset = {key: value for key, value in a_dictionary.items() if value > 2}
 '''
 def decide():
     greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
-    while False in {key: RCV_ROLES[key] for key in greater}:
+    while False in {key: RCV_ROLES[key+"_role"] for key in greater}:
         #wait
         sleep(1)
 

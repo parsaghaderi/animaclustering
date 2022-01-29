@@ -23,7 +23,7 @@ received roles are stored here
 * join(u, v) node u joins v
 * join (v, v) node v is the cluster head  = ch(v)
 '''
-RCV_ROLES = dict((tmp,False) for tmp in NEIGHBORS)
+RCV_ROLES = dict((tmp+"_role",False) for tmp in NEIGHBORS)
 
 # '''
 # registering ASA named cluster

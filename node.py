@@ -146,8 +146,12 @@ def init():
         CLUSTER = NODE_ID
         CLUSTER_SET.append(NODE_ID)
         mprint("&&&&&&&&&&&&&&&&&&\nI'm head\n&&&&&&&&&&&&&&&&&&\n")
+        exit()
         #broadcast CH
     #else: wait for join
+
+init_thread = threading.Thread(target=init, args=[])
+init_thread.start()
 
 '''
 decides for ch

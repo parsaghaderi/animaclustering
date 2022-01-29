@@ -17,7 +17,7 @@ the values in dict are initialized to False.
 '''
 
 RCV_NEIGHBORS = dict((RCV_NEIGHBORS,0) for RCV_NEIGHBORS in NEIGHBORS)
-
+RCV_CH = []
 '''
 received roles are stored here
 * join(u, v) node u joins v
@@ -48,7 +48,7 @@ it's only for sync.
 @param asa
 @param loop-count 
 '''
-node, err = OBJ_REG(NODE_ID, get_node_value(), False, True, 10, cluster)
+node, err = OBJ_REG(NODE_ID, WEIGHT, False, True, 10, cluster)
 tagged = TAG_OBJ(node, cluster)
 '''
 flooding weight
@@ -93,29 +93,9 @@ listen to neighbor weight
 create a thread for each neighbor
 '''
 #TODO add number of tries
-# class listener(threading.Thread):
-#     def __init__(self, tagged):
-#         threading.Thread.__init__(self)
-#         self.tagged = tagged
-    
-#     def run(self):
-#         while True:
-#             err, result = graspi.synchronize(
-#                             self.tagged.source, 
-#                             self.tagged.objective,
-#                             None, 
-#                             5000)
-#             if not err:
-#                 mprint("neighbor {} weight received".format(self.tagged.objective.name))
-#                 RCV_NEIGHBORS[self.tagged.objective.name] = result.value
-#                 exit()
-#                 #TODO check if this works
-#             else:
-#                 mprint("can't get weight from {}".format(
-#                                         self.tagged.objective.name))
-                
 # #TODO add loop count
 # #it stops by itself.
+
 def listener(tagged, asa):
     while True:
         mprint("listening for objective {}".format(tagged.objective.name))
@@ -128,6 +108,7 @@ def listener(tagged, asa):
             mprint("neighbor {} weight received".format(tagged.objective.name))
             RCV_NEIGHBORS[tagged.objective.name] = result.value
             mprint("&&&&&&&&&&&&&&&&&\nfrom {} value {}\n&&&&&&&&&&&&&&&&&\n".format(tagged.objective.name, RCV_NEIGHBORS[tagged.objective.name]))
+            mprint(RCV_NEIGHBORS)
             exit()
             #TODO check if this works
         else:
@@ -147,13 +128,66 @@ for key in threads:
 for i in threads:
     threads[i].start()
 
-# '''
-# Update messages can be:
-#     * join(u, v) where u is the neighbor ID and v is the node they're joining
-#     * head(v) where v is the neighbor and announces itself as clusterhead
-# '''
+'''
+Update messages can be:
+    * join(u, v) where u is the neighbor ID and v is the node they're joining
+    * head(v) where v is the neighbor and announces itself as clusterhead
+'''
 
-# role = TAG_OBJ(OBJ_REG(NODE_ID, None, False, True, 10, cluster), cluster)
+role = TAG_OBJ(OBJ_REG(NODE_ID, None, False, True, 10, cluster), cluster)
+'''
+init phase
+'''
+def init():
+    while 0 in RCV_NEIGHBORS.values():
+        mprint("haven't received all weights ")
+        sleep(1)
+    if WEIGHT > RCV_NEIGHBORS[max(RCV_NEIGHBORS, key = RCV_NEIGHBORS.get)]:
+        CLUSTER = NODE_ID
+        CLUSTER_SET.append(NODE_ID)
+        mprint("&&&&&&&&&&&&&&&&&&\nI'm head\n&&&&&&&&&&&&&&&&&&\n")
+        #broadcast CH
+    #else: wait for join
+
+'''
+decides for ch
+
+a_subset = {key: value for key, value in a_dictionary.items() if value > 2}
+
+'''
+def check_CH():
+    greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
+    
+    for item in greater:
+        if RCV_ROLES != False:
+            rcvd_ch(greater)
+        else:
+            #wait
+            pass
+
+def rcvd_ch(nodes):
+    max = 0
+    for item in nodes: #neighbor with max weight who sent ch or join
+                        #rcv_roles[item] == item -> item has sent ch
+        if RCV_NEIGHBORS[item] > max and RCV_ROLES[item] == item:
+            max = item
+    CLUSTER = max
+    #TODO join max
+
+    #neighbors with greater weight check and see if have recevied messages from them or not
+
+def rcv_join(node):
+    if node == NODE_ID: #cluster head joined another cluster
+        CLUSTER_SET.append(node)
+        #TODO terminate
+    elif node == CLUSTER:
+        greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
+        if len(greater) != 0:
+            
+
+    
+
+#TODO broadcast role as CH
 
 # # def send_role():
 # #     while True:
@@ -243,50 +277,50 @@ for i in threads:
 # ###############################################
 
 
-from cluster import *
-from time import sleep
+# from cluster import *
+# from time import sleep
 
-def flooder(tagged, asa):
-    while True:
-        mprint("flooding objective {}".format(tagged.objective.name))
-        err = graspi.flood(
-            asa, 59000,  [graspi.tagged_objective(tagged.objective, None)]
-        )
-        sleep(1)
+# def flooder(tagged, asa):
+#     while True:
+#         mprint("flooding objective {}".format(tagged.objective.name))
+#         err = graspi.flood(
+#             asa, 59000,  [graspi.tagged_objective(tagged.objective, None)]
+#         )
+#         sleep(1)
 
-def listener(tagged, asa):
-    while True:
-        mprint("synchronizing obj {}".format(tagged.objective.name))
-        err, result = graspi.synchronize(
-            asa, tagged.objective, None, 5000
-        )
-        if not err:
-            mprint("value of obj {} is being synchronized".format(tagged.objective.name))
-            mprint("peer offered {}".format(result.value))
-            exit()
-        else:
-            mprint("there is an error, {}".format(graspi.etext[err]))
+# def listener(tagged, asa):
+#     while True:
+#         mprint("synchronizing obj {}".format(tagged.objective.name))
+#         err, result = graspi.synchronize(
+#             asa, tagged.objective, None, 5000
+#         )
+#         if not err:
+#             mprint("value of obj {} is being synchronized".format(tagged.objective.name))
+#             mprint("peer offered {}".format(result.value))
+#             exit()
+#         else:
+#             mprint("there is an error, {}".format(graspi.etext[err]))
 
-NODE, NEIGHBORS = readmap(MAP_PATH)
-
-
-err, asa = ASA_REG('asa')
-obj, err = OBJ_REG("1", 10, False, True, 10, asa)
-tagged = TAG_OBJ(obj, asa)
-
-obj2, err = OBJ_REG("2", None, False, True, 10, asa)
-tagged2 = TAG_OBJ(obj2, asa)
+# NODE, NEIGHBORS = readmap(MAP_PATH)
 
 
+# err, asa = ASA_REG('asa')
+# obj, err = OBJ_REG("1", 10, False, True, 10, asa)
+# tagged = TAG_OBJ(obj, asa)
 
-
-a = threading.Thread(target=flooder, args=[tagged, asa])
+# obj2, err = OBJ_REG("2", None, False, True, 10, asa)
+# tagged2 = TAG_OBJ(obj2, asa)
 
 
 
 
-b = threading.Thread(target = listener, args=[tagged2, asa])
+# a = threading.Thread(target=flooder, args=[tagged, asa])
 
 
-b.start()
-a.start()
+
+
+# b = threading.Thread(target = listener, args=[tagged2, asa])
+
+
+# b.start()
+# a.start()

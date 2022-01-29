@@ -50,6 +50,9 @@ it's only for sync.
 '''
 node, err = OBJ_REG(NODE_ID, WEIGHT, False, True, 10, cluster)
 tagged = TAG_OBJ(node, cluster)
+
+node_role,err = OBJ_REG(NODE_ID+"_role", 0, False, True, 10, cluster)
+role_tagged = TAG_OBJ(node_role, cluster)
 '''
 flooding weight
 stops when info from all neighbors is received
@@ -78,8 +81,22 @@ def flooder(tagged, asa):
 
 flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
 flooding_thread.start()
-# #TODO stop
+#TODO stop
 
+def role_flooder(tagged, asa):
+    while tagged.objective.value == 0:
+        mprint("waiting to decide role")
+    while True:
+        err = graspi.flood(asa, 59000, [graspi.tagged_objective(tagged.objective, None)])
+        if not err:
+            mprint("flooding objective {}'s role".format(tagged.objective.name))
+        else:
+            mprint("can't flood because {}".format(graspi.etext[err]))
+        sleep(1)
+
+role_thread = threading.Thread(target=role_flooder, args=[role_tagged, cluster])
+role_thread.start()
+#TODO stop
 
 neighbor_weight = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
@@ -128,13 +145,49 @@ for key in threads:
 for i in threads:
     threads[i].start()
 
+def role_listener(tagged, asa):
+    while True:#TODO change the condition
+        mprint("listening to role of node {}".format(tagged.objective.name))
+        err, result = graspi.synchronize(
+                        asa, 
+                        tagged.objective,
+                        None, 
+                        5000)
+        if not err:
+            mprint("neighbor {} role received".format(tagged.objective.name))
+            RCV_ROLES[tagged.objective.name] = result.value
+            mprint("&&&&&&&&&&&&&&&&&\nfrom {} role is {}\n&&&&&&&&&&&&&&&&&\n".format(tagged.objective.name, RCV_NEIGHBORS[tagged.objective.name]))
+            mprint(RCV_ROLES)
+            exit()
+            #TODO check if this works
+        else:
+
+            mprint("can't get role from {}".format(
+                                    graspi.etext[err]))
+            sleep(5)
+
+
+neighbor_role = dict((tmp,None) for tmp in NEIGHBORS)
+for key in NEIGHBORS:
+    mprint(key)
+    tmp, err = OBJ_REG(key+"_role", None, False, True, 10, cluster)
+    neighbor_weight[key] = TAG_OBJ(tmp, cluster)
+    
+role_threads_listener = dict((tmp,None) for tmp in NEIGHBORS)
+for key in role_threads_listener:
+    role_threads_listener[key] = threading.Thread(target=role_listener, args = [neighbor_role[key], cluster])
+
+for i in threads:
+    threads[i].start()
+
+
+
 '''
 Update messages can be:
     * join(u, v) where u is the neighbor ID and v is the node they're joining
     * head(v) where v is the neighbor and announces itself as clusterhead
 '''
 
-role = TAG_OBJ(OBJ_REG(NODE_ID, None, False, True, 10, cluster), cluster)
 '''
 init phase
 '''
@@ -146,6 +199,7 @@ def init():
         CLUSTER = NODE_ID
         CLUSTER_SET.append(NODE_ID)
         mprint("&&&&&&&&&&&&&&&&&&\nI'm head\n&&&&&&&&&&&&&&&&&&\n")
+        node_role.value = NODE_ID
         exit()
         #broadcast CH
     #else: wait for join

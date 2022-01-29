@@ -172,7 +172,7 @@ neighbor_role = dict((tmp,None) for tmp in NEIGHBORS)
 for key in NEIGHBORS:
     mprint(key)
     tmp, err = OBJ_REG(key+"_role", None, False, True, 10, cluster)
-    neighbor_weight[key] = TAG_OBJ(tmp, cluster)
+    neighbor_role[key] = TAG_OBJ(tmp, cluster)
     
 role_threads_listener = dict((tmp,None) for tmp in NEIGHBORS)
 for key in role_threads_listener:

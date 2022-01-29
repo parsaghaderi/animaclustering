@@ -229,6 +229,8 @@ def decide():
     CLUSTER = max
     node_role.value = max
 
+decision = threading.Thread(target = decide, args=[])
+decision.start()
     
     
 

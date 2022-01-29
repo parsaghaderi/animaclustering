@@ -86,6 +86,7 @@ flooding_thread.start()
 def role_flooder(tagged, asa):
     while tagged.objective.value == 0:
         mprint("waiting to decide role")
+        sleep(3)
     while True:
         err = graspi.flood(asa, 59000, [graspi.tagged_objective(tagged.objective, None)])
         if not err:

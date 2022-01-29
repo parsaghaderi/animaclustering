@@ -220,7 +220,7 @@ def decide():
         #wait
         sleep(1)
 
-    greater_dict = {key: RCV_ROLES[key] for key in greater}
+    greater_dict = {key: RCV_ROLES[key+"_role"] for key in greater}
     max = 0
     for item in greater_dict.keys():
         if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:

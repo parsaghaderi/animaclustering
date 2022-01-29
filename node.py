@@ -214,6 +214,32 @@ decides for ch
 a_subset = {key: value for key, value in a_dictionary.items() if value > 2}
 
 '''
+def decide():
+    greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
+    while False in {key: RCV_ROLES[key] for key in greater}:
+        #wait
+        sleep(1)
+
+    greater_dict = {key: RCV_ROLES[key] for key in greater}
+    max = 0
+    for item in greater_dict.keys():
+        if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:
+            max = item
+    
+    CLUSTER = max
+    node_role.value = max
+
+    
+    
+
+def rcv_role(node, role):
+
+
+
+
+
+
+
 def check_CH():
     greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
     

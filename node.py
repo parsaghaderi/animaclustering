@@ -178,8 +178,8 @@ role_threads_listener = dict((tmp,None) for tmp in NEIGHBORS)
 for key in role_threads_listener:
     role_threads_listener[key] = threading.Thread(target=role_listener, args = [neighbor_role[key], cluster])
 
-for i in threads:
-    threads[i].start()
+for i in role_threads_listener:
+    role_threads_listener[i].start()
 
 
 

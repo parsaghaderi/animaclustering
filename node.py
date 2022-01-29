@@ -233,7 +233,7 @@ def decide():
     
 
 def rcv_role(node, role):
-
+    pass
 
 
 

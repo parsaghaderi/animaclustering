@@ -183,7 +183,7 @@ def rcv_join(node):
     elif node == CLUSTER:
         greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
         if len(greater) != 0:
-            
+           pass 
 
     
 
@@ -312,15 +312,6 @@ def rcv_join(node):
 # tagged2 = TAG_OBJ(obj2, asa)
 
 
-
-
 # a = threading.Thread(target=flooder, args=[tagged, asa])
-
-
-
-
 # b = threading.Thread(target = listener, args=[tagged2, asa])
-
-
 # b.start()
-# a.start()

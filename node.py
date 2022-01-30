@@ -200,6 +200,7 @@ def decide():
     mprint("for nodes with greater weight, roles have been received")
     mprint("$$$$$$$$$$$$$$$$\n{}\n$$$$$$$$$$$$$$$$".format(RCV_ROLES))
     greater_dict = {key: RCV_ROLES[key+"_role"] for key in greater_weight}
+    mprint("weights {}\nroles {}\n".format({key: RCV_NEIGHBORS[key] for key in greater_weight}, greater_dict))
     max = 0
     print()
     for item in greater_dict.keys():

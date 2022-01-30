@@ -183,37 +183,7 @@ for i in role_threads_listener:
 
 
 
-'''
-Update messages can be:
-    * join(u, v) where u is the neighbor ID and v is the node they're joining
-    * head(v) where v is the neighbor and announces itself as clusterhead
-'''
 
-'''
-init phase
-'''
-def init():
-    while 0 in RCV_NEIGHBORS.values():
-        mprint("haven't received all weights ")
-        sleep(1)
-    if WEIGHT > RCV_NEIGHBORS[max(RCV_NEIGHBORS, key = RCV_NEIGHBORS.get)]:
-        CLUSTER = NODE_ID
-        CLUSTER_SET.append(NODE_ID)
-        mprint("&&&&&&&&&&&&&&&&&&\nI'm head\n&&&&&&&&&&&&&&&&&&\n")
-        node_role.value = NODE_ID
-        exit()
-        #broadcast CH
-    #else: wait for join
-
-init_thread = threading.Thread(target=init, args=[])
-init_thread.start()
-
-'''
-decides for ch
-
-a_subset = {key: value for key, value in a_dictionary.items() if value > 2}
-
-'''
 def decide():
     mprint("deciding for node's role")
     greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
@@ -235,6 +205,41 @@ def decide():
     role_tagged.objective.value = max #TODO have to delete it, I guess
 
 decision = threading.Thread(target = decide, args=[])
+
+'''
+Update messages can be:
+    * join(u, v) where u is the neighbor ID and v is the node they're joining
+    * head(v) where v is the neighbor and announces itself as clusterhead
+'''
+
+'''
+init phase
+'''
+def init():
+    while 0 in RCV_NEIGHBORS.values():
+        mprint("haven't received all weights ")
+        sleep(1)
+    if WEIGHT > RCV_NEIGHBORS[max(RCV_NEIGHBORS, key = RCV_NEIGHBORS.get)]:
+        CLUSTER = NODE_ID
+        CLUSTER_SET.append(NODE_ID)
+        mprint("&&&&&&&&&&&&&&&&&&\nI'm head\n&&&&&&&&&&&&&&&&&&\n")
+        node_role.value = NODE_ID
+        exit()
+        #broadcast CH
+    else:
+        decision.start()
+        exit()
+
+init_thread = threading.Thread(target=init, args=[])
+init_thread.start()
+
+'''
+decides for ch
+
+a_subset = {key: value for key, value in a_dictionary.items() if value > 2}
+
+'''
+
 
     
     

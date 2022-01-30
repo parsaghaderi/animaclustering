@@ -218,7 +218,7 @@ def decide():
     mprint("deciding for node's role")
     greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
     while False in {key: RCV_ROLES[key+"_role"] for key in greater}:
-        mprint("waiting for roles")
+        mprint("waiting for roles {}".format(RCV_ROLES))
         sleep(1)
 
     mprint("for nodes with greater weight, roles have been received")

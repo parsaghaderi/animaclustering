@@ -199,6 +199,7 @@ def decide():
         CLUSTER = NODE_ID
         node_role.value = NODE_ID
         role_tagged.objective.value = NODE_ID
+        mprint("I'm cluster head")
 
 decision = threading.Thread(target = decide, args=[])
 
@@ -295,6 +296,8 @@ def check_ch_join():
                     CLUSTER = NODE_ID
                     node_role = NODE_ID
                     role_tagged.objective.value = NODE_ID
+                    mprint("I'm cluster head")
+
         sleep(1)
 
 rcv_join = threading.Thread(target = check_ch_join, args=[])

@@ -185,16 +185,21 @@ def decide():
     mprint("weights {}\nroles {}\n".format({key: RCV_NEIGHBORS[key] for key in greater_weight}, greater_dict))
     max = 0
     print()
-    for item in greater_dict.keys():
-        if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:
-            max = item
-    mprint("@@@@@@@@@@@@@@\njoining {} with weight {}\n@@@@@@@@@@@@@@\n".format(max, RCV_NEIGHBORS[max]))
+    if max != 0:
+        for item in greater_dict.keys():
+            if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:
+                max = item
+    # mprint("@@@@@@@@@@@@@@\njoining {} with weight {}\n@@@@@@@@@@@@@@\n".format(max, RCV_NEIGHBORS[max]))
     
     if max != 0:
         CLUSTER = max
         node_role.value = max
         role_tagged.objective.value = max #TODO have to delete it, I guess
-
+    else:
+        CLUSTER = NODE_ID
+        node_role.value = NODE_ID
+        role_tagged.objective.value = NODE_ID
+        
 decision = threading.Thread(target = decide, args=[])
 
 '''

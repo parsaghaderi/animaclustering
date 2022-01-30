@@ -283,16 +283,33 @@ def rcvd_ch(nodes):
 
     #neighbors with greater weight check and see if have recevied messages from them or not
 
-def rcv_join(node):
-    if node == NODE_ID: #cluster head joined another cluster
-        CLUSTER_SET.append(node)
-        #TODO terminate
-    elif node == CLUSTER:
-        greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
-        if len(greater) != 0:
-           pass 
+def check_ch_join():
+    while True:
+        while CLUSTER == NODE_ID:
+            #wait
+            sleep(1)
+        else:
+            if RCV_ROLES[CLUSTER+"_role"] != CLUSTER:
+                greater_weight = [key for key,value in RCV_NEIGHBORS.items() if value > WEIGHT 
+                                                                            and key != CLUSTER]
+                greater_dict = {key: RCV_ROLES[key+"_role"] for key in greater_weight}
 
-    
+                max = 0
+                for item in greater_dict.keys():
+                    if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:
+                        max = item
+                if max != 0:
+                    CLUSTER = item
+                    node_role.value = max
+                    role_tagged.objective.value = max #TODO remove this I guess
+                else:
+                    CLUSTER = NODE_ID
+                    node_role = NODE_ID
+                    role_tagged.objective.value = NODE_ID
+        sleep(1)
+
+rcv_join = threading.Thread(target = check_ch_join, args=[])
+rcv_join.start()
 
 #TODO broadcast role as CH
 

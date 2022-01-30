@@ -266,8 +266,10 @@ def rcvd_ch(nodes):
 
 def check_ch_join():
     global CLUSTER
+    while CLUSTER == False:
+        sleep(0.5)
     while True:
-        while str(CLUSTER) == NODE_ID:
+        while CLUSTER == NODE_ID:
             #wait
             sleep(1)
         else:

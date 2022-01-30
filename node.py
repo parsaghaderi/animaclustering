@@ -1,4 +1,5 @@
 from time import sleep
+import webbrowser
 from cluster import *
 import random
 import threading
@@ -186,23 +187,30 @@ for i in role_threads_listener:
 
 def decide():
     mprint("deciding for node's role")
-    greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
-    while False in {key: RCV_ROLES[key+"_role"] for key in greater}:
-        mprint("waiting for roles {}".format(RCV_ROLES))
-        sleep(1)
+    greater_weight = [key for key,value in RCV_NEIGHBORS.items() if value > WEIGHT]
 
+    while False in {key:RCV_ROLES[key+"_role"] for key in greater_weight}:
+        mprint("waiting")
+        sleep(1)
+    # greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}
+    # while False in {key: RCV_ROLES[key+"_role"] for key in greater}:
+    #     mprint("waiting for roles {}".format(RCV_ROLES))
+    #     sleep(1)
+    
     mprint("for nodes with greater weight, roles have been received")
     mprint("$$$$$$$$$$$$$$$$\n{}\n$$$$$$$$$$$$$$$$".format(RCV_ROLES))
-    greater_dict = {key: RCV_ROLES[key+"_role"] for key in greater}
+    greater_dict = {key: RCV_ROLES[key+"_role"] for key in greater_weight}
     max = 0
     print()
     for item in greater_dict.keys():
         if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:
             max = item
-    mprint("@@@@@@@@@@@@@@\njoining {}\n@@@@@@@@@@@@@@\n".format(max))
-    CLUSTER = max
-    node_role.value = max
-    role_tagged.objective.value = max #TODO have to delete it, I guess
+    mprint("@@@@@@@@@@@@@@\njoining {} with weight {}\n@@@@@@@@@@@@@@\n".format(max, RCV_NEIGHBORS[max]))
+    
+    if max != 0:
+        CLUSTER = max
+        node_role.value = max
+        role_tagged.objective.value = max #TODO have to delete it, I guess
 
 decision = threading.Thread(target = decide, args=[])
 

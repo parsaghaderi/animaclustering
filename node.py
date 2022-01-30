@@ -265,6 +265,7 @@ def rcvd_ch(nodes):
     #neighbors with greater weight check and see if have recevied messages from them or not
 
 def check_ch_join():
+    global CLUSTER
     while True:
         while CLUSTER == NODE_ID:
             #wait

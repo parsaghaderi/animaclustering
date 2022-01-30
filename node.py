@@ -190,7 +190,7 @@ def decide():
     greater_weight = [key for key,value in RCV_NEIGHBORS.items() if value > WEIGHT]
     tmp  = {key:RCV_ROLES[key+"_role"] for key in greater_weight}
     mprint("!!!!!!!!!!!!!\n{}\n!!!!!!!!!!!!!!".format(tmp))
-    while False in {key:RCV_ROLES[key+"_role"] for key in greater_weight}:
+    while False in {key:RCV_ROLES[key+"_role"] for key in greater_weight}.values():
         mprint("waiting")
         sleep(1)
     # greater = {key for key, value in RCV_NEIGHBORS.items() if value > WEIGHT}

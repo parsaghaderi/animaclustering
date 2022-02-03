@@ -57,9 +57,7 @@ def readmap(path):
 # utility print function
 #########################
 def mprint(msg):
-    print("\n#######################")
-    print(msg)
-    print("#######################\n")
+    pass
 
 
 #########################

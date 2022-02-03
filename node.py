@@ -143,6 +143,8 @@ def role_listener(tagged, asa):
         if not err:
             mprint("neighbor {} role received".format(tagged.objective.name))
             RCV_ROLES[tagged.objective.name] = result.value
+            if result.value == NODE_ID:
+                CLUSTER_SET.append(tagged.objective.name) #joins to the cluster set
             mprint("&&&&&&&&&&&&&&&&&\nfrom {} role is {}\n&&&&&&&&&&&&&&&&&\n".format(tagged.objective.name, RCV_ROLES[tagged.objective.name]))
             mprint(RCV_ROLES)
             exit()
@@ -189,12 +191,13 @@ def decide():
     for item in greater_dict.keys():
         if RCV_ROLES[item+"_role"] == item and RCV_NEIGHBORS[item] > max:
             max = item
-    # mprint("@@@@@@@@@@@@@@\njoining {} with weight {}\n@@@@@@@@@@@@@@\n".format(max, RCV_NEIGHBORS[max]))
     
     if max != 0:
         CLUSTER = max
         node_role.value = max
         role_tagged.objective.value = max #TODO have to delete it, I guess
+        mprint("@@@@@@@@@@@@@@\njoining {} with weight {}\n@@@@@@@@@@@@@@\n".format(max, RCV_NEIGHBORS[max]))
+
     else:
         CLUSTER = NODE_ID
         node_role.value = NODE_ID
@@ -297,8 +300,8 @@ def check_ch_join():
                     node_role = NODE_ID
                     role_tagged.objective.value = NODE_ID
                     mprint("I'm cluster head")
-
         sleep(1)
+
 
 rcv_join = threading.Thread(target = check_ch_join, args=[])
 rcv_join.start()

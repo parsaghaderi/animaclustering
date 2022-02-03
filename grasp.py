@@ -2239,6 +2239,7 @@ def synchronize(asa_handle, obj, loc, timeout):
         if len(ll)==0:
             return errors.notFloodDisc, None
         else:
+            print("#####################\n{}\n#####################\n".format(ll))
             #choose the first locator discovered
             loc = ll[0]
 

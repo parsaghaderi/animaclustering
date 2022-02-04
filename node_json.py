@@ -44,7 +44,7 @@ def listener(tagged, asa):
                         None, 
                         5000)
         if not err:
-            value  = json.loads(result)
+            value  = json.loads(result.value)
             mprint(value)
 
         else:

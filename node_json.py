@@ -48,7 +48,7 @@ def listener(tagged, asa):
         else:
             mprint("can't get weight from {}".format(
                                     graspi.etext[err]))
-            sleep(5)
+        sleep(3)
 
 
 listeners = threading.Thread(target=listener, args=[tagged, cluster])

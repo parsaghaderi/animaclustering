@@ -51,3 +51,5 @@ def listener(tagged, asa):
             sleep(5)
 
 
+listeners = threading.Thread(target=listener, args=[tagged, cluster])
+listeners.start()

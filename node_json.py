@@ -44,12 +44,26 @@ def listener(tagged, asa):
                         None, 
                         5000)
         if not err:
-            pass
+            value  = json.loads(result)
+            mprint(value)
+
         else:
             mprint("can't get weight from {}".format(
                                     graspi.etext[err]))
         sleep(3)
 
+listener_threads = []
+neighbor_objective = []
+neighbors_tagged = []
+for item in NEIGHBORS:
+    tmp, err = OBJ_REG(item, None, False,True,10,cluster)
+    tmp_tagged = TAG_OBJ(tmp, cluster)
+    if not err:
+        neighbor_objective.append(tmp)
+        neighbors_tagged.append(tmp_tagged)
 
-listeners = threading.Thread(target=listener, args=[tagged, cluster])
-listeners.start()
+for item in neighbors_tagged:
+    listener_threads.append(threading.Thread(target=listener, args=[item, cluster]))
+
+for item in listener_threads:
+    item.start()

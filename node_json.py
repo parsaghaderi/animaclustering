@@ -1,4 +1,3 @@
-from ctypes.wintypes import tagRECT
 import json
 from cluster import *
 from grasp import tagged_objective

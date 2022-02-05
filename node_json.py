@@ -1,3 +1,4 @@
+from ctypes.wintypes import tagRECT
 import json
 from cluster import *
 from grasp import tagged_objective
@@ -18,6 +19,7 @@ def get_node_value(): #TODO change to get_node_weight
 WEIGHT = get_node_value()
 
 WEIGHTS_RCVD = False
+CH = False
 NEIGHBOR_INFO = {}
 node_json = {"node_id":NODE_ID,
              "weight": WEIGHT,
@@ -65,7 +67,7 @@ def listener(tagged, asa):
             try_fail-=1
         sleep(3)
     if try_fail == 0:
-        link_failure()
+        link_failure(tagged.objective.value["node_id"])
 
 listener_threads = []
 neighbor_objective = []
@@ -104,15 +106,12 @@ def send_ch(): #init pre
         node.value["cluster_set"].append(NODE_ID)
         tagged.objective.value["head"] = NODE_ID
         tagged.objective.value["cluster_set"].append(NODE_ID)
-    # else:
-    #     if CLUSTER == NODE_ID:
-    #         node.value["cluster_set"] = []
-    #     CLUSTER = max_id
-    #     node.value["head"] = max_id
     INIT = True
 
+init_procedure = threading.Thread(target=send_ch, args=[])
+init_procedure.start()
 
-def return_head():
+def return_heads():
     head = 0
     head_weight = 0
     for item in HEAVIER:
@@ -135,13 +134,17 @@ def receive_ch():
     # for item in HEAVIER:
     #     if NEIGHBOR_INFO[item]["weight"] > head_weight and NEIGHBOR_INFO[item]["head"] == item: #ch sets head to its own node_id
     #         head = item
-    head = return_head()
+    head = return_heads()
     if head != 0:
         CLUSTER = head
         node.value["head"] = head
         tagged.objective.value["head"] = head
         node.value["cluster_set"] = []
         tagged.objective.value["cluster_set"] = []
+    
+
+on_ch_receive = threading.Thread(target=receive_ch, args=[])
+on_ch_receive.start()
 
 
 def receive_join():
@@ -150,38 +153,42 @@ def receive_join():
     
     while True:
         if NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER:
-            head = return_head()
+            head = return_heads()
             CLUSTER = head
             node.value["head"] = head
             tagged.objective.value["head"] = head
         sleep(5)
 
-            
-def join_link(): #required ACP
+on_join_receive = threading.Thread(target=receive_join, args=[])
+on_join_receive.start()
+
+def join_link(): #TODO required ACP
     pass
 
 def link_failure(node_id):
     global CLUSTER
-    if CLUSTER == node_id:
-        NEIGHBORS.remove(node_id) #removed failed link date
-        NEIGHBOR_INFO.pop(node_id) #removed failed link data
-        if HEAVIER.__contains__(node_id):
-            HEAVIER.remove(node_id)
+    while True:
+        if CLUSTER == node_id:
+            NEIGHBORS.remove(node_id) #removed failed link date
+            NEIGHBOR_INFO.pop(node_id) #removed failed link data
+            if HEAVIER.__contains__(node_id):
+                HEAVIER.remove(node_id)
 
-        #look for a new head
-        head = return_head()
-        if head != 0:
-            CLUSTER = head
-            node.value["head"] = head
-            tagged.objective.value["head"] = head
-            node.value["cluster_set"] = []
-            tagged.objective.value["cluster_set"] = [] 
-        else:
-            CLUSTER = NODE_ID
-            node.value["head"] = NODE_ID
-            tagged.objective.value["head"] = NODE_ID
-            node.value["cluster_set"].append(NODE_ID)
-            tagged.objective.value["cluster_set"].append(NODE_ID)
+            #look for a new head
+            head = return_heads()
+            if head != 0:
+                CLUSTER = head
+                node.value["head"] = head
+                tagged.objective.value["head"] = head
+                node.value["cluster_set"] = []
+                tagged.objective.value["cluster_set"] = [] 
+            else:
+                CLUSTER = NODE_ID
+                node.value["head"] = NODE_ID
+                tagged.objective.value["head"] = NODE_ID
+                node.value["cluster_set"].append(NODE_ID)
+                tagged.objective.value["cluster_set"].append(NODE_ID)
+        sleep(5)    
 
 
     

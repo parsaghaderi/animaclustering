@@ -103,8 +103,8 @@ def send_ch(): #init pre
     global CLUSTER
     global INIT
     global HEAVIER
-
-    while not WEIGHTS_RCVD:
+    check = True
+    while not len(NEIGHBOR_INFO) == len(NEIGHBORS):
         sleep(2) #wait until receive all weights
     mprint("in sending ch")
     max_id = 0

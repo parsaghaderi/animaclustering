@@ -4,7 +4,7 @@ from grasp import tagged_objective
 
 NODE_ID, NEIGHBORS = readmap(MAP_PATH)
 CLUSTER = False
-CLUSTER_SET = []
+CLUSTER_SET = {}
 HEAVIER = [] #nodes with heavier weights
 
 INIT = True
@@ -62,9 +62,9 @@ def listener(tagged, asa):
             NEIGHBOR_INFO[value["node_id"]] = value
             mprint(NEIGHBOR_INFO)
             if value["head"] == NODE_ID and CLUSTER == NODE_ID:
-                CLUSTER_SET.append(value["node_id"])
-                node.value["cluster_set"].append(value["node_id"])
-                tagged.objective.value["cluster_set"].append(value["node_id"])
+                CLUSTER_SET.add(value["node_id"])
+                node.value["cluster_set"].add(value["node_id"])
+                tagged.objective.value["cluster_set"].add(value["node_id"])
             try_fail = 20
         else:
             mprint("can't get weight from {}".format(
@@ -214,8 +214,8 @@ def link_failure(node_id):
                 CLUSTER = NODE_ID
                 node.value["head"] = NODE_ID
                 tagged.objective.value["head"] = NODE_ID
-                node.value["cluster_set"].append(NODE_ID)
-                tagged.objective.value["cluster_set"].append(NODE_ID)
+                node.value["cluster_set"].add(NODE_ID)
+                tagged.objective.value["cluster_set"].add(NODE_ID)
         sleep(5)    
 
 

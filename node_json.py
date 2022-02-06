@@ -179,7 +179,7 @@ def receive_join():
         sleep(2) #wait until init procedure is done
     mprint("in receiving join")
     while True:
-        if CLUSTER != False:
+        if CLUSTER != False and CLUSTER != NODE_ID:
             if NEIGHBOR_INFO[CLUSTER]["head"] != NODE_ID:
                 head = return_heads()
                 CLUSTER = head

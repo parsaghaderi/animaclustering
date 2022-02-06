@@ -43,6 +43,7 @@ flooding_thread = threading.Thread(target=flooder, args=[tagged, cluster])
 flooding_thread.start()
 
 def listener(tagged, asa):
+    global NEIGHBOR_INFO
     try_fail = 20
     while try_fail > 0:
         mprint("listening for objective {}".format(tagged.objective.name))

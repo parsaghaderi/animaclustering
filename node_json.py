@@ -182,10 +182,23 @@ def receive_join():
     while True:
         if CLUSTER != False and CLUSTER != NODE_ID:
             if NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER: #TODO check
+                try:
+                    HEAVIER.pop(CLUSTER)
+                except:
+                    pass
+
                 head = return_heads()
-                CLUSTER = head
-                node.value["head"] = head
-                tagged.objective.value["head"] = head
+                if head != 0:
+                    CLUSTER = head
+                    node.value["head"] = head
+                    tagged.objective.value["head"] = head
+                else:
+                    CLUSTER = NODE_ID
+                    node.value["head"] = NODE_ID
+                    node.value["cluster_set"].add(NODE_ID)
+                    tagged.objective.value["head"] = NODE_ID
+                    tagged.objective.value["cluster_set"].add(NODE_ID)
+                    mprint("I'm head")
         sleep(5)
 
 on_join_receive = threading.Thread(target=receive_join, args=[])

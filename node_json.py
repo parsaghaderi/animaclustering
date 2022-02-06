@@ -55,7 +55,7 @@ def listener(tagged, asa):
             value  = json.loads(result.value)
             #mprint(value)
             NEIGHBOR_INFO[value["node_id"]] = value
-            mprint(NEIGHBOR_INFO[value["node_id"]])
+            mprint(NEIGHBOR_INFO)
             if value["head"] == NODE_ID and CLUSTER == NODE_ID:
                 CLUSTER_SET.append(value["node_id"])
                 node.value["cluster_set"].append(value["node_id"])

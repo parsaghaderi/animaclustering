@@ -95,7 +95,8 @@ def check_weights():
             except:
                 check = True
     WEIGHTS_RCVD = True
-    
+check_weights()
+
 def send_ch(): #init pre
     global CLUSTER
     global INIT

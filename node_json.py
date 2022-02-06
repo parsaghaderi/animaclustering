@@ -115,10 +115,10 @@ def send_ch(): #init procedure
     max_id = 0
     max_weight = 0
     for item in NEIGHBORS:
-        if NEIGHBOR_INFO[item]["weight"] > WEIGHT and NEIGHBOR_INFO[item]["weight"] > max_weight:
-            max_id = item
         if NEIGHBOR_INFO[item]["weight"] > WEIGHT:
             HEAVIER.append(item)
+        if NEIGHBOR_INFO[item]["weight"] > WEIGHT and NEIGHBOR_INFO[item]["weight"] > max_weight:
+            max_id = item
 
     if max_id == 0:
         CLUSTER = NODE_ID
@@ -161,6 +161,7 @@ def receive_ch():
     #     if NEIGHBOR_INFO[item]["weight"] > head_weight and NEIGHBOR_INFO[item]["head"] == item: #ch sets head to its own node_id
     #         head = item
     head = return_heads()
+    mprint("heads are {}".format(head))
     if head != 0:
         CLUSTER = head
         node.value["head"] = head
@@ -180,7 +181,7 @@ def receive_join():
     mprint("in receiving join")
     while True:
         if CLUSTER != False and CLUSTER != NODE_ID:
-            if NEIGHBOR_INFO[CLUSTER]["head"] != NODE_ID:
+            if NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER: #TODO check
                 head = return_heads()
                 CLUSTER = head
                 node.value["head"] = head

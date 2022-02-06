@@ -7,7 +7,7 @@ CLUSTER = False
 CLUSTER_SET = []
 HEAVIER = [] #nodes with heavier weights
 
-INIT = False
+INIT = True
 err, cluster = ASA_REG("cluster")
 
 def get_node_value(): #TODO change to get_node_weight
@@ -84,22 +84,22 @@ for item in neighbors_tagged:
 
 for item in listener_threads:
     item.start()
-def check_weights():
-    check = True
-    while check:
-        for item in NEIGHBORS:
+# def check_weights():
+#     check = True
+#     while check:
+#         for item in NEIGHBORS:
             
-            try:
-                mprint("weight of item {} is {}".format(item, NEIGHBOR_INFO[item]["weight"]))
-                if NEIGHBOR_INFO[item]["weight"]:
-                    check = False
-            except:
-                check = True
-    WEIGHTS_RCVD = True
-receiving_all_weight = threading.Thread(target=check_weights, args=[])
-receiving_all_weight.start()
+#             try:
+#                 mprint("weight of item {} is {}".format(item, NEIGHBOR_INFO[item]["weight"]))
+#                 if NEIGHBOR_INFO[item]["weight"]:
+#                     check = False
+#             except:
+#                 check = True
+#     WEIGHTS_RCVD = True
+# receiving_all_weight = threading.Thread(target=check_weights, args=[])
+# receiving_all_weight.start()
 
-def send_ch(): #init pre
+def send_ch(): #init procedure
     global CLUSTER
     global INIT
     global HEAVIER
@@ -163,6 +163,7 @@ on_ch_receive.start()
 
 
 def receive_join():
+    global CLUSTER
     while not INIT:
         sleep(2) #wait until init procedure is done
     mprint("in receiving join")

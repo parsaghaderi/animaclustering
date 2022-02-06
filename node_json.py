@@ -195,7 +195,7 @@ def receive_join():
                     tagged.objective.value["head"] = NODE_ID
                     tagged.objective.value["cluster_set"].add(NODE_ID)
                     mprint("I'm head")
-        # elif CLUSTER == False:
+        # elif CLUSTER == False: #TODO check later
         #     head = return_heads()
         #     if head == 0:
         #         CLUSTER = NODE_ID

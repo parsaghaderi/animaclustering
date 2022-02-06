@@ -136,13 +136,17 @@ def return_heads():
 
 def receive_ch():
     global CLUSTER
+    global NEIGHBOR_INFO
     while not INIT:
         sleep(2) #wait until init procedure is done
     check = True
     while check:
-        for item in NEIGHBORS:
-            if NEIGHBOR_INFO[item]["head"] != False:
-                check = False
+        try:
+            for item in NEIGHBORS:
+                if NEIGHBOR_INFO[item]["head"] != False:
+                    check = False
+        except:
+            pass
         sleep(2) #wait until the roles of heavier nodes are decided
     # head = 0
     # head_weight = 0
@@ -168,7 +172,7 @@ def receive_join():
         sleep(2) #wait until init procedure is done
     mprint("in receiving join")
     while True:
-        if NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER:
+        if NEIGHBOR_INFO[CLUSTER]["head"] != NODE_ID:
             head = return_heads()
             CLUSTER = head
             node.value["head"] = head

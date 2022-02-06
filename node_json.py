@@ -125,7 +125,7 @@ def send_ch(): #init procedure
         node.value["head"] = NODE_ID
         node.value["cluster_set"].add(NODE_ID)
         tagged.objective.value["head"] = NODE_ID
-        tagged.objective.value["cluster_set"].append(NODE_ID)
+        tagged.objective.value["cluster_set"].add(NODE_ID)
         mprint("I'm head")
     INIT = True
 

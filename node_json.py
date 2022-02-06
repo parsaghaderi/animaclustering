@@ -181,7 +181,8 @@ def receive_join():
     mprint("in receiving join")
     while True:
         if CLUSTER != NODE_ID:
-            if NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER: #TODO check
+            
+            if CLUSTER!= False and  NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER: #TODO check
                 head = return_heads()
                 if head != 0:
                     CLUSTER = head

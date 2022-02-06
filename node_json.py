@@ -27,7 +27,7 @@ node_json = {"node_id":NODE_ID,
 def json_generator():
     return json.dumps(node_json)
 
-node, err = OBJ_REG(NODE_ID, json_generator(), False,True,10,cluster)
+node, err = OBJ_REG(NODE_ID, node_json, False,True,10,cluster)
 tagged = TAG_OBJ(node,cluster)
 
 def flooder(tagged, asa):

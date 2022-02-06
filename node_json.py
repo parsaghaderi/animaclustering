@@ -4,7 +4,7 @@ from grasp import tagged_objective
 
 NODE_ID, NEIGHBORS = readmap(MAP_PATH)
 CLUSTER = False
-CLUSTER_SET = {}
+CLUSTER_SET = set()
 HEAVIER = [] #nodes with heavier weights
 
 INIT = True
@@ -165,8 +165,8 @@ def receive_ch():
         CLUSTER = head
         node.value["head"] = head
         tagged.objective.value["head"] = head
-        node.value["cluster_set"] = []
-        tagged.objective.value["cluster_set"] = []
+        node.value["cluster_set"] = set()
+        tagged.objective.value["cluster_set"] = set()
     
 
 on_ch_receive = threading.Thread(target=receive_ch, args=[])

@@ -32,6 +32,9 @@ tagged = TAG_OBJ(node,cluster)
 
 def flooder(tagged, asa):
     while True:
+        '''tmp'''
+        
+        '''tmp'''
         err = graspi.flood(asa, 59000, [graspi.tagged_objective(tagged.objective, None)])
         if not err:
             mprint("flooding objective {}".format(tagged.objective.name))
@@ -53,7 +56,8 @@ def listener(tagged, asa):
                         None, 
                         5000)
         if not err:
-            value  = json.loads(result.value)
+            # value  = json.loads(result.value)
+            value = result.value
             #mprint(value)
             NEIGHBOR_INFO[value["node_id"]] = value
             mprint(NEIGHBOR_INFO)

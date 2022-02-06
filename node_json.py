@@ -172,11 +172,12 @@ def receive_join():
         sleep(2) #wait until init procedure is done
     mprint("in receiving join")
     while True:
-        if NEIGHBOR_INFO[CLUSTER]["head"] != NODE_ID:
-            head = return_heads()
-            CLUSTER = head
-            node.value["head"] = head
-            tagged.objective.value["head"] = head
+        if CLUSTER != False:
+            if NEIGHBOR_INFO[CLUSTER]["head"] != NODE_ID:
+                head = return_heads()
+                CLUSTER = head
+                node.value["head"] = head
+                tagged.objective.value["head"] = head
         sleep(5)
 
 on_join_receive = threading.Thread(target=receive_join, args=[])

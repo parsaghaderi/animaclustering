@@ -195,15 +195,15 @@ def receive_join():
                     tagged.objective.value["head"] = NODE_ID
                     tagged.objective.value["cluster_set"].add(NODE_ID)
                     mprint("I'm head")
-        elif CLUSTER == False:
-            head = return_heads()
-            if head == 0:
-                CLUSTER = NODE_ID
-                node.value["head"] = NODE_ID
-                node.value["cluster_set"].add(NODE_ID)
-                tagged.objective.value["head"] = NODE_ID
-                tagged.objective.value["cluster_set"].add(NODE_ID)
-                mprint("I'm head")
+        # elif CLUSTER == False:
+        #     head = return_heads()
+        #     if head == 0:
+        #         CLUSTER = NODE_ID
+        #         node.value["head"] = NODE_ID
+        #         node.value["cluster_set"].add(NODE_ID)
+        #         tagged.objective.value["head"] = NODE_ID
+        #         tagged.objective.value["cluster_set"].add(NODE_ID)
+        #         mprint("I'm head")
         sleep(5)
 
 on_join_receive = threading.Thread(target=receive_join, args=[])

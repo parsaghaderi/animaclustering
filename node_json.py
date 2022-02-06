@@ -64,7 +64,7 @@ def listener(tagged, asa):
             if value["head"] == NODE_ID and CLUSTER == NODE_ID:
                 CLUSTER_SET.add(value["node_id"])
                 node.value["cluster_set"].add(value["node_id"])
-                tagged.objective.value["cluster_set"].add(value["node_id"])
+                # tagged.objective.value["cluster_set"].add(value["node_id"])
             try_fail = 20
         else:
             mprint("can't get weight from {}".format(

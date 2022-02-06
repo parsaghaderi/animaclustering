@@ -122,6 +122,7 @@ def send_ch(): #init procedure
         node.value["cluster_set"].append(NODE_ID)
         tagged.objective.value["head"] = NODE_ID
         tagged.objective.value["cluster_set"].append(NODE_ID)
+        mprint("I'm head")
     INIT = True
 
 init_procedure = threading.Thread(target=send_ch, args=[])
@@ -140,6 +141,7 @@ def receive_ch():
     global NEIGHBOR_INFO
     while not INIT:
         sleep(2) #wait until init procedure is done
+    
     check = True
     while check:
         try:

@@ -88,11 +88,10 @@ def check_weights():
     check = True
     while check:
         for item in NEIGHBORS:
+            mprint("weight of item {} is {}".format(item, NEIGHBOR_INFO[item]["weight"]))
             try:
                 if NEIGHBOR_INFO[item]["weight"]:
                     check = False
-                else:
-                    check = True
             except:
                 check = True
     WEIGHTS_RCVD = True

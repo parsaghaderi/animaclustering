@@ -83,7 +83,19 @@ for item in neighbors_tagged:
 
 for item in listener_threads:
     item.start()
-
+def check_weights():
+    check = True
+    while check:
+        for item in NEIGHBORS:
+            try:
+                if NEIGHBOR_INFO[item]["weight"]:
+                    check = False
+                else:
+                    check = True
+            except:
+                check = True
+    WEIGHTS_RCVD = True
+    
 def send_ch(): #init pre
     global CLUSTER
     global INIT

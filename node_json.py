@@ -95,7 +95,8 @@ def check_weights():
             except:
                 check = True
     WEIGHTS_RCVD = True
-check_weights()
+receiving_all_weight = threading.Thread(target=check_weights, args=[])
+receiving_all_weight.start()
 
 def send_ch(): #init pre
     global CLUSTER
@@ -104,6 +105,7 @@ def send_ch(): #init pre
 
     while not WEIGHTS_RCVD:
         sleep(2) #wait until receive all weights
+    mprint("in sending ch")
     max_id = 0
     max_weight = 0
     for item in NEIGHBORS:
@@ -162,7 +164,7 @@ on_ch_receive.start()
 def receive_join():
     while not INIT:
         sleep(2) #wait until init procedure is done
-    
+    mprint("in receiving join")
     while True:
         if NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER:
             head = return_heads()

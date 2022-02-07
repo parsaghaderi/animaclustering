@@ -140,6 +140,7 @@ def return_heads():
     for item in HEAVIER:
         if NEIGHBOR_INFO[item]["weight"] > head_weight and NEIGHBOR_INFO[item]["head"] == item: #ch sets head to its own node_id
             head = item
+            head_weight = NEIGHBOR_INFO[item]["weight"] 
     return head
 
 def receive_ch():

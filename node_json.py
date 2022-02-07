@@ -117,6 +117,8 @@ def send_ch(): #init procedure
     for item in NEIGHBORS:
         if NEIGHBOR_INFO[item]["weight"] > WEIGHT:
             HEAVIER.append(item)
+        if NEIGHBOR_INFO[item]["weight"] > max_weight:
+            max_weight = NEIGHBOR_INFO[item]["weight"]
         if NEIGHBOR_INFO[item]["weight"] > WEIGHT and NEIGHBOR_INFO[item]["weight"] > max_weight:
             max_id = item
 
@@ -181,7 +183,6 @@ def receive_join():
     mprint("in receiving join")
     while True:
         if CLUSTER != NODE_ID and CLUSTER!= False:
-            
             if  NEIGHBOR_INFO[CLUSTER]["head"] != CLUSTER: #TODO check
                 head = return_heads()
                 if head != 0:
@@ -195,15 +196,22 @@ def receive_join():
                     tagged.objective.value["head"] = NODE_ID
                     tagged.objective.value["cluster_set"].add(NODE_ID)
                     mprint("I'm head")
+        if return_heads() == 0:
+            CLUSTER = NODE_ID
+            node.value["head"] = NODE_ID
+            node.value["cluster_set"].add(NODE_ID)
+            tagged.objective.value["head"] = NODE_ID
+            tagged.objective.value["cluster_set"].add(NODE_ID)
+            mprint("I'm head")
         # elif CLUSTER == False: #TODO check later
         #     head = return_heads()
         #     if head == 0:
-        #         CLUSTER = NODE_ID
-        #         node.value["head"] = NODE_ID
-        #         node.value["cluster_set"].add(NODE_ID)
-        #         tagged.objective.value["head"] = NODE_ID
-        #         tagged.objective.value["cluster_set"].add(NODE_ID)
-        #         mprint("I'm head")
+                # CLUSTER = NODE_ID
+                # node.value["head"] = NODE_ID
+                # node.value["cluster_set"].add(NODE_ID)
+                # tagged.objective.value["head"] = NODE_ID
+                # tagged.objective.value["cluster_set"].add(NODE_ID)
+                # mprint("I'm head")
         sleep(5)
 
 on_join_receive = threading.Thread(target=receive_join, args=[])

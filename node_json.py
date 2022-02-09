@@ -1,7 +1,9 @@
 import json
 from cluster import *
 from grasp import tagged_objective
+import acp
 
+mprint("$$$$$$$$$$$$$$$$$$$\n{}\n$$$$$$$$$$$$$$$$$$$\n".format(acp._get_my_address()))
 NODE_ID, NEIGHBORS = readmap(MAP_PATH)
 CLUSTER = False
 CLUSTER_SET = set()

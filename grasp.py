@@ -2236,12 +2236,13 @@ def synchronize(asa_handle, obj, loc, timeout):
     if loc == None:
         #Caller did not supply locator, we can try discovery
         _, ll = discover(asa_handle, obj, timeout)
+        print("#############\n!!!!!!!!!!!!!!!\n{}\n!!!!!!!!!!!!!!\n#############\n".format(ll))
         if len(ll)==0:
             return errors.notFloodDisc, None
         else:
             #choose the first locator discovered
             loc = ll[0]
-    print("#############\n!!!!!!!!!!!!!!!\n{}\n!!!!!!!!!!!!!!\n#############\n".format(loc))
+  
 
     #Did a value arrive with the discovery response (i.e. rapid mode synch)?
     _disc_lock.acquire()

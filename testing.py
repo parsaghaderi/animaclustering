@@ -66,4 +66,4 @@ ll = get_ll_address()
 listening = threading.Thread(target=listener, args=[tagged, test_ASA, ll[0][1]])
 if sys.argv[1] != 'mc':
     # listening.start()
-    print(graspi.discover(test_ASA, 59000))
+    print(graspi.discover(test_ASA, obj, 59000))

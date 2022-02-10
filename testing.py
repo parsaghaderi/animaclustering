@@ -63,6 +63,6 @@ def listener(tagged, asa, ll):
             mprint("didn't work | {}".format(graspi.etext[err]))
         sleep(3)
 ll = get_ll_address()
-listening = threading.Thread(target=listener, args=[tagged, test_ASA, ll[1]])
+listening = threading.Thread(target=listener, args=[tagged, test_ASA, ll[0]])
 if sys.argv[1] != 'mc':
     listening.start()

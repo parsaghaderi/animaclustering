@@ -11,7 +11,7 @@ def get_ll_address():
     if f == None:
         mprint("interfaces doesn't exist")
         return 0
-    interfaces = file.readlines()
+    interfaces = f.readlines()
     interfaces = [item for item in interfaces]
 
     out_lines = sp.getoutput('ip -6 neigh').splitlines()

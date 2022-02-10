@@ -1,8 +1,7 @@
 import json
 from cluster import *
-from grasp import tagged_objective
 import acp
-
+import subprocess as sp
 mprint("$$$$$$$$$$$$$$$$$$$\n{}\n$$$$$$$$$$$$$$$$$$$\n".format(acp._get_my_address())) 
 NODE_ID, NEIGHBORS = readmap(MAP_PATH)
 CLUSTER = False
@@ -12,12 +11,32 @@ HEAVIER = [] #nodes with heavier weights
 INIT = True
 err, cluster = ASA_REG("cluster")
 
+
 def get_node_value(): #TODO change to get_node_weight
     rand = random.random()
     num_neighbors = len(NEIGHBORS)
     return num_neighbors*rand
-
 WEIGHT = get_node_value()
+
+def get_ll_address():
+    try:
+        f = open('/etc/TD_map/interfaces.txt')
+    except:
+        f = None
+    if f == None:
+        mprint("interfaces doesn't exist")
+        return 0
+    interfaces = file.readlines()
+    interfaces = [item for item in interfaces]
+
+    out_lines = sp.getoutput('ip -6 neigh').splitlines()
+    neighbors = []
+    for line in out_lines:
+        tmp = line.split()
+        if interfaces.__contains__(tmp[2]):
+            neighbors.append([tmp[2], tmp[0]])
+    
+    return neighbors
 
 WEIGHTS_RCVD = False
 CH = False

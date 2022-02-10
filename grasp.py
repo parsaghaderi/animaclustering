@@ -1405,7 +1405,7 @@ def discover(asa_handle, obj, timeout, flush=False, minimum_TTL=-1,
     _disc_lock.acquire()
     for x in _discovery_cache:
         if x.objective.name == obj.name:
-            answer = x.
+            answer = x.asa_locators
             _disc_lock.release()
             _disactivate_session(shandle)
             del _drq #garbage collect
@@ -2257,7 +2257,7 @@ def synchronize(asa_handle, obj, loc, timeout):
     #request synch from the given locator
     #create TCP socket, assemble message and send it
     #(lazy code, not checking that TCP is the right one to use)
-    print("#############\n!!!!!!!!!!!!!!!\n{}\n!!!!!!!!!!!!!!\n#############\n".format(loc.ifi))
+    print("#############\n!!!!!!!!!!!!!!!\n{}\n!!!!!!!!!!!!!!\n#############\n".format( loc.ifi))
    
     sync_sess = _new_session(None)
     shandle = _session_handle(sync_sess, None)

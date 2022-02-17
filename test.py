@@ -40,7 +40,7 @@ def synch(tagged):
         mprint("synch successful with value {}".format(result.value))
 
 if get_name() == 'Ritchie':
-    threading.Thread(target=synch, args=[obj_synch]).start()
+    threading.Thread(target=synch, args=[tagged_synch]).start()
 
 
 

@@ -30,14 +30,16 @@ if get_name() == 'Dijkstra':
     threading.Thread(target=flooder, args=[tagged_synch]).start()
 
 def synch(tagged):
-    err, result = graspi.synchronize(
-                tagged.source,
-                tagged.objective,
-                None, 
-                59000
-                )      
-    if not err:
-        mprint("synch successful with value {}".format(result.value))
+    while True:
+        err, result = graspi.synchronize(
+                    tagged.source,
+                    tagged.objective,
+                    None, 
+                    59000
+                    )      
+        if not err:
+            mprint("synch successful with value {}".format(result.value))
+        sleep(3)
 
 if get_name() == 'Ritchie':
     threading.Thread(target=synch, args=[tagged_synch]).start()

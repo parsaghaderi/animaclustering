@@ -43,5 +43,7 @@ if get_name() == 'Ritchie':
     threading.Thread(target=synch, args=[tagged_synch]).start()
 
 
-
+if get_name() == 'Gingko':
+    while True:
+        sleep(3)
 

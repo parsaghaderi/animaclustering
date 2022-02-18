@@ -211,7 +211,7 @@ def negotiate_request_side(tagged, old):
             #     pass
             mprint("peer offered {}".format(answer.value))
             step = 1
-            if answer.value < 1000:
+            if answer.value < 100:
                 answer.value += 1
                 neg_loop = True
                 while neg_loop:
@@ -234,7 +234,7 @@ def negotiate_request_side(tagged, old):
                                 neg_loop = False
                             break
                             
-                        elif answer.value < 1000:
+                        elif answer.value < 100:
                             answer.value += 1
         else:
             neg_loop = False

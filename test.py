@@ -150,7 +150,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
             else:
                 err, temp, answer, reason = neg_step_output
             answer.value = cbor.loads(answer.value)
-            mprint("peer offered {} {} {} {}".format(err, temp, answer, reason))
+            mprint("peer offered {} {} {} {}".format(err, temp, answer.value, reason))
             step += 1
             if not err:
                 if answer.value < 88:

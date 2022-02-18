@@ -1,4 +1,101 @@
-from cluster import *
+import time
+import os
+import threading
+import cbor
+_old_API = False
+
+try:
+    import graspi
+except:
+    print("Cannot find the RFC API module graspi.py.")
+    print("Will run with only the basic grasp.py module.")
+    try:
+        _old_API = True
+        import grasp as graspi
+    except:
+        print("Cannot import grasp.py")
+        time.sleep(10)
+        exit()
+
+try: 
+    import networkx as nx
+except:
+    print("can't import networkx; installing networkx")
+    import os
+    os.system('python3 -m pip install networkx')
+
+MAP_PATH = '/etc/TD_map/neighbors.map'
+
+def return_old_API():
+    return _old_API
+#########################
+#check grasp
+#########################
+try:
+    graspi.checkrun
+except:
+    #not running under ASA loader
+    graspi.tprint("========================")
+    graspi.tprint("ASA server is starting up.")
+    graspi.tprint("========================")
+
+
+#########################
+# utility function for reading info from map; 
+# later this info will be received from ACP
+#########################
+def readmap(path):
+    file = open(path)
+    l = file.readlines()
+    l = [str(int(item)) for item in l]
+    return l[0], l[1:]
+
+
+#########################
+# utility print function
+#########################
+def mprint(msg):
+    print("\n#######################")
+    print(msg)
+    print("#######################\n")
+
+
+#########################
+#Registering ASA 
+#########################
+def ASA_REG(name):
+    mprint("registering asa and objective")
+    err, asa_handle = graspi.register_asa(name)
+    if not err:
+        mprint("ASA registered successfully")
+        return err, asa_handle
+    else:
+        mprint("Cannot register ASA:\n\t" + graspi.etext[err])
+        mprint("exiting now.")
+
+
+#########################
+#Registering objectives
+#########################
+def OBJ_REG(name, value, neg, synch, loop_count, ASA):
+    obj = graspi.objective(name)
+    obj.value = value
+    obj.neg = neg
+    obj.synch = synch
+    obj.loop_count = loop_count
+    err = graspi.register_obj(ASA, obj)
+    if not err:
+        mprint("Objective registered successfully")
+    else:
+        mprint("Cannot register Objective:\n\t"+ graspi.etext[err])
+        mprint("exiting now.")
+    return obj, err
+        
+def TAG_OBJ(obj, ASA):
+    return graspi.tagged_objective(obj, ASA)
+
+
+
 import subprocess as sp
 from time import sleep
 

@@ -26,6 +26,7 @@ def flooder(tagged):
 
 
 def negotiate_listener_side(tagged, handle, answer):
+    global _old_API
     answer.value=cbor.loads(answer.value)
     if answer.dry:
         mprint("Dry run")
@@ -67,6 +68,7 @@ def negotiate_listener_side(tagged, handle, answer):
                 
             
 def negotiate_request_side(tagged):
+    global _old_API
     while True:
         _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
 

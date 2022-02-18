@@ -1,25 +1,30 @@
+
 import time
 import os
 import threading
 import cbor
-try: 
-    import networkx as nx
-except:
-    print("can't import networkx; installing networkx")
-    import os
-    os.system('python3 -m pip install networkx')
 _old_API = False
+
 try:
     import graspi
 except:
     print("Cannot find the RFC API module graspi.py.")
     print("Will run with only the basic grasp.py module.")
     try:
+        _old_API = True
         import grasp as graspi
     except:
         print("Cannot import grasp.py")
         time.sleep(10)
         exit()
+
+try: 
+    import networkx as nx
+except:
+    print("can't import networkx; installing networkx")
+    import os
+    os.system('python3 -m pip install networkx')
+
 MAP_PATH = '/etc/TD_map/neighbors.map'
 
 def return_old_API():

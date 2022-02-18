@@ -193,7 +193,7 @@ def negotiate_request_side(tagged, old):
                 answer.value = cbor.loads(answer.value)
             except:
                 pass
-            mprint("peer offered {}".format(answer.value))
+            mprint("peer offered {}".format(type(answer.value)))
             step = 1
             if answer.value < 1000:
                 answer.value += 1

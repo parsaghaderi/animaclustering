@@ -3,20 +3,8 @@ import subprocess as sp
 from time import sleep
 
 from grasp import objective
-_old_API = False
-try:
-    import graspi
-except:
-    print("Cannot find the RFC API module graspi.py.")
-    print("Will run with only the basic grasp.py module.")
-    _old_API = True
-    try:
-        import grasp as graspi
-    except:
-        print("Cannot import grasp.py")
-        time.sleep(10)
-        exit()
-        
+old_API = _old_API
+
 err, asa = ASA_REG('testing')
 
 obj_synch, err = OBJ_REG('test_synch', None, False, True ,50, asa)
@@ -39,7 +27,7 @@ def flooder(tagged):
 
 
 def negotiate_listener_side(tagged, handle, answer, old):
-    _old_API = old
+    old_API = old
     answer.value=cbor.loads(answer.value)
     if answer.dry:
         mprint("Dry run")
@@ -54,7 +42,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
             answer.value += 1 #based on grasp doc page 12 comment section paragraph 5 line 2
             answer.value=cbor.dumps(answer.value)
             neg_step_output = graspi.negotiate_step(tagged.source, handle, answer, 1000)
-            if _old_API:
+            if old_API:
                 err, temp, answer = neg_step_output #TODO figure out whats each of them 
                 reason = answer
             else:
@@ -81,7 +69,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
                 
             
 def negotiate_request_side(tagged, old):
-    _old_API = old
+    old_API = old
     while True:
         _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
 
@@ -90,7 +78,7 @@ def negotiate_request_side(tagged, old):
             continue
         mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
         tagged.objective.value = cbor.dumps(tagged.objective.value)
-        if _old_API:
+        if old_API:
             err, handle, answer = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
             reason = answer
         else:
@@ -113,7 +101,7 @@ def negotiate_request_side(tagged, old):
                 while neg_loop:
                     answer.value = cbor.dumps(answer.value)
                     _r = graspi.negotiate_step(tagged.source, handle, answer, 1000)
-                    if _old_API:
+                    if old_API:
                         err, temp, answer = _r
                         reason = answer
                     else:
@@ -140,7 +128,7 @@ def listen_neg(tagged):
         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
         if not err:
             if answer.value != tagged.objective.value:
-                threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer, _old_API]).start()
+                threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer, old_API]).start()
             else: #answer == obj.value no need for negotiation
                 pass #end negotiation
         if err:
@@ -174,5 +162,5 @@ if get_name() == 'Ritchie':
 
 if get_name() == 'Gingko':
     tagged_neg.objective.value = 50
-    threading.Thread(target=negotiate_request_side, args=[tagged_neg, _old_API]).start()
+    threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API]).start()
 

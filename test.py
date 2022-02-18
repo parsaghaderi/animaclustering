@@ -3,19 +3,19 @@ import os
 import threading
 import cbor
 _old_API = False
-
-try:
-    import graspi
-except:
-    print("Cannot find the RFC API module graspi.py.")
-    print("Will run with only the basic grasp.py module.")
-    try:
-        _old_API = True
-        import grasp as graspi
-    except:
-        print("Cannot import grasp.py")
-        time.sleep(10)
-        exit()
+import graspi
+# try:
+#     import graspi
+# except:
+#     print("Cannot find the RFC API module graspi.py.")
+#     print("Will run with only the basic grasp.py module.")
+#     try:
+#         _old_API = True
+#         import grasp as graspi
+#     except:
+#         print("Cannot import grasp.py")
+#         time.sleep(10)
+#         exit()
 
 try: 
     import networkx as nx
@@ -163,7 +163,6 @@ def negotiate_listener_side(tagged, handle, answer, old):
                 
             
 def negotiate_request_side(tagged, old):
-    old_API = old
     while True:
         _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
 

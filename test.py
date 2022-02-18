@@ -3,7 +3,20 @@ import subprocess as sp
 from time import sleep
 
 from grasp import objective
-
+_old_API = False
+try:
+    import graspi
+except:
+    print("Cannot find the RFC API module graspi.py.")
+    print("Will run with only the basic grasp.py module.")
+    _old_API = True
+    try:
+        import grasp as graspi
+    except:
+        print("Cannot import grasp.py")
+        time.sleep(10)
+        exit()
+        
 err, asa = ASA_REG('testing')
 
 obj_synch, err = OBJ_REG('test_synch', None, False, True ,50, asa)

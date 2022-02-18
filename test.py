@@ -172,11 +172,8 @@ def negotiate_request_side(tagged, old):
             continue
         mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
         tagged.objective.value = cbor.dumps(tagged.objective.value)
-        if old_API:
-            err, handle, answer = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
+        
+        err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
         
         if err:
             mprint("neg request failed because {}".format(graspi.etext[err]))

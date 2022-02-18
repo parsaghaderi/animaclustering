@@ -135,7 +135,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
         result = True
         reason = None
         
-    elif answer.value < 1000:
+    elif answer.value < 100:
         step = 1
         neg_loop = True
         mprint("peer offered {} - step {}".format(answer.value, step))
@@ -152,10 +152,10 @@ def negotiate_listener_side(tagged, handle, answer, old):
             answer.value = cbor.loads(answer.value)
             mprint("peer offered {} {} {} {}".format(err, temp, answer, reason))
             step += 1
-            if not err:
-                if answer.value < 1000:
+            if (not err) and temp == None:
+                if answer.value < 88:
                     answer.value += 1
-                if answer.value == 1000:
+                if answer.value >= 88:
                    break
             else:
                 mprint("err {}".format(graspi.etext[err]))
@@ -223,16 +223,19 @@ def negotiate_request_side(tagged, old):
                     else:
                         err, temp, answer, reason = _r
                     # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
-                    answer.value = cbor.loads(answer.value)
-                    mprint("peer offered {}".format(answer.value))
-                    step += 1
-                    if answer.value == 1000:
-                        err, graspi.end_negotiate(tagged.source, handle, True)
-                        if not err:
-                            mprint("negotiation successfully done!")
-                            neg_loop = False
-                    elif answer.value < 1000:
-                        answer.value += 1
+                    if (not err) and temp == None:
+                        answer.value = cbor.loads(answer.value)
+                        mprint("peer offered {}".format(answer.value))
+                        step += 1
+                        if answer.value > 80:
+                            err, graspi.end_negotiate(tagged.source, handle, True)
+                            if not err:
+                                mprint("negotiation successfully done!")
+                                neg_loop = False
+                            break
+                            
+                        elif answer.value < 1000:
+                            answer.value += 1
         else:
             neg_loop = False
             break

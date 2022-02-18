@@ -26,8 +26,6 @@ except:
 
 MAP_PATH = '/etc/TD_map/neighbors.map'
 
-def return_old_API():
-    return _old_API
 #########################
 #check grasp
 #########################
@@ -99,7 +97,7 @@ def TAG_OBJ(obj, ASA):
 import subprocess as sp
 from time import sleep
 
-old_API = return_old_API
+old_API = _old_API
 
 err, asa = ASA_REG('testing')
 

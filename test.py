@@ -223,7 +223,7 @@ def negotiate_request_side(tagged, old):
                     else:
                         err, temp, answer, reason = _r
                     # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
-                    if (not err) and temp == None:
+                    if (not err):
                         answer.value = cbor.loads(answer.value)
                         mprint("peer offered {}".format(answer.value))
                         step += 1

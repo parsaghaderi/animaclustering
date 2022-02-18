@@ -138,31 +138,46 @@ def negotiate_listener_side(tagged, handle, answer, old):
     elif answer.value < 1000:
         step = 1
         neg_loop = True
+        mprint("peer offered {} - step {}".format(answer.value, step))
+        answer.value += 1 #based on grasp doc page 12 comment section paragraph 5 line 2
+        answer.value=cbor.dumps(answer.value)
+        
         while neg_loop:
-            mprint("peer offered {} - step {}".format(answer.value, step))
-            answer.value += 1 #based on grasp doc page 12 comment section paragraph 5 line 2
-            answer.value=cbor.dumps(answer.value)
             neg_step_output = graspi.negotiate_step(tagged.source, handle, answer, 1000)
             if old_API:
                 err, temp, answer = neg_step_output #TODO figure out whats each of them 
                 reason = answer
             else:
                 err, temp, answer, reason = neg_step_output
+            answer.value = cbor.loads(answer.value)
             mprint("peer offered {} {} {} {}".format(err, temp, answer, reason))
             step += 1
-            if (not err) and temp == None:
+            if not err:
+                if answer.value < 1000:
+                    answer.value += 1
+                if answer.value == 1000:
+                   break
+            else:
+                mprint("err {}".format(graspi.etext[err]))
                 neg_loop = False
-                mprint("negotiation succeeded")
-            elif not err:
-                try:
-                    answer.value = cbor.loads(answer.value)
-                except:
-                    pass
-                mprint("loop count {}, request {}".format(answer.loop_count, answer.value))
-                if tagged.objective.value < answer.value:
-                    tagged.objective.value = answer.value
-                elif tagged.objective.value > 1000:
-                    neg_loop = False
+                break
+            # if (not err) and temp == None:
+            #     err = graspi.end_negotiate(tagged.source, handle, True)
+            #     if not err:
+            #         neg_loop = False
+            #         mprint("negotiation succeeded")
+            # elif not err:
+            #     try:
+            #         answer.value = cbor.loads(answer.value)
+            #     except:
+            #         pass
+            mprint("loop count {}, request {}".format(answer.loop_count, answer.value))
+            answer.value = cbor.dumps(answer.value)
+            
+        err = graspi.end_negotiate(tagged.source, handle, True)
+        if not err:
+            mprint("negotiation done with value {}".format(answer.value))
+            tagged.objective.value = answer.value
     else:
         err = graspi.end_negotiate(tagged.source, handle, True)
         if not err:
@@ -188,11 +203,12 @@ def negotiate_request_side(tagged, old):
             mprint("neg request failed because {}".format(graspi.etext[err]))
             continue
         elif (not err) and handle:
+            answer.value = cbor.loads(answer.value)
             mprint("session started {}, answer {}".format(handle, answer))
-            try:
-                answer.value = cbor.loads(answer.value)
-            except:
-                pass
+            # try:
+            #     answer.value = cbor.loads(answer.value)
+            # except:
+            #     pass
             mprint("peer offered {}".format(answer.value))
             step = 1
             if answer.value < 1000:

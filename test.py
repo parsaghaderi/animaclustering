@@ -206,7 +206,7 @@ def negotiate_request_side(tagged, old):
                         reason = answer
                     else:
                         err, temp, answer, reason = _r
-                    mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
+                    # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
                     step += 1
                     if answer.value == 1000:
                         err, graspi.end_negotiate(tagged.source, handle, True)

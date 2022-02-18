@@ -2,8 +2,15 @@ import time
 import os
 import threading
 import cbor
-_old_API = False
-import graspi
+
+try:
+    import graspi
+    _old_API = False
+
+except:
+    _old_API = True
+    import grasp as graspi
+
 # try:
 #     import graspi
 # except:
@@ -171,9 +178,12 @@ def negotiate_request_side(tagged, old):
             continue
         mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
         tagged.objective.value = cbor.dumps(tagged.objective.value)
-        
-        err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
-        
+        if _old_API:
+            err, handle, answer = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
+            reason = answer
+        else:
+        # err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
+            err, handle, answer ,reason = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
         if err:
             mprint("neg request failed because {}".format(graspi.etext[err]))
             continue

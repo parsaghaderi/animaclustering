@@ -67,8 +67,8 @@ def negotiate_listener_side(tagged, handle, answer):
             mprint("negotiation done with value {}".format(answer.value))
                 
             
-def negotiate_request_side(tagged):
-    global _old_API
+def negotiate_request_side(tagged, old):
+    _old_API = old
     while True:
         _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
 
@@ -161,5 +161,5 @@ if get_name() == 'Ritchie':
 
 if get_name() == 'Gingko':
     tagged_neg.objective.value = 50
-    threading.Thread(target=negotiate_request_side, args=[tagged_neg]).start()
+    threading.Thread(target=negotiate_request_side, args=[tagged_neg, _old_API]).start()
 

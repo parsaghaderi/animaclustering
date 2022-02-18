@@ -152,7 +152,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
             answer.value = cbor.loads(answer.value)
             mprint("peer offered {} {} {} {}".format(err, temp, answer, reason))
             step += 1
-            if (not err) and temp == None:
+            if not err:
                 if answer.value < 88:
                     answer.value += 1
                 if answer.value >= 88:

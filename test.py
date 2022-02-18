@@ -193,7 +193,7 @@ def negotiate_request_side(tagged, old):
                 answer.value = cbor.loads(answer.value)
             except:
                 pass
-            mprint("peer offered {}".format(type(answer.value)))
+            mprint("peer offered {}".format(answer.value))
             step = 1
             if answer.value < 1000:
                 answer.value += 1
@@ -207,6 +207,7 @@ def negotiate_request_side(tagged, old):
                     else:
                         err, temp, answer, reason = _r
                     # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
+                    answer.value = cbor.loads(answer.value)
                     step += 1
                     if answer.value == 1000:
                         err, graspi.end_negotiate(tagged.source, handle, True)

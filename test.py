@@ -25,8 +25,8 @@ def flooder(tagged):
         sleep(1.5)
 
 
-def negotiate_listener_side(tagged, handle, answer):
-    global _old_API
+def negotiate_listener_side(tagged, handle, answer, old):
+    _old_API = old
     answer.value=cbor.loads(answer.value)
     if answer.dry:
         mprint("Dry run")
@@ -127,7 +127,7 @@ def listen_neg(tagged):
         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
         if not err:
             if answer.value != tagged.objective.value:
-                threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer]).start()
+                threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer, _old_API]).start()
             else: #answer == obj.value no need for negotiation
                 pass #end negotiation
         if err:

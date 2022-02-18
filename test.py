@@ -231,6 +231,8 @@ def negotiate_request_side(tagged, old):
                         if not err:
                             mprint("negotiation successfully done!")
                             neg_loop = False
+                    elif answer.value < 1000:
+                        answer.value += 1
         else:
             neg_loop = False
             break

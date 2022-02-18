@@ -2,7 +2,7 @@ from cluster import *
 import subprocess as sp
 from time import sleep
 
-old_API = _old_API
+old_API = return_old_API
 
 err, asa = ASA_REG('testing')
 

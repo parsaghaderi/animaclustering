@@ -12,7 +12,6 @@ try:
 except:
     print("Cannot find the RFC API module graspi.py.")
     print("Will run with only the basic grasp.py module.")
-    _old_API = True
     try:
         import grasp as graspi
     except:
@@ -21,7 +20,8 @@ except:
         exit()
 MAP_PATH = '/etc/TD_map/neighbors.map'
 
-
+def return_old_API():
+    return _old_API
 #########################
 #check grasp
 #########################

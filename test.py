@@ -2,7 +2,6 @@ from cluster import *
 import subprocess as sp
 from time import sleep
 
-from grasp import objective
 old_API = _old_API
 
 err, asa = ASA_REG('testing')

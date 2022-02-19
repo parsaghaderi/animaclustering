@@ -134,7 +134,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
         mprint("Dry run")
         result = True
         reason = None
-        
+        mprint("*****\n{}\n****".format(answer.value))
     elif answer.value < 80:
         step = 1
         neg_loop = True

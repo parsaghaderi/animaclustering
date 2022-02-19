@@ -197,7 +197,7 @@ def negotiate_request_side(tagged, old):
 
     if ll == []:
         mprint("discovery failed, no handlers found")
-        continue
+        # continue
     mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
     tagged.objective.value = cbor.dumps(tagged.objective.value)
     if _old_API:
@@ -208,7 +208,7 @@ def negotiate_request_side(tagged, old):
         err, handle, answer ,reason = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
     if err:
         mprint("neg request failed because {}".format(graspi.etext[err]))
-        continue
+        # continue
     elif (not err) and handle:
         answer.value = cbor.loads(answer.value)
         mprint("session started {}, answer {}".format(handle, answer))

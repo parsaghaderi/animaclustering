@@ -130,11 +130,12 @@ def flooder(tagged):
 def negotiate_listener_side(tagged, handle, answer, old):
     old_API = old
     answer.value = cbor.loads(answer.value)
+    mprint("*****\n{}\n****\n{}\n****".format(type(answer.value), answer.value))
     if answer.dry:
         mprint("Dry run")
         result = True
         reason = None
-        mprint("*****\n{}\n****".format(answer.value))
+    
     elif answer.value < 80:
         step = 1
         neg_loop = True

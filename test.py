@@ -257,12 +257,12 @@ def listen_neg(tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
         if not err:
-            answer.value = cbor.loads(answer.value)
-            if answer.value != tagged.objective.value:
-                answer.value = cbor.dumps(answer.value)
-                threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer, old_API]).start()
-            else: #answer == obj.value no need for negotiation
-                pass #end negotiation
+            # answer.value = cbor.loads(answer.value)
+            # if answer.value != tagged.objective.value:
+            #     answer.value = cbor.dumps(answer.value)
+            threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer, old_API]).start()
+            # else: #answer == obj.value no need for negotiation
+            #     pass #end negotiation
         if err:
             mprint("listen negotiation err {}".format(graspi.etext[err]))
             break

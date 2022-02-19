@@ -154,7 +154,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
             step += 1
             if (not err) and temp == None:
                 mprint("neg finished")
-                neg_loop = false
+                neg_loop = False
                 break
         
             if not err:

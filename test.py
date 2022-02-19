@@ -129,13 +129,13 @@ def flooder(tagged):
 
 def negotiate_listener_side(tagged, handle, answer, old):
     old_API = old
-    answer.value=cbor.loads(answer.value)
+    answer.value = cbor.loads(answer.value)
     if answer.dry:
         mprint("Dry run")
         result = True
         reason = None
         
-    elif answer.value < 100:
+    elif answer.value < 80:
         step = 1
         neg_loop = True
         mprint("peer offered {} - step {}".format(answer.value, step))
@@ -154,13 +154,15 @@ def negotiate_listener_side(tagged, handle, answer, old):
             step += 1
             if (not err) and temp == None:
                 mprint("neg finished")
+                neg_loop = false
                 break
         
             if not err:
                 if answer.value < 88:
                     answer.value += 1
                 if answer.value >= 88:
-                   break
+                    neg_loop = False
+                    break
             else:
                 mprint("err {}".format(graspi.etext[err]))
                 neg_loop = False
@@ -254,7 +256,9 @@ def listen_neg(tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
         if not err:
+            answer.value = cbor.loads(answer.value)
             if answer.value != tagged.objective.value:
+                answer.value = cbor.dumps(answer.value)
                 threading.Thread(target=negotiate_listener_side, args=[tagged, handle, answer, old_API]).start()
             else: #answer == obj.value no need for negotiation
                 pass #end negotiation

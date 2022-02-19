@@ -192,60 +192,60 @@ def negotiate_listener_side(tagged, handle, answer, old):
                 
             
 def negotiate_request_side(tagged, old):
-    while True:
-        _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
+    # while True:
+    _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
 
-        if ll == []:
-            mprint("discovery failed, no handlers found")
-            continue
-        mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
-        tagged.objective.value = cbor.dumps(tagged.objective.value)
-        if _old_API:
-            err, handle, answer = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
-            reason = answer
-        else:
-        # err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
-            err, handle, answer ,reason = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
-        if err:
-            mprint("neg request failed because {}".format(graspi.etext[err]))
-            continue
-        elif (not err) and handle:
-            answer.value = cbor.loads(answer.value)
-            mprint("session started {}, answer {}".format(handle, answer))
-            # try:
-            #     answer.value = cbor.loads(answer.value)
-            # except:
-            #     pass
-            mprint("peer offered {}".format(answer.value))
-            step = 1
-            if answer.value < 100:
-                answer.value += 1
-                neg_loop = True
-                while neg_loop:
-                    answer.value = cbor.dumps(answer.value)
-                    _r = graspi.negotiate_step(tagged.source, handle, answer, 1000)
-                    if old_API:
-                        err, temp, answer = _r
-                        reason = answer
-                    else:
-                        err, temp, answer, reason = _r
-                    # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
-                    if (not err):
-                        answer.value = cbor.loads(answer.value)
-                        mprint("peer offered {}".format(answer.value))
-                        step += 1
-                        if answer.value > 80:
-                            err, graspi.end_negotiate(tagged.source, handle, True)
-                            if not err:
-                                mprint("negotiation successfully done!")
-                                neg_loop = False
-                            break
-                            
-                        elif answer.value < 100:
-                            answer.value += 1
+    if ll == []:
+        mprint("discovery failed, no handlers found")
+        continue
+    mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
+    tagged.objective.value = cbor.dumps(tagged.objective.value)
+    if _old_API:
+        err, handle, answer = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
+        reason = answer
+    else:
+    # err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
+        err, handle, answer ,reason = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
+    if err:
+        mprint("neg request failed because {}".format(graspi.etext[err]))
+        continue
+    elif (not err) and handle:
+        answer.value = cbor.loads(answer.value)
+        mprint("session started {}, answer {}".format(handle, answer))
+        # try:
+        #     answer.value = cbor.loads(answer.value)
+        # except:
+        #     pass
+        mprint("peer offered {}".format(answer.value))
+        step = 1
+        if answer.value < 100:
+            answer.value += 1
+            neg_loop = True
+            while neg_loop:
+                answer.value = cbor.dumps(answer.value)
+                _r = graspi.negotiate_step(tagged.source, handle, answer, 1000)
+                if old_API:
+                    err, temp, answer = _r
+                    reason = answer
+                else:
+                    err, temp, answer, reason = _r
+                # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
+                if (not err):
+                    answer.value = cbor.loads(answer.value)
+                    mprint("peer offered {}".format(answer.value))
+                    step += 1
+                    if answer.value > 80:
+                        err, graspi.end_negotiate(tagged.source, handle, True)
+                        if not err:
+                            mprint("negotiation successfully done!")
+                            neg_loop = False
+                        break
+                        
+                    elif answer.value < 100:
+                        answer.value += 1
         else:
             neg_loop = False
-            break
+            
         
 
 

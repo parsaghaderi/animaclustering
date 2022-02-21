@@ -290,12 +290,12 @@ if get_name() == 'Dijkstra':
 if get_name() == 'Ritchie':
     obj_synch.value = 'Ritchie_synch'
     obj_synch.discoverable = True
-    # obj_neg.value = 1
+    obj_neg.value = 1
     threading.Thread(target=flooder,    args = [tagged_synch]).        start()
     # obj_synch.value = 'Ritchie_synch'
     # obj_neg.value = 50
     # threading.Thread(target=flooder,    args = [tagged_synch]).        start()
-    # threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
+    threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
     # threading.Thread(target=synch,      args = [tagged_synch]).        start()
     # err, ll = graspi.synchronize(tagged_synch.source, tagged_synch.objective ,None, 59000)
@@ -305,22 +305,22 @@ if get_name() == 'Ritchie':
     # threading.Thread(target=flooder,    args = [tagged_synch]).        start()
 
 if get_name() == 'Gingko':
-    threading.Thread(target=synch,      args = [tagged_synch]).        start()
-    err, ll = graspi.discover(tagged_synch.source, tagged_synch.objective, 10000, flush=False)
+    # threading.Thread(target=synch,      args = [tagged_synch]).        start()
+    err, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 10000, flush=False)
     mprint(len(ll))
     # err, ll = graspi.synchronize(tagged_synch.source, tagged_synch.objective ,None, 59000)
     # mprint(ll)
     # tagged_neg.objective.value = 50
     # threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API]).start()
-    # _, ll = graspi.discover(tagged_synch.source, tagged_synch.objective, 1000, flush = True)
-    # mprint(len(ll))
+    _, ll = graspi.discover(tagged_synch.source, tagged_synch.objective, 1000, flush = True)
+    mprint(len(ll))
     # if ll != []:
     #     for item in ll:
     #         mprint(item.locator)
     # else:
     #     mprint("discovery returned zero")
     # for item in ll:
-    #threading.Thread(target=synch,      args = [tagged_synch, ll[1]]).        start()
+    # threading.Thread(target=synch,      args = [tagged_synch, ll[1]]).        start()
         
 
             

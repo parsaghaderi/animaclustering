@@ -271,12 +271,12 @@ def listen_neg(tagged):
         sleep(3)
 
 
-def synch(tagged, ll):
+def synch(tagged):
     while True:
         err, result = graspi.synchronize(
                     tagged.source,
                     tagged.objective,
-                    ll, 
+                    None, 
                     59000
                     )      
         if not err:

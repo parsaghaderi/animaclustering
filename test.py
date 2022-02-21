@@ -271,16 +271,17 @@ def listen_neg(tagged):
         sleep(3)
 
 
-def synch(tagged):
+def synch(tagged, ll):
     while True:
         err, result = graspi.synchronize(
                     tagged.source,
                     tagged.objective,
-                    None, 
+                    ll, 
                     59000
                     )      
         if not err:
             mprint("synch successful with value {}".format(result.value))
+            break
         sleep(3)
 
 
@@ -304,13 +305,15 @@ if get_name() == 'Ritchie':
 if get_name() == 'Gingko':
     # tagged_neg.objective.value = 50
     # threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API]).start()
-    # _, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 1000, flush = True)
+    _, ll = graspi.discover(tagged_synch.source, tagged_synch.objective, 1000, flush = True)
     # if ll != []:
     #     for item in ll:
     #         mprint(item.locator)
     # else:
     #     mprint("discovery returned zero")
-    threading.Thread(target=synch,      args = [tagged_synch]).        start()
+    for item in ll:
+        threading.Thread(target=synch,      args = [tagged_synch, item]).        start()
+        
 
             
     

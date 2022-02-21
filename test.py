@@ -305,6 +305,15 @@ if get_name() == 'Gingko':
     if ll != []:
         for item in ll:
             mprint(item.locator)
-
+            err, result = graspi.synchronize(
+                        tagged_synch.source,
+                        tagged_synch.objective,
+                        item.locator,
+                        59000
+            )
+            mprint("the value from {} is {}".format(item.locator, result.value))   
+            sleep (50)
+            
     
+
 

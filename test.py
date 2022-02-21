@@ -283,10 +283,9 @@ def synch(tagged):
 if get_name() == 'Dijkstra':
     obj_synch.value = 'Dijkstra_synch'
     obj_synch.discoverable = True
-    # obj_synch.local = True
     obj_neg.value = 1
     threading.Thread(target=flooder,    args = [tagged_synch]).        start()
-    # threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
+    threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
 if get_name() == 'Ritchie':
     # obj_synch.value = 'Ritchie_synch'
@@ -299,6 +298,8 @@ if get_name() == 'Ritchie':
     # threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
     threading.Thread(target=synch,      args = [tagged_synch]).        start()
+    err, ll = graspi.synchronize(tagged_synch.source, tagged_synch.objective ,None, 59000)
+    mprint(ll)
     # obj_synch.value = 'Ritchie_synch'
     # obj_neg.value = 1
     # threading.Thread(target=flooder,    args = [tagged_synch]).        start()

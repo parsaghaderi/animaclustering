@@ -311,7 +311,10 @@ if get_name() == 'Gingko':
                         item,
                         59000
             )
-            mprint("the value from {} is {}".format(item.locator, result.value))   
+            if not err:
+                mprint("the value from {} is {}".format(item.locator, result.value))  
+            else:
+                mprint(graspi.etext[err])
             sleep (50)
             
     

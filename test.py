@@ -308,7 +308,7 @@ if get_name() == 'Gingko':
             err, result = graspi.synchronize(
                         tagged_synch.source,
                         tagged_synch.objective,
-                        item.locator,
+                        item,
                         59000
             )
             mprint("the value from {} is {}".format(item.locator, result.value))   

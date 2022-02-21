@@ -311,8 +311,8 @@ if get_name() == 'Gingko':
     #         mprint(item.locator)
     # else:
     #     mprint("discovery returned zero")
-    for item in ll:
-        threading.Thread(target=synch,      args = [tagged_synch, item]).        start()
+    # for item in ll:
+    threading.Thread(target=synch,      args = [tagged_synch, ll[1]]).        start()
         
 
             

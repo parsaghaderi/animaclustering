@@ -198,6 +198,7 @@ def negotiate_request_side(tagged, old):
     if ll == []:
         mprint("discovery failed, no handlers found")
         # continue
+
     mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
     tagged.objective.value = cbor.dumps(tagged.objective.value)
     if _old_API:
@@ -290,9 +291,14 @@ if get_name() == 'Dijkstra':
     threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
 if get_name() == 'Ritchie':
-    threading.Thread(target=synch,      args = [tagged_synch]).        start()
+    obj_synch.value = 'Ritchie_synch'
+    obj_neg.value = 50
+    threading.Thread(target=flooder,    args = [tagged_synch]).        start()
+    threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
+
+    # threading.Thread(target=synch,      args = [tagged_synch]).        start()
 
 if get_name() == 'Gingko':
-    tagged_neg.objective.value = 50
+    tagged_neg.objective.value = 30
     threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API]).start()
 

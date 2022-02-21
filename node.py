@@ -1,5 +1,3 @@
-from time import sleep
-import webbrowser
 from cluster import *
 import random
 import threading

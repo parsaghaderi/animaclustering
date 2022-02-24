@@ -323,7 +323,10 @@ if get_name() == 'Gingko':
             # th = threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item])
             # th./start()
             # th.join()
-            negotiate_request_side(tagged_neg, old_API, item)
+            # negotiate_request_side(tagged_neg, old_API, item)
+            mprint("locator {}\nprotocol {}\nport {}\nifi {}".format(
+                item.locator,item.protocol, item.port, item.ifi
+            ))
         
 
         print("&&&&&&&&\n{}\n&&&&&&&&&&".format(tagged_neg.objective.value))

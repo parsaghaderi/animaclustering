@@ -314,7 +314,7 @@ if get_name() == 'Ritchie':
 
 if get_name() == 'Gingko':
     # threading.Thread(target=synch,      args = [tagged_synch]).        start()
-    tagged_neg.objective.value = 30
+    tagged_neg.objective.value = 17
     err, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 10000, flush=False)
     mprint(len(ll))
     if len(ll)!= 0:

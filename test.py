@@ -255,7 +255,7 @@ def negotiate_request_side(tagged, old, ll):
                     break
         else:
             neg_loop = False
-            
+    tagged.objective.value = cbor.loads(tagged.objective.value)
         
 
 def listen_neg(tagged):

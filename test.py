@@ -281,17 +281,17 @@ def synch(tagged):
 
 
 if get_name() == 'Dijkstra':
-    obj_synch.value = 'Dijkstra_synch'
-    obj_synch.discoverable = True
+    # obj_synch.value = 'Dijkstra_synch'
+    # obj_synch.discoverable = True
     obj_neg.value = 15
-    threading.Thread(target=flooder,    args = [tagged_synch]).        start()
+    #threading.Thread(target=flooder,    args = [tagged_synch]).        start()
     threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
 if get_name() == 'Ritchie':
-    obj_synch.value = 'Ritchie_synch'
-    obj_synch.discoverable = True
+    # obj_synch.value = 'Ritchie_synch'
+    # obj_synch.discoverable = True
     obj_neg.value = 1
-    threading.Thread(target=flooder,    args = [tagged_synch]).        start()
+    #threading.Thread(target=flooder,    args = [tagged_synch]).        start()
     # obj_synch.value = 'Ritchie_synch'
     # obj_neg.value = 50
     # threading.Thread(target=flooder,    args = [tagged_synch]).        start()

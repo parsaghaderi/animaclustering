@@ -321,7 +321,7 @@ if get_name() == 'Gingko':
     if len(ll)!= 0:
         for item in ll:
             threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item]).start()
-            print(tagged_neg.objective.value)
+            print("&&&&&&&&\n{}\n&&&&&&&&&&".format(tagged_neg.objective.value))
     # err, ll = graspi.synchronize(tagged_synch.source, tagged_synch.objective ,None, 59000)
     # mprint(ll)
     # tagged_neg.objective.value = 50

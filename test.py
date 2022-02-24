@@ -191,22 +191,22 @@ def negotiate_listener_side(tagged, handle, answer, old):
             mprint("negotiation done with value {}".format(answer.value))
                 
             
-def negotiate_request_side(tagged, old):
+def negotiate_request_side(tagged, old, ll):
     # while True:
-    _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
+    # _, ll = graspi.discover(tagged.source, tagged.objective, 1000, flush = True)
 
-    if ll == []:
-        mprint("discovery failed, no handlers found")
-        # continue
+    # if ll == []:
+    #     mprint("discovery failed, no handlers found")
+    #     # continue
 
-    mprint("{} locators found, locator {} was chosen".format(len(ll), ll[0].locator))
+    mprint("{} locators found, locator {} was chosen".format(len(ll), ll.locator))
     tagged.objective.value = cbor.dumps(tagged.objective.value)
     if _old_API:
-        err, handle, answer = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
+        err, handle, answer = graspi.request_negotiate(tagged.source, tagged.objective, ll, None)
         reason = answer
     else:
     # err, handle, answer, reason = graspi.req_negotiate(tagged.source, tagged.objective, ll[0], None)
-        err, handle, answer ,reason = graspi.request_negotiate(tagged.source, tagged.objective, ll[0], None)
+        err, handle, answer ,reason = graspi.request_negotiate(tagged.source, tagged.objective, ll, None)
     if err:
         mprint("neg request failed because {}".format(graspi.etext[err]))
         # continue
@@ -283,7 +283,7 @@ def synch(tagged):
 if get_name() == 'Dijkstra':
     obj_synch.value = 'Dijkstra_synch'
     obj_synch.discoverable = True
-    obj_neg.value = 1
+    obj_neg.value = 15
     threading.Thread(target=flooder,    args = [tagged_synch]).        start()
     threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
@@ -305,9 +305,12 @@ if get_name() == 'Ritchie':
     # threading.Thread(target=flooder,    args = [tagged_synch]).        start()
 
 if get_name() == 'Gingko':
-    threading.Thread(target=synch,      args = [tagged_synch]).        start()
-    # err, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 10000, flush=False)
-    # mprint(len(ll))
+    # threading.Thread(target=synch,      args = [tagged_synch]).        start()
+    err, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 10000, flush=False)
+    mprint(len(ll))
+    if len(ll)!= 0:
+        for item in ll:
+            threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item]).start()
     # err, ll = graspi.synchronize(tagged_synch.source, tagged_synch.objective ,None, 59000)
     # mprint(ll)
     # tagged_neg.objective.value = 50

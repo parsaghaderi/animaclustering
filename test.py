@@ -136,7 +136,7 @@ def negotiate_listener_side(tagged, handle, answer, old):
         result = True
         reason = None
     
-    elif answer.value < 80:
+    elif answer.value < 25:
         step = 1
         neg_loop = True
         mprint("peer offered {} - step {}".format(answer.value, step))
@@ -159,9 +159,12 @@ def negotiate_listener_side(tagged, handle, answer, old):
                 break
         
             if not err:
-                if answer.value < 88:
+                if answer.value < 25 and (answer.value!= None):
                     answer.value += 1
-                if answer.value >= 88:
+                if answer.value >= 25 and (answer.value!= None):
+                    neg_loop = False
+                    break
+                if  answer.value!= None:
                     neg_loop = False
                     break
             else:
@@ -180,8 +183,11 @@ def negotiate_listener_side(tagged, handle, answer, old):
             #         pass
             mprint("loop count {}, request {}".format(answer.loop_count, answer.value))
             answer.value = cbor.dumps(answer.value)
-            
-        err = graspi.end_negotiate(tagged.source, handle, True)
+        if not (answer.value!= None):
+            err = graspi.end_negotiate(tagged.source, handle, True)
+        if answer.value!= None:
+            err = graspi.end_negotiate(tagged.source, handle, False)
+
         if not err:
             mprint("negotiation done with value {}".format(answer.value))
             tagged.objective.value = answer.value
@@ -219,7 +225,7 @@ def negotiate_request_side(tagged, old, ll):
         #     pass
         mprint("peer offered {}".format(answer.value))
         step = 1
-        if answer.value < 100:
+        if answer.value < 25 and (answer.value!= None):
             answer.value += 1
             neg_loop = True
             while neg_loop:
@@ -231,19 +237,21 @@ def negotiate_request_side(tagged, old, ll):
                 else:
                     err, temp, answer, reason = _r
                 # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
-                if (not err):
+                if (not err) and  (answer.value!= None) :
                     answer.value = cbor.loads(answer.value)
                     mprint("peer offered {}".format(answer.value))
                     step += 1
-                    if answer.value > 80:
+                    if (answer.value >= 25) and (answer.value!= None):
                         err, graspi.end_negotiate(tagged.source, handle, True)
                         if not err:
                             mprint("negotiation successfully done!")
                             neg_loop = False
                         break
                         
-                    elif answer.value < 100:
+                    elif answer.value < 25:
                         answer.value += 1
+                if answer.value == None:
+                    err, graspi.end_negotiate(tagged.source, handle, False)
         else:
             neg_loop = False
             

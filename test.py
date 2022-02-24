@@ -325,7 +325,7 @@ if get_name() == 'Gingko':
             # th.join()
             # negotiate_request_side(tagged_neg, old_API, item)
             mprint("locator {}\nprotocol {}\nport {}\nifi {}".format(
-                item.locator,item.protocol, item.port, item.ifi
+                type(item.locator),item.protocol, item.port, item.ifi
             ))
         
 

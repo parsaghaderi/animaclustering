@@ -237,7 +237,7 @@ def negotiate_request_side(tagged, old, ll):
                 else:
                     err, temp, answer, reason = _r
                 # mprint("loopcount {}, offered {}".format(answer.loop_count, answer.value))
-                if (not err) and  (answer.value!= None) :
+                if (not err) and  (temp!= None) :
                     answer.value = cbor.loads(answer.value)
                     mprint("peer offered {}".format(answer.value))
                     step += 1
@@ -250,8 +250,9 @@ def negotiate_request_side(tagged, old, ll):
                         
                     elif answer.value < 25:
                         answer.value += 1
-                if answer.value == None:
+                if temp == None:
                     err, graspi.end_negotiate(tagged.source, handle, False)
+                    break
         else:
             neg_loop = False
             

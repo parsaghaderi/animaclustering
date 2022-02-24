@@ -320,9 +320,10 @@ if get_name() == 'Gingko':
     mprint(len(ll))
     if len(ll)!= 0:
         for item in ll:
-            th = threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item])
-            th.start()
-            th.join()
+            # th = threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item])
+            # th./start()
+            # th.join()
+            negotiate_request_side(tagged_neg, old_API, item)
         
 
         print("&&&&&&&&\n{}\n&&&&&&&&&&".format(tagged_neg.objective.value))

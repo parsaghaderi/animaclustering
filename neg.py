@@ -123,7 +123,7 @@ asa, err = ASA_REG('asa')
 obj, err = OBJ_REG('node', [ifi_info, get_node_value()], True, False, 10, asa)
 tagged_node = TAG_OBJ(obj, asa)
 
-def discover_neighbors():
+def discover_neighbors(tagged_node):
     err, ll = graspi.discover(tagged_node.source,
                             tagged_node.objective,
                             10000,
@@ -132,10 +132,14 @@ def discover_neighbors():
         for item in ll:
             if NEIGHBOR.__contains__(str(item.locator)):
                 NEIGHBOR_LOCATORS.append(item)
-print("*******")
-for item in NEIGHBOR_LOCATORS:
-    print("{}".format(str(item.locator)))
-print("*******")
+                print(str(item.locator))
+def listen_neg(tagged):
+    while True:
+        err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
+        sleep(3)
+threading.Thread(target=listen_neg, args=[tagged_node]).start()
+threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
+
 
 
 

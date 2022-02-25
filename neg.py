@@ -109,8 +109,9 @@ NEIGHBOR_LOCATORS = []
 def get_my_neighbors():
     file = open(MAP)
     l = file.readlines()
-    l = [item for item in l]
+    l = [item.strip('\n') for item in l]
     mprint(l)
+    file.close()
     return l[0], l[1:]
 
 IFI, NEIGHBOR = get_my_neighbors()

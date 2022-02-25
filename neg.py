@@ -130,7 +130,7 @@ asa, err = ASA_REG('asa')
 obj, err = OBJ_REG('node', [ifi_info, get_node_value()], True, False, 10, asa)
 tagged_node = TAG_OBJ(obj, asa)
 
-mprint(obj.value)
+# mprint(obj.value)
 # def discover_neighbors(tagged_node):
 #     err, ll = graspi.discover(tagged_node.source,
 #                             tagged_node.objective,
@@ -166,15 +166,16 @@ mprint(obj.value)
 #     err = graspi.end_negotiate(tagged.source, handle, True)
 #     if not err:
 #         mprint("neg ended successfully")
-# def listen_neg(tagged):
-#     while True:
-#         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
-#         if not err:
-#             pass
-#             #threading.Thread(target= lis_neg, args=[tagged, handle, answer, _old_API])
-#         sleep(3)
+def listen_neg(tagged):
+    while True:
+        err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
+        if not err:
+            pass
+        mprint("listening for incoming neg requests!")
+            #threading.Thread(target= lis_neg, args=[tagged, handle, answer, _old_API])
+        sleep(3)
 
-# threading.Thread(target=listen_neg, args=[tagged_node]).start()
+threading.Thread(target=listen_neg, args=[tagged_node]).start()
 # threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
 
 

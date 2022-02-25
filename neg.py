@@ -168,10 +168,11 @@ tagged_node = TAG_OBJ(obj, asa)
 #         mprint("neg ended successfully")
 def listen_neg(tagged):
     while True:
+        mprint("listening for incoming neg requests!")
         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
         if not err:
             pass
-        mprint("listening for incoming neg requests!")
+        
             #threading.Thread(target= lis_neg, args=[tagged, handle, answer, _old_API])
         sleep(3)
 

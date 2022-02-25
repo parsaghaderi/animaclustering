@@ -2,7 +2,7 @@ import os
 import random
 import threading
 import cbor
-
+import subprocess as sp
 try:
     import graspi
     _old_API = False
@@ -179,6 +179,16 @@ def listen_neg(tagged):
 threading.Thread(target=listen_neg, args=[tagged_node]).start()
 sleep(10)
 threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
+
+
+ch, err =OBJ_REG('ch', True, True, False, 10, asa)
+tagged_ch = TAG_OBJ(ch, asa)
+if sp.getoutput('hostname') == 'Tarjan':
+    threading.Thread(target=listen_neg, args=[tagged_ch]).start()
+if sp.getoutput('hostname') == 'Ritchie':
+    threading.Thread(target=listen_neg, args=[tagged_ch]).start()
+if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=discover_neighbors, args = [tagged_ch]).start()
 
 
 

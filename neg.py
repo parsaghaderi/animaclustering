@@ -128,6 +128,7 @@ def discover_neighbors(tagged_node):
                             tagged_node.objective,
                             10000,
                             flush = False)
+    mprint(len(ll))
     if (not err) and len(ll)> 0:
         for item in ll:
             if NEIGHBOR.__contains__(str(item.locator)):
@@ -161,9 +162,10 @@ def listen_neg(tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
         if not err:
-            threading.Thread(target= lis_neg, args=[tagged, handle, answer, _old_API])
+            pass
+            #threading.Thread(target= lis_neg, args=[tagged, handle, answer, _old_API])
         sleep(3)
-        
+
 threading.Thread(target=listen_neg, args=[tagged_node]).start()
 threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
 

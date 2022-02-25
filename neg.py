@@ -177,6 +177,7 @@ def listen_neg(tagged):
         sleep(3)
 
 threading.Thread(target=listen_neg, args=[tagged_node]).start()
+sleep(10)
 threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
 
 

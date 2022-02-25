@@ -320,7 +320,7 @@ if get_name() == 'Dijkstra':
     #         mprint("locator {}\nprotocol {}\nport {}\nifi {}".format(
     #             type(str(item.locator)),str(item.locator), item.port, item.ifi
     #         ))
-    threading.Thread(target=run_discovery, args=[tagged_neg, 10000, True]).start()
+    threading.Thread(target=run_discovery, args=[tagged_neg, 10000, False]).start()
 
 if get_name() == 'Ritchie':
     # obj_synch.value = 'Ritchie_synch'
@@ -341,7 +341,7 @@ if get_name() == 'Ritchie':
 
 if get_name() == 'Gingko':
     threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
-    threading.Thread(target=run_discovery, args=[tagged_neg, 10000, True]).start()
+    threading.Thread(target=run_discovery, args=[tagged_neg, 10000, False]).start()
 
     # err, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 10000, flush=True)
     # obj_neg.value = 15

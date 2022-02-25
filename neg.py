@@ -131,17 +131,17 @@ obj, err = OBJ_REG('node', [ifi_info, get_node_value()], True, False, 10, asa)
 tagged_node = TAG_OBJ(obj, asa)
 
 # mprint(obj.value)
-# def discover_neighbors(tagged_node):
-#     err, ll = graspi.discover(tagged_node.source,
-#                             tagged_node.objective,
-#                             10000,
-#                             flush = False)
-#     mprint(len(ll))
-#     if (not err) and len(ll)> 0:
-#         for item in ll:
-#             if NEIGHBOR.__contains__(str(item.locator)):
-#                 NEIGHBOR_LOCATORS.append(item)
-#                 print(str(item.locator))
+def discover_neighbors(tagged_node):
+    err, ll = graspi.discover(tagged_node.source,
+                            tagged_node.objective,
+                            10000,
+                            flush = False)
+    mprint(len(ll))
+    # if (not err) and len(ll)> 0:
+    #     for item in ll:
+    #         if NEIGHBOR.__contains__(str(item.locator)):
+    #             NEIGHBOR_LOCATORS.append(item)
+    #             print(str(item.locator))
 # def req_neg(tagged, ll):
 #     tagged.objective.value = cbor.dumps(tagged.objective.value)
 #     if _old_API:
@@ -159,13 +159,13 @@ tagged_node = TAG_OBJ(obj, asa)
 #                                     None)
 
 
-# def lis_neg(tagged, handle, answer, old_API):
-#     answer.value = cbor.loads(answer.value)
-#     mprint(answer.value)
-#     mprint(str(handle.handler))
-#     err = graspi.end_negotiate(tagged.source, handle, True)
-#     if not err:
-#         mprint("neg ended successfully")
+def lis_neg(tagged, handle, answer, old_API):
+    answer.value = cbor.loads(answer.value)
+    mprint(answer.value)
+    mprint(str(handle.handler))
+    err = graspi.end_negotiate(tagged.source, handle, True)
+    if not err:
+        mprint("neg ended successfully")
 def listen_neg(tagged):
     while True:
         mprint("listening for incoming neg requests!")
@@ -177,7 +177,7 @@ def listen_neg(tagged):
         sleep(3)
 
 threading.Thread(target=listen_neg, args=[tagged_node]).start()
-# threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
+threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
 
 
 

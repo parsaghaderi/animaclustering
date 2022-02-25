@@ -115,12 +115,12 @@ def get_my_neighbors():
     return l[0], l[1:]
 
 IFI, NEIGHBOR = get_my_neighbors()
-mprint("IFI {}".format(IFI))
-mprint("neighbor locators {}".format(NEIGHBOR))
+# mprint("IFI {}".format(IFI))
+# mprint("neighbor locators {}".format(NEIGHBOR))
 
-# ifi_info = {}
-# ifi_info[IFI] = NEIGHBOR
-# mprint(ifi_info)
+ifi_info = {}
+ifi_info[IFI] = NEIGHBOR
+mprint(ifi_info)
 # def get_node_value():
 #     rand = random.random()
 #     num_neighbors = len(NEIGHBOR)

@@ -120,16 +120,17 @@ IFI, NEIGHBOR = get_my_neighbors()
 
 ifi_info = {}
 ifi_info[IFI] = NEIGHBOR
-mprint(ifi_info)
-# def get_node_value():
-#     rand = random.random()
-#     num_neighbors = len(NEIGHBOR)
-#     return num_neighbors*rand
+# mprint(ifi_info)
+def get_node_value():
+    rand = random.random()
+    num_neighbors = len(NEIGHBOR)
+    return num_neighbors*rand
     
-# asa, err = ASA_REG('asa')
-# obj, err = OBJ_REG('node', [ifi_info, get_node_value()], True, False, 10, asa)
-# tagged_node = TAG_OBJ(obj, asa)
+asa, err = ASA_REG('asa')
+obj, err = OBJ_REG('node', [ifi_info, get_node_value()], True, False, 10, asa)
+tagged_node = TAG_OBJ(obj, asa)
 
+mprint(obj.value)
 # def discover_neighbors(tagged_node):
 #     err, ll = graspi.discover(tagged_node.source,
 #                             tagged_node.objective,

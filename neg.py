@@ -135,7 +135,7 @@ def discover_neighbors(tagged_node):
     err, ll = graspi.discover(tagged_node.source,
                             tagged_node.objective,
                             10000,
-                            flush = False)
+                            flush = True)
     mprint(len(ll))
     # if (not err) and len(ll)> 0:
     #     for item in ll:

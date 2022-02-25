@@ -290,17 +290,19 @@ def synch(tagged):
         sleep(3)
 
 def run_discovery(tagged, ttl, _flush):
-    err, ll = graspi.discover(tagged.source, tagged.objective, ttl, flush=_flush)
-    mprint(len(ll))
-    if len(ll)!= 0:
-        for item in ll:
-            # th = threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item])
-            # th./start()
-            # th.join()
-            # negotiate_request_side(tagged_neg, old_API, item)
-            mprint("locator {}\nprotocol {}\nport {}\nifi {}".format(
-                type(str(item.locator)),str(item.locator), item.port, item.ifi
-            ))
+    while True:
+        err, ll = graspi.discover(tagged.source, tagged.objective, ttl, flush=_flush)
+        mprint(len(ll))
+        if len(ll)!= 0:
+            for item in ll:
+                # th = threading.Thread(target=negotiate_request_side, args=[tagged_neg, old_API, item])
+                # th./start()
+                # th.join()
+                # negotiate_request_side(tagged_neg, old_API, item)
+                mprint("locator {}\nprotocol {}\nport {}\nifi {}".format(
+                    type(str(item.locator)),str(item.locator), item.port, item.ifi
+                ))
+        sleep(5)
 
 if get_name() == 'Dijkstra':
     # obj_synch.value = 'Dijkstra_synch'

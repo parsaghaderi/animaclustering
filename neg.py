@@ -170,10 +170,10 @@ def listen_neg_node_info(_tagged):
 def request_neg_node_info(_tagged, handler):
     mprint("negotiation with {}".format(handler.locator))
     if _old_API:
-        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.obj, handler, None) #TODO
+        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, handler, None) #TODO
         reason = answer
     else:
-        err, handle, answer, reason = graspi.req_negotiate(_tagged.source,_tagged.obj, handler, None)
+        err, handle, answer, reason = graspi.req_negotiate(_tagged.source,_tagged.objective, handler, None)
     if not err:
         answer.value = cbor.loads(answer.value)
         NEIGHBOR_weights[str(handle.locator)] = answer.value

@@ -169,14 +169,16 @@ def listen_neg_node_info(_tagged):
             threading.Thread(target=listen_node_info_handler, 
                              args=[_tagged, handle, answer]
             )
-
+        else:
+            mprint(graspi.etext[err])
+            
 def request_neg_node_info(_tagged, handler):
     mprint("negotiation with {}".format(handler.locator))
     if _old_API:
-        err, handle, answer = graspi.request_negotiate(_tagged.source,_tagged.objective, None, None) #TODO
+        err, handle, answer = graspi.request_negotiate(_tagged.source,_tagged.objective, handler, None) #TODO
         reason = answer
     else:
-        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, None, None)
+        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, handler, None)
     if not err:
         answer.value = cbor.loads(answer.value)
         NEIGHBOR_weights[str(handle.locator)] = answer.value
@@ -187,12 +189,12 @@ def request_neg_node_info(_tagged, handler):
             mprint(graspi.etext[err])
 def send_req_node_info(_tagged):
     for item in NEIGHBOR_LOCATORS:
-        threading.Thread(target=request_neg_node_info, args=[_tagged, item]).start()
+        threading.Thread(target=request_neg_node_info, args=[_tagged, None]).start()
     
 
-threading.Thread(target=listen_neg_ND, args = [tagged_node]).start()
-sleep(10)
-threading.Thread(target=discovery, args=[tagged_node]).start()
+# threading.Thread(target=listen_neg_ND, args = [tagged_node]).start()
+# sleep(10)
+# threading.Thread(target=discovery, args=[tagged_node]).start()
 def print_neighbors():
     for i in range(1, 5):
         for item in NEIGHBOR_LOCATORS:
@@ -203,11 +205,11 @@ def print_neighbors():
         print(len(NEIGHBOR_LOCATORS))
         sleep(3)
     send_req_node_info(tagged_node)
-threading.Thread(target=print_neighbors, args=[]).start()
+# threading.Thread(target=print_neighbors, args=[]).start()
 
 threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()
 # threading.Thread(target=send_req_node_info, args=[tagged_node]).start()
-
+send_req_node_info(tagged_node)
 
 
 

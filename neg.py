@@ -3,13 +3,15 @@ import random
 import threading
 import cbor
 import subprocess as sp
-# try:
-import graspi
-#     _old_API = False
 
-# except:
-_old_API = False
-# import grasp as graspi
+try:
+    import graspi
+    _old_API = False
+
+except:
+    _old_API = True
+    import grasp as graspi
+
 
 # try:
 #     import graspi

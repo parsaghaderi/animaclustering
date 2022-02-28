@@ -1478,7 +1478,7 @@ def _drloop(ifi,ttl,options,rec_obj,obj,inDivert):
 #                                  #
 ####################################
 
-def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
+def request_negotiate(asa_handle, obj, peer, timeout, noloop=False):
     """
 ##############################################################
 # req_negotiate(asa_handle, obj, peer, timeout)

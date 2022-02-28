@@ -134,9 +134,11 @@ def discovery(tag):
         if (not err) and (len(ll) != 0):
             for item in ll:
                 NEIGHBOR_LOCATORS.add(item)
+                
         sleep(5)
 
 def listen_node_info_handler(_tagged, handle, answer):
+    mprint("handling request from {}".format(handle.locator))
     answer.value = cbor.loads(answer.value)
     NEIGHBOR_weights[str(handle.locator)] = answer.value
     answer.value = _tagged.objective.value
@@ -149,10 +151,13 @@ def listen_node_info_handler(_tagged, handle, answer):
         err, temp, answer, reason = _r
     if (not err) and (temp == None):
         mprint("neg ended, from {} weight {} received".format(handle.locator, NEIGHBOR_weights[str(handle.locator)] ))
-    
+    else:
+        mprint(graspi.etext[err])
 
 def listen_neg_node_info(_tagged):
+    mprint("listening for incoming requests")
     while True:
+        
         err, handle, answer = graspi.listen_negotiate(
             _tagged.source,
             _tagged.objective, 
@@ -163,6 +168,7 @@ def listen_neg_node_info(_tagged):
             )
 
 def request_neg_node_info(_tagged, handler):
+    mprint("negotiation with {}".format(handler.locator))
     if _old_API:
         err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.obj, handler, None) #TODO
         reason = answer
@@ -174,7 +180,8 @@ def request_neg_node_info(_tagged, handler):
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="Got weights")
         if not _err:
             mprint("neg ended, from {} weight {} received".format(handle.locator, NEIGHBOR_weights[str(handle.locator)]))
-
+        else:
+            mprint(graspi.etext[err])
 def send_req_node_info(_tagged):
     for item in NEIGHBOR_LOCATORS:
         threading.Thread(target=request_neg_node_info, args=[_tagged, item]).start()
@@ -184,11 +191,13 @@ threading.Thread(target=listen_neg_ND, args = [tagged]).start()
 threading.Thread(target=discovery, args=[tagged]).start()
 def print_neighbors():
     for i in range(1, 20):
-        for item in NEIGHBOR_LOCATORS:
-            print(item.locator)
+        # for item in NEIGHBOR_LOCATORS:
+        #     print(item.locator)
+        print("----------------------------")
+        print(len(NEIGHBOR_LOCATORS))
         print("----------------------------")
         sleep(5)
-# threading.Thread(target=print_neighbors, args=[]).start()
+threading.Thread(target=print_neighbors, args=[]).start()
 
 threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()
 # threading.Thread(target=send_req_node_info, args=[tagged_node]).start()

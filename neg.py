@@ -178,6 +178,7 @@ def listen_neg_node_info(_tagged):
             )
         else:
             mprint(graspi.etext[err])
+        sleep(3)
 
 def request_neg_node_info(_tagged, handler):
     # mprint("negotiation with {}".format(handler.locator))
@@ -189,6 +190,7 @@ def request_neg_node_info(_tagged, handler):
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, handler, None)
     if not err:
         answer.value = cbor.loads(answer.value)
+        mprint(answer.value)
         NEIGHBOR_weights[str(handle.locator)] = answer.value
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="Got weights")
         if not _err:

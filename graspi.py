@@ -119,7 +119,7 @@ def request_negotiate(asa_handle, obj, peer, timeout):
 # exponential backoff RECOMMENDED before retry.
 ##############################################################
 """
-    e,s,r = grasp.req_negotiate(asa_handle, obj, peer, timeout)
+    e,s,r = grasp.request_negotiate(asa_handle, obj, peer, timeout)
     if e == errors.ok:
         return e, s, r, None
     if e == errors.declined:

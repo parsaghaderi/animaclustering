@@ -118,12 +118,13 @@ def listen_neg(_tagged):
 
 def discovery(tag):
     while True:
-        err, ll = graspi.discover(tag.source, tag.objective, 10000, False)
+        err, ll = graspi.discover(tag.source, tag.objective, 10000, True)
         if (not err) and (len(ll) != 0):
-            print("##################")
-            for item in ll:
-                print(item.locator)
-            print("##################")
+            # print("##################")
+            # for item in ll:
+            #     print(item.locator)
+            # print("##################")
+            mprint(len(ll))
         sleep(5)
     
 threading.Thread(target=listen_neg, args = [tagged]).start()

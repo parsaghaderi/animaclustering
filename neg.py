@@ -133,7 +133,8 @@ def discovery(tag):
         err, ll = graspi.discover(tag.source, tag.objective, 10000, True)
         if (not err) and (len(ll) != 0):
             for item in ll:
-                NEIGHBOR_LOCATORS.add(item)
+                if not NEIGHBOR_LOCATORS.__contains__(item):
+                    NEIGHBOR_LOCATORS.add(item)
                 
         sleep(5)
 

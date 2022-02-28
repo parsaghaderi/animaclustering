@@ -128,5 +128,10 @@ def discovery(_tagged):
 
 if sp.getoutput('hostname') == "Dijkstra":
     threading.Thread(target=listener, args = [tagged]).start()
-else:
+elif sp.getoutput('hostname') == "Ritchie":
     threading.Thread(target = discovery, args=[tagged]).start()
+else:
+    while True:
+        graspi._initialise_grasp()
+        while True:
+            sleep(5)

@@ -286,8 +286,8 @@ def synch(tagged):
                     )      
         if not err:
             mprint("synch successful with value {}".format(result.value))
-            break
-        sleep(3)
+            
+        sleep(5)
 
 def run_discovery(tagged, ttl, _flush):
     while True:

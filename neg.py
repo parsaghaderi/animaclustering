@@ -135,3 +135,4 @@ def print_neighbors():
         for item in NEIGHBOR_LOCATORS:
             print(item)
         sleep(5)
+threading.Thread(target=print_neighbors, args=[]).start()

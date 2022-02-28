@@ -197,6 +197,7 @@ def print_neighbors():
         print(len(NEIGHBOR_LOCATORS))
         print("----------------------------")
         sleep(5)
+sleep(20)
 threading.Thread(target=print_neighbors, args=[]).start()
 
 threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()

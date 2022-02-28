@@ -176,7 +176,7 @@ def listen_neg_node_info(_tagged):
             mprint("openening a new thread {}".format(cbor.loads(answer.value)))
             threading.Thread(target=listen_node_info_handler, 
                              args=[_tagged, handle, answer]
-            )
+            ).start()
         else:
             mprint(graspi.etext[err])
         sleep(3)

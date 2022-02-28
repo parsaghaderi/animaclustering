@@ -190,8 +190,8 @@ def print_neighbors():
         sleep(5)
 threading.Thread(target=print_neighbors, args=[]).start()
 
-threading.Thread(target=listen_neg_node_info, args=[node]).start()
-threading.Thread(target=send_req_node_info, args=[node]).start()
+threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()
+threading.Thread(target=send_req_node_info, args=[tagged_node]).start()
 
 
 

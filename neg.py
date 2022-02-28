@@ -103,11 +103,11 @@ def TAG_OBJ(obj, ASA):
 
 import subprocess as sp
 from time import sleep
-
+NEIGHBOR_LOCATORS = set()
 asa, err = ASA_REG('domain1')
 obj, err = OBJ_REG('node', None, True, False, 10, asa)
 tagged = TAG_OBJ(obj, asa)
-def listen_neg(_tagged):
+def listen_neg_ND(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
@@ -120,12 +120,18 @@ def discovery(tag):
     while True:
         err, ll = graspi.discover(tag.source, tag.objective, 10000, True)
         if (not err) and (len(ll) != 0):
+
             # print("##################")
-            # for item in ll:
-            #     print(item.locator)
+            for item in ll:
+                NEIGHBOR_LOCATORS.add(item.locator)
             # print("##################")
-            mprint(len(ll))
+            # mprint(len(ll))
         sleep(5)
     
-threading.Thread(target=listen_neg, args = [tagged]).start()
+threading.Thread(target=listen_neg_ND, args = [tagged]).start()
 threading.Thread(target=discovery, args=[tagged]).start()
+def print_neighbors():
+    while True:
+        for item in NEIGHBOR_LOCATORS:
+            print(item)
+        sleep(5)

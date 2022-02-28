@@ -148,7 +148,7 @@ def discovery(_tagged):
         
 
 def listen_node_info_handler(_tagged, handle, answer):
-    mprint("handling request from {}".format(cbor.loads(handle.id_source)))
+    mprint("handling request from {}".format(cbor.loads(handle.id_source).decode("utf-8")))
     answer.value = cbor.loads(answer.value)
     # NEIGHBOR_weights[str(handle.locator)] = answer.value
     answer.value = _tagged.objective.value

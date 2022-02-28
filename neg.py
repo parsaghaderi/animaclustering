@@ -192,12 +192,13 @@ threading.Thread(target=listen_neg_ND, args = [tagged]).start()
 threading.Thread(target=discovery, args=[tagged]).start()
 def print_neighbors():
     for i in range(1, 5):
-        # for item in NEIGHBOR_LOCATORS:
-        #     print(item.locator)
-        print("----------------------------")
+        for item in NEIGHBOR_LOCATORS:
+            print("----------------------------")
+            print(item.locator)
+            print("----------------------------")
+
         print(len(NEIGHBOR_LOCATORS))
-        print("----------------------------")
-        sleep(5)
+        sleep(3)
     send_req_node_info(tagged_node)
 threading.Thread(target=print_neighbors, args=[]).start()
 

@@ -322,7 +322,6 @@ if get_name() == 'Dijkstra':
     #         mprint("locator {}\nprotocol {}\nport {}\nifi {}".format(
     #             type(str(item.locator)),str(item.locator), item.port, item.ifi
     #         ))
-    sleep(15)
     threading.Thread(target=run_discovery, args=[tagged_neg, 10000, False]).start()
 
 if get_name() == 'Ritchie':

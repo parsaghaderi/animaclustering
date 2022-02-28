@@ -44,6 +44,8 @@ except:
     graspi.tprint("ASA server is starting up.")
     graspi.tprint("========================")
 
+READ_LOCK = False
+WRITE_LOCK = False
 
 #########################
 # utility function for reading info from map; 
@@ -55,6 +57,9 @@ def readmap(path):
     l = [str(int(item)) for item in l]
     return l[0], l[1:]
 
+def get_node_value():
+    return random.random()
+    
 
 #########################
 # utility print function
@@ -104,9 +109,16 @@ def TAG_OBJ(obj, ASA):
 import subprocess as sp
 from time import sleep
 NEIGHBOR_LOCATORS = set()
+NEIGHBOR_weights = {}
 asa, err = ASA_REG('domain1')
+
 obj, err = OBJ_REG('node', None, True, False, 10, asa)
 tagged = TAG_OBJ(obj, asa)
+
+node, err = OBJ_REG('node_info', cbor.dumps(get_node_value()), True, False, 10, asa)
+tagged_node = TAG_OBJ(node, asa)
+
+
 def listen_neg_ND(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
@@ -120,20 +132,66 @@ def discovery(tag):
     while True:
         err, ll = graspi.discover(tag.source, tag.objective, 10000, True)
         if (not err) and (len(ll) != 0):
-
-            # print("##################")
             for item in ll:
-                NEIGHBOR_LOCATORS.add(item.locator)
-            # print("##################")
-            # mprint(len(ll))
+                NEIGHBOR_LOCATORS.add(item)
         sleep(5)
+
+def listen_node_info_handler(_tagged, handle, answer):
+    answer.value = cbor.loads(answer.value)
+    NEIGHBOR_weights[str(handle.locator)] = answer.value
+    answer.value = _tagged.objective.value
+    answer.value = cbor.dumps(answer.value)
+    _r = graspi.negotiate_step(_tagged.source, handle, answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        mprint("neg ended, from {} weight {} received".format(handle.locator, NEIGHBOR_weights[str(handle.locator)] ))
     
+
+def listen_neg_node_info(_tagged):
+    while True:
+        err, handle, answer = graspi.listen_negotiate(
+            _tagged.source,
+            _tagged.objective, 
+        )
+        if not err:
+            threading.Thread(target=listen_node_info_handler, 
+                             args=[_tagged, handle, answer]
+            )
+
+def request_neg_node_info(_tagged, handler):
+    if _old_API:
+        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.obj, handler, None) #TODO
+        reason = answer
+    else:
+        err, handle, answer, reason = graspi.req_negotiate(_tagged.source,_tagged.obj, handler, None)
+    if not err:
+        answer.value = cbor.loads(answer.value)
+        NEIGHBOR_weights[str(handle.locator)] = answer.value
+        _err = graspi.end_negotiate(_tagged.source, handle, True, reason="Got weights")
+        if not _err:
+            mprint("neg ended, from {} weight {} received".format(handle.locator, NEIGHBOR_weights[str(handle.locator)]))
+
+def send_req_node_info(_tagged):
+    for item in NEIGHBOR_LOCATORS:
+        threading.Thread(target=request_neg_node_info, args=[_tagged, item]).start()
+    
+
 threading.Thread(target=listen_neg_ND, args = [tagged]).start()
 threading.Thread(target=discovery, args=[tagged]).start()
 def print_neighbors():
-    while True:
+    for i in range(1, 20):
         for item in NEIGHBOR_LOCATORS:
-            print(item)
+            print(item.locator)
         print("----------------------------")
         sleep(5)
 threading.Thread(target=print_neighbors, args=[]).start()
+
+threading.Thread(target=listen_neg_node_info, args=[node]).start()
+threading.Thread(target=send_req_node_info, args=[node]).start()
+
+
+

@@ -143,7 +143,7 @@ def discovery(_tagged):
                 if not flag:
                     NEIGHBOR_LOCATORS.add(item)
         mprint(NEIGHBOR_LOCATORS)        
-        sleep(5)   
+        sleep(3)   
     send_req_node_info(_tagged)
         
 
@@ -173,7 +173,7 @@ def listen_neg_node_info(_tagged):
             _tagged.objective, 
         )
         if not err:
-            mprint("openening a new thread")
+            mprint("openening a new thread {}".format(cbor.loads(answer.value)))
             threading.Thread(target=listen_node_info_handler, 
                              args=[_tagged, handle, answer]
             )

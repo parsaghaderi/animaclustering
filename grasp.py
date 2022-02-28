@@ -1571,18 +1571,18 @@ def request_negotiate(asa_handle, obj, peer, timeout, noloop=False):
         _ifi = 0
     try:
         ttprint("Sending req_negotiate to",peer.locator, peer.port)
-        print("\n****************\nhere 1\n**************\n")
+        # print("\n****************\nhere 1\n**************\n")
         sock.settimeout(5) #there should always be a listener
-        print("\n****************\nhere 2\n**************\n")
+        # print("\n****************\nhere 2\n**************\n")
 
         sock.connect((str(peer.locator), peer.port,0,_ifi))
-        print("\n****************\nhere 3\n**************\n")
+        # print("\n****************\nhere 3\n**************\n")
 
         msg_bytes = _ass_message(M_REQ_NEG, neg_sess, None, obj)
-        print("\n****************\nhere 4\n**************\n")
+        # print("\n****************\nhere 4\n**************\n")
 
         sock.sendall(msg_bytes,0)
-        print("\n****************\nhere 5\n**************\n")
+        # print("\n****************\nhere 5\n**************\n")
 
     except OSError as ex:
         tprint("Socket error sending negotiation request", ex)

@@ -4,6 +4,7 @@ import threading
 import cbor
 import subprocess as sp
 from time import sleep
+import grasp
 try:
     import graspi
     _old_API = False
@@ -132,6 +133,6 @@ elif sp.getoutput('hostname') == "Ritchie":
     threading.Thread(target = discovery, args=[tagged]).start()
 else:
     while True:
-        graspi._initialise_grasp()
+        grasp._initialise_grasp()
         while True:
             sleep(5)

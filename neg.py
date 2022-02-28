@@ -143,7 +143,7 @@ def discovery(_tagged):
                 if not flag:
                     NEIGHBOR_LOCATORS.add(item)
         mprint(NEIGHBOR_LOCATORS)        
-        sleep(3)   
+        sleep(1)   
     send_req_node_info(_tagged)
         
 

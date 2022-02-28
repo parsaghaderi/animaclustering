@@ -173,6 +173,7 @@ def listen_neg_node_info(_tagged):
             _tagged.objective, 
         )
         if not err:
+            mprint("openening a new thread")
             threading.Thread(target=listen_node_info_handler, 
                              args=[_tagged, handle, answer]
             )

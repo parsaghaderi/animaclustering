@@ -137,8 +137,8 @@ def discovery(tag):
             for item in ll:
                 if not NEIGHBOR_LOCATORS.__contains__(item):
                     NEIGHBOR_LOCATORS.add(item)
-                
-        sleep(5)
+        mprint(NEIGHBOR_LOCATORS)        
+        sleep(5)    
 
 def listen_node_info_handler(_tagged, handle, answer):
     mprint("handling request from {}".format(handle.locator))
@@ -211,7 +211,8 @@ import subprocess as sp
 if sp.getoutput('hostname') == 'Dijkstra':
     threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()
 elif sp.getoutput('hostname') == 'Gingko':
-    threading.Thread(target=request_neg_node_info, args=[tagged_node, None]).start()
+    threading.Thread(target=discovery, args = [tagged_node]).start()
+    # threading.Thread(target=request_neg_node_info, args=[tagged_node, None]).start()
 # threading.Thread(target=send_req_node_info, args=[tagged_node]).start()
 send_req_node_info(tagged_node)
 

@@ -65,7 +65,7 @@ def TAG_OBJ(obj, ASA):
 
 
 asa, err = ASA_REG('neg1')
-obj, err = OBJ_REG('node', None, True, False, 10, asa)
+obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listener(_tagged):
@@ -127,8 +127,6 @@ def discovery(_tagged):
     threading.Thread(target=request_neg, args=[_tagged, ll[0]]).start()
 
 if sp.getoutput('hostname') == "Dijkstra":
-    tagged.objective.value = 1
     threading.Thread(target=listener, args = [tagged]).start()
 else:
-    tagged.objective.value = 2
     threading.Thread(target = discovery, args=[tagged]).start()

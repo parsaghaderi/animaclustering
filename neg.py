@@ -130,9 +130,10 @@ def listen_neg_ND(_tagged):
             mprint("listen negotiation err {}".format(graspi.etext[err]))
         sleep(3)
 
-def discovery(tag):
-    while True:
-        err, ll = graspi.discover(tag.source, tag.objective, 10000, True)
+def discovery(_tagged):
+    # while True:
+    for i in range(1, 6):
+        err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, True)
         if (not err) and (len(ll) != 0):
             for item in ll:
                 flag = False
@@ -142,7 +143,9 @@ def discovery(tag):
                 if not flag:
                     NEIGHBOR_LOCATORS.add(item)
         mprint(NEIGHBOR_LOCATORS)        
-        sleep(5)    
+        sleep(5)   
+    send_req_node_info(_tagged)
+        
 
 def listen_node_info_handler(_tagged, handle, answer):
     mprint("handling request from {}".format(handle.locator))
@@ -194,7 +197,7 @@ def request_neg_node_info(_tagged, handler):
             mprint(graspi.etext[err])
 def send_req_node_info(_tagged):
     for item in NEIGHBOR_LOCATORS:
-        threading.Thread(target=request_neg_node_info, args=[_tagged, None]).start()
+        threading.Thread(target=request_neg_node_info, args=[_tagged, item]).start()
     
 
 # threading.Thread(target=listen_neg_ND, args = [tagged_node]).start()
@@ -218,7 +221,7 @@ elif sp.getoutput('hostname') == 'Gingko':
     threading.Thread(target=discovery, args = [tagged_node]).start()
     # threading.Thread(target=request_neg_node_info, args=[tagged_node, None]).start()
 # threading.Thread(target=send_req_node_info, args=[tagged_node]).start()
-send_req_node_info(tagged_node)
+# send_req_node_info(tagged_node)
 
 
 

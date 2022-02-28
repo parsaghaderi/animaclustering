@@ -69,7 +69,7 @@ for t in _most:
 #original implementation. We therefore wrap calls to the
 #old version to preserve backwards compatibility.
     
-def request_negotiate(asa_handle, obj, peer, timeout):
+def req_negotiate(asa_handle, obj, peer, timeout):
     """
 ##############################################################
 # request_negotiate(asa_handle, obj, peer, timeout)

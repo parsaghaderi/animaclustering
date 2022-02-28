@@ -104,93 +104,27 @@ def TAG_OBJ(obj, ASA):
 import subprocess as sp
 from time import sleep
 
-NEIGHBOR_LOCATORS = []
-
-def get_my_neighbors():
-    file = open('/etc/TD_neighbor/locators')
-    l = file.readlines()
-    l = [item.strip('\n') for item in l]
-    mprint(l)
-    file.close()
-    return l[0], l[1:]
-
-IFI, NEIGHBOR = get_my_neighbors()
-# mprint("IFI {}".format(IFI))
-# mprint("neighbor locators {}".format(NEIGHBOR))
-
-ifi_info = {}
-ifi_info[IFI] = NEIGHBOR
-# mprint(ifi_info)
-def get_node_value():
-    rand = random.random()
-    num_neighbors = len(NEIGHBOR)
-    return num_neighbors*rand
-    
-asa, err = ASA_REG('asa')
-obj, err = OBJ_REG('node', [ifi_info, get_node_value()], True, False, 10, asa)
-tagged_node = TAG_OBJ(obj, asa)
-
-# mprint(obj.value)
-def discover_neighbors(tagged_node):
-    err, ll = graspi.discover(tagged_node.source,
-                            tagged_node.objective,
-                            10000,
-                            flush = False,relay_ifi=True)
-    mprint(len(ll))
-    # if (not err) and len(ll)> 0:
-    #     for item in ll:
-    #         if NEIGHBOR.__contains__(str(item.locator)):
-    #             NEIGHBOR_LOCATORS.append(item)
-    #             print(str(item.locator))
-# def req_neg(tagged, ll):
-#     tagged.objective.value = cbor.dumps(tagged.objective.value)
-#     if _old_API:
-#         err, handle, answer = graspi.req_negotiate(
-#                                     tagged.source,
-#                                     tagged.objective,
-#                                     ll,
-#                                     None)
-#         reason = answer
-#     else:
-#         err, handle, answer, reason = graspi.req_negotiate(
-#                                     tagged.source, 
-#                                     tagged.objective, 
-#                                     ll, 
-#                                     None)
-
-
-def lis_neg(tagged, handle, answer, old_API):
-    answer.value = cbor.loads(answer.value)
-    mprint(answer.value)
-    mprint(str(handle.handler))
-    err = graspi.end_negotiate(tagged.source, handle, True)
-    if not err:
-        mprint("neg ended successfully")
-def listen_neg(tagged):
+asa, err = ASA_REG('domain1')
+obj, err = OBJ_REG('node', None, True, False, 10, asa)
+tagged = TAG_OBJ(obj, asa)
+def listen_neg(_tagged):
     while True:
-        mprint("listening for incoming neg requests!")
-        err, handle, answer = graspi.listen_negotiate(tagged.source, tagged.objective)
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             pass
-        
-            #threading.Thread(target= lis_neg, args=[tagged, handle, answer, _old_API])
+        else:
+            mprint("listen negotiation err {}".format(graspi.etext[err]))
         sleep(3)
 
-threading.Thread(target=listen_neg, args=[tagged_node]).start()
-sleep(10)
-threading.Thread(target=discover_neighbors, args=[tagged_node]).start()
-
-
-ch, err =OBJ_REG('ch', True, True, False, 10, asa)
-tagged_ch = TAG_OBJ(ch, asa)
-if sp.getoutput('hostname') == 'Tarjan':
-    threading.Thread(target=listen_neg, args=[tagged_ch]).start()
-if sp.getoutput('hostname') == 'Ritchie':
-    threading.Thread(target=listen_neg, args=[tagged_ch]).start()
-if sp.getoutput('hostname') == 'Dijkstra':
-    threading.Thread(target=discover_neighbors, args = [tagged_ch]).start()
-
-
-
-
-
+def discovery(tag):
+    while True:
+        err, ll = graspi.discover(tag.source, tag.objective, 10000, False)
+        if (not err) and (len(ll) != 0):
+            print("##################")
+            for item in ll:
+                print(item.locator)
+            print("##################")
+        sleep(5)
+    
+threading.Thread(target=listen_neg, args = [tagged]).start()
+threading.Thread(target=discovery, args=[tagged]).start()

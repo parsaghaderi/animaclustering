@@ -3,7 +3,7 @@ import random
 import threading
 import cbor
 import subprocess as sp
-
+from time import sleep
 try:
     import graspi
     _old_API = False
@@ -83,12 +83,14 @@ def request_neg(_tagged, ll):
     pass
 
 def discovery(_tagged):
-    err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000)
-    if (not err) and len(ll) != 0:
-        for item in ll:
-            mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
-    else:
-        mprint(graspi.etext[err])
+    while True:
+        err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000)
+        if (not err) and len(ll) != 0:
+            for item in ll:
+                mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
+        else:
+            mprint(graspi.etext[err])
+        sleep(3)
 
 if sp.getoutput('hostname') == "Dijkstra":
     threading.Thread(target=listener, args = [tagged]).start()

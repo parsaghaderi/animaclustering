@@ -174,7 +174,7 @@ def listen_neg_node_info(_tagged):
 
 def request_neg_node_info(_tagged, handler):
     # mprint("negotiation with {}".format(handler.locator))
-    mprint("requesting {}", _tagged.objective.name)
+    mprint("requesting {}".format(_tagged.objective.name))
     if _old_API:
         err, handle, answer = graspi.request_negotiate(_tagged.source,_tagged.objective, handler, None) #TODO
         reason = answer

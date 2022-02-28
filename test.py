@@ -89,3 +89,8 @@ def discovery(_tagged):
             mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
     else:
         mprint(graspi.etext[err])
+
+if sp.getoutput('hostname') == "Dijkstra":
+    threading.Thread(target=listener, args = [tagged]).start()
+else:
+    threading.Thread(target = discovery, args=[tagged]).start()

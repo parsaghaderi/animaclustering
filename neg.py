@@ -132,7 +132,7 @@ def listen_neg_ND(_tagged):
 
 def discovery(_tagged):
     # while True:
-    for i in range(1, 6):
+    for i in range(1, 3):
         err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, True)
         if (not err) and (len(ll) != 0):
             for item in ll:
@@ -148,7 +148,7 @@ def discovery(_tagged):
         
 
 def listen_node_info_handler(_tagged, handle, answer):
-    mprint("handling request from {}".format(handle.id_source))
+    mprint("handling request from {}".format(cbor.loads(handle.id_source)))
     answer.value = cbor.loads(answer.value)
     # NEIGHBOR_weights[str(handle.locator)] = answer.value
     answer.value = _tagged.objective.value

@@ -134,5 +134,6 @@ def print_neighbors():
     while True:
         for item in NEIGHBOR_LOCATORS:
             print(item)
+        print("----------------------------")
         sleep(5)
 threading.Thread(target=print_neighbors, args=[]).start()

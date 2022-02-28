@@ -76,11 +76,43 @@ def listener(_tagged):
             threading.Thread(target = request_handler, args = [_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
+
 def request_handler(_tagged, handle, answer):
-    pass
+    mprint("handling request from {}".format(handle.id_source))
+    answer.value = cbor.loads(answer.value)
+    mprint("peer offered {}".format(answer.value))
+    #TODO do something with the answer
+    answer.value = _tagged.objective.value
+    answer.value = cbor.dumps(answer.value)
+    _r = graspi.negotiate_step(_tagged.source, handle, answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        mprint("neg ended with reason {}".format(reason))
+    else:
+        mprint(graspi.etext[err])
 
 def request_neg(_tagged, ll):
-    pass
+    mprint("requestion objective {}".format(_tagged.objective.name))
+    if _old_API:
+        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+        reason = answer
+    else:
+        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+
+    if not err:
+        mprint("peer offered {}".format(cbor.loads(answer.value)))
+        #TODO use the value here
+        _err = graspi.end_negotiate(_tagged.source, handle, True, "neg finished")
+        if not _err:
+            mprint("neg finished successfully")
+        else:
+            mprint("error in ending negotiation {}".format(graspi.etext[_err]))
+    else:
+        mprint("can't make neg request {}".format(graspi.etext[err]))
 
 def discovery(_tagged):
     while True:
@@ -88,11 +120,15 @@ def discovery(_tagged):
         if (not err) and len(ll) != 0:
             for item in ll:
                 mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
+            break
         else:
             mprint(graspi.etext[err])
         sleep(3)
+    threading.Thread(target=request_neg, args=[_tagged, ll[0]]).start()
 
 if sp.getoutput('hostname') == "Dijkstra":
+    tagged.objective.value = 1
     threading.Thread(target=listener, args = [tagged]).start()
 else:
+    tagged.objective.value = 2
     threading.Thread(target = discovery, args=[tagged]).start()

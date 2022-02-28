@@ -136,7 +136,7 @@ def discovery(tag):
         if (not err) and (len(ll) != 0):
             for item in ll:
                 if not NEIGHBOR_LOCATORS.__contains__(item):
-                    NEIGHBOR_LOCATORS.add(item)
+                    NEIGHBOR_LOCATORS.add(item.locator)
         mprint(NEIGHBOR_LOCATORS)        
         sleep(5)    
 

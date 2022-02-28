@@ -171,7 +171,7 @@ def listen_neg_node_info(_tagged):
             )
         else:
             mprint(graspi.etext[err])
-            
+
 def request_neg_node_info(_tagged, handler):
     mprint("negotiation with {}".format(handler.locator))
     if _old_API:
@@ -206,8 +206,11 @@ def print_neighbors():
         sleep(3)
     send_req_node_info(tagged_node)
 # threading.Thread(target=print_neighbors, args=[]).start()
-
-threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()
+import subprocess as sp
+if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=listen_neg_node_info, args=[tagged_node]).start()
+elif sp.getoutput('hostname') == 'Gingko':
+    threading.Thread(target=request_neg_node_info, args=[tagged_node, None]).start()
 # threading.Thread(target=send_req_node_info, args=[tagged_node]).start()
 send_req_node_info(tagged_node)
 

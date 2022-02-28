@@ -325,13 +325,13 @@ if get_name() == 'Dijkstra':
     threading.Thread(target=run_discovery, args=[tagged_neg, 10000, False]).start()
 
 if get_name() == 'Ritchie':
-    # obj_synch.value = 'Ritchie_synch'
+    obj_synch.value = 'Ritchie_synch'
     # obj_synch.discoverable = True
     obj_neg.value = 1
     #threading.Thread(target=flooder,    args = [tagged_synch]).        start()
     # obj_synch.value = 'Ritchie_synch'
     # obj_neg.value = 50
-    # threading.Thread(target=flooder,    args = [tagged_synch]).        start()
+    threading.Thread(target=flooder,    args = [tagged_synch]).        start()
     threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
 
     # threading.Thread(target=synch,      args = [tagged_synch]).        start()
@@ -343,7 +343,7 @@ if get_name() == 'Ritchie':
 
 if get_name() == 'Gingko':
     # threading.Thread(target=listen_neg, args = [tagged_neg])  .        start()
-    threading.Thread(target=run_discovery, args=[tagged_neg, 10000, False]).start()
+    # threading.Thread(target=run_discovery, args=[tagged_neg, 10000, False]).start()
 
     # err, ll = graspi.discover(tagged_neg.source, tagged_neg.objective, 10000, flush=True)
     # obj_neg.value = 15
@@ -376,7 +376,7 @@ if get_name() == 'Gingko':
     # else:
     #     mprint("discovery returned zero")
     # for item in ll:
-    # threading.Thread(target=synch,      args = [tagged_synch, ll[1]]).        start()
+    threading.Thread(target=synch,      args = [tagged_synch]).        start()
         
 
             

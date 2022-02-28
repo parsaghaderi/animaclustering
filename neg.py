@@ -148,9 +148,9 @@ def discovery(_tagged):
         
 
 def listen_node_info_handler(_tagged, handle, answer):
-    mprint("handling request from {}".format(handle.locator))
+    mprint("handling request from {}".format(handle.id_source))
     answer.value = cbor.loads(answer.value)
-    NEIGHBOR_weights[str(handle.locator)] = answer.value
+    # NEIGHBOR_weights[str(handle.locator)] = answer.value
     answer.value = _tagged.objective.value
     answer.value = cbor.dumps(answer.value)
     _r = graspi.negotiate_step(_tagged.source, handle, answer, 10000)
@@ -182,7 +182,7 @@ def listen_neg_node_info(_tagged):
         sleep(3)
 
 def request_neg_node_info(_tagged, handler):
-    # mprint("negotiation with {}".format(handler.locator))
+    mprint("negotiation with {}".format(handler.locator))
     mprint("requesting {}".format(_tagged.objective.name))
     if _old_API:
         err, handle, answer = graspi.request_negotiate(_tagged.source,_tagged.objective, handler, None) #TODO

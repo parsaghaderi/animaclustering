@@ -1,3 +1,4 @@
+from base64 import decode
 import os
 import random
 import threading
@@ -79,7 +80,7 @@ def listener(_tagged):
             mprint(graspi.etext[err])
 
 def request_handler(_tagged, handle, answer):
-    mprint("handling request from {}".format(str(handle.id_source, 'utf-8')))
+    mprint("handling request from {}".format(handle.id_source.decode()))
     answer.value = cbor.loads(answer.value)
     mprint("peer offered {}".format(answer.value))
     #TODO do something with the answer

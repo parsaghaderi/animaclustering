@@ -114,7 +114,7 @@ def request_handler(_tagged, handle, answer):
         mprint(graspi.etext[err])
 
 def request_neg(_tagged, ll):
-    mprint("requestion objective {} from {}".format(_tagged.objective.name, ll.locator))
+    mprint("requesting objective {} from {}".format(_tagged.objective.name, ll.locator))
     if _old_API:
         err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
         reason = answer

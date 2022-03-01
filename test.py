@@ -128,7 +128,7 @@ def request_neg(_tagged, ll):
     else:
         mprint("can't make neg request {}".format(graspi.etext[err]))
 
-def discovery(_tagged):
+def neighbor_discovery(_tagged):
     neighbors = set()
     while True:
         err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True)
@@ -149,7 +149,7 @@ def discovery(_tagged):
 # if sp.getoutput('hostname') == "Dijkstra":
 threading.Thread(target=listener, args = [tagged]).start()
 # elif sp.getoutput('hostname') == "Ritchie":
-threading.Thread(target = discovery, args=[tagged]).start()
+threading.Thread(target = neighbor_discovery, args=[tagged]).start()
 # else:
     # while True:
     #     grasp._initialise_grasp()

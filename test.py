@@ -18,7 +18,7 @@ import acp
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')
     l = f.readlines()
-    l = [str(item) for item in l]
+    l = [item.rstrip('\n') for item in l]
     return l[0], l[1:]
 
 #########################

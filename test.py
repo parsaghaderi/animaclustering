@@ -82,7 +82,7 @@ def TAG_OBJ(obj, ASA):
 
 asa, err = ASA_REG('neg1')
 # obj, err = OBJ_REG('node', cbor.dumps({str(acp._get_my_address()):get_node_value()}), True, False, 10, asa)
-obj, err = OBJ_REG('node', get_node_value(), True, False, 10, asa)
+obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
 
 tagged   = TAG_OBJ(obj, asa)
 

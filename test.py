@@ -137,6 +137,7 @@ def discovery(_tagged):
                 mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
                 if str(item.locator) in NEIGHBOR_ULA:
                     neighbors.add(item.locator)
+                    mprint("----\n{}\n-----".format(neighbors))
             if len(neighbors) == len(NEIGHBOR_ULA):
                 mprint("found all neighbors \n {}".format(neighbors))
                 break

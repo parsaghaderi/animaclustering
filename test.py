@@ -142,13 +142,13 @@ def discovery(_tagged):
                 break
         else:
             mprint(graspi.etext[err])
-        sleep(3)
+        sleep(1)
     # threading.Thread(target=request_neg, args=[_tagged, ll[0]]).start()
 
 # if sp.getoutput('hostname') == "Dijkstra":
-#     threading.Thread(target=listener, args = [tagged]).start()
+threading.Thread(target=listener, args = [tagged]).start()
 # elif sp.getoutput('hostname') == "Ritchie":
-#     threading.Thread(target = discovery, args=[tagged]).start()
+threading.Thread(target = discovery, args=[tagged]).start()
 # else:
     # while True:
     #     grasp._initialise_grasp()

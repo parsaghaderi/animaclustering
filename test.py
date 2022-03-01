@@ -14,13 +14,19 @@ except:
     _old_API = True
     import grasp as graspi
 import acp
+def grasp_run():
+    while True:
+        grasp._initialise_grasp()
+        while True:
+            sleep(5)
+threading.Thread(target=grasp_run, args = [])
 
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')
     l = f.readlines()
     l = [item.rstrip('\n') for item in l]
     return l[0], l[1:]
-
+MY_ULA, NEIGHBOR_ULA = get_neighbors()
 #########################
 # utility function for setting the value of
 # each node randomly. 
@@ -36,8 +42,6 @@ def mprint(msg):
     print("\n#######################")
     print(msg)
     print("#######################\n")
-a, b = get_neighbors()
-mprint("neighbors {} {}".format(a, b))
 
 #########################
 #Registering ASA 
@@ -125,23 +129,29 @@ def request_neg(_tagged, ll):
         mprint("can't make neg request {}".format(graspi.etext[err]))
 
 def discovery(_tagged):
+    neighbors = set()
     while True:
         err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000)
         if (not err) and len(ll) != 0:
             for item in ll:
                 mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
-            break
+                if str(item.locator) in NEIGHBOR_ULA:
+                    neighbors.add(item.locator)
+            if len(neighbors) == len(NEIGHBOR_ULA):
+                mprint("found all neighbors \n {}".format(neighbors))
+                break
         else:
             mprint(graspi.etext[err])
         sleep(3)
-    threading.Thread(target=request_neg, args=[_tagged, ll[0]]).start()
+    # threading.Thread(target=request_neg, args=[_tagged, ll[0]]).start()
 
-if sp.getoutput('hostname') == "Dijkstra":
-    threading.Thread(target=listener, args = [tagged]).start()
-elif sp.getoutput('hostname') == "Ritchie":
-    threading.Thread(target = discovery, args=[tagged]).start()
-else:
-    while True:
-        grasp._initialise_grasp()
-        while True:
-            sleep(5)
+# if sp.getoutput('hostname') == "Dijkstra":
+#     threading.Thread(target=listener, args = [tagged]).start()
+# elif sp.getoutput('hostname') == "Ritchie":
+#     threading.Thread(target = discovery, args=[tagged]).start()
+# else:
+    # while True:
+    #     grasp._initialise_grasp()
+    #     while True:
+    #         sleep(5)
+

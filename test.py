@@ -27,6 +27,8 @@ def get_neighbors():
     l = [item.rstrip('\n') for item in l]
     return l[0], l[1:]
 MY_ULA, NEIGHBOR_ULA = get_neighbors()
+NEIGHBOR_INFO = {}
+
 #########################
 # utility function for setting the value of
 # each node randomly. 
@@ -110,7 +112,7 @@ def request_handler(_tagged, handle, answer):
         mprint(graspi.etext[err])
 
 def request_neg(_tagged, ll):
-    mprint("requestion objective {}".format(_tagged.objective.name))
+    mprint("requestion objective {} from {}".format(_tagged.objective.name, ll.locator))
     if _old_API:
         err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
         reason = answer
@@ -118,15 +120,21 @@ def request_neg(_tagged, ll):
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
 
     if not err:
-        mprint("peer offered {}".format(cbor.loads(answer.value)))
+        mprint("peer {} offered {}".format(ll.locator, cbor.loads( answer.value)))
+        NEIGHBOR_INFO[ll] = cbor.loads(answer.value)
         #TODO use the value here
         _err = graspi.end_negotiate(_tagged.source, handle, True, "neg finished")
         if not _err:
-            mprint("neg finished successfully")
+            mprint("neg with {} finished successfully".format(ll.locator))
         else:
-            mprint("error in ending negotiation {}".format(graspi.etext[_err]))
+            mprint("error in ending negotiation {} with {}".format(graspi.etext[_err], ll.locator))
     else:
-        mprint("can't make neg request {}".format(graspi.etext[err]))
+        mprint("can't make neg request {} to {}".format(graspi.etext[err], ll.locator))
+
+def send_request(_tagged):
+    for item in NEIGHBOR_INFO:
+        threading.Thread(target=request_neg, args=[_tagged, item]).start()
+        
 
 def neighbor_discovery(_tagged):
     neighbors = set()
@@ -137,8 +145,10 @@ def neighbor_discovery(_tagged):
                 mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
                 if str(item.locator) in NEIGHBOR_ULA:
                     neighbors.add(item.locator)
+                    NEIGHBOR_INFO[item] = 0
             if len(neighbors) == len(NEIGHBOR_ULA):
                 mprint("found all neighbors \n {}".format(neighbors))
+                threading.Thread(target=send_request, args=[_tagged]).start()
                 break
         else:
             mprint(graspi.etext[err])

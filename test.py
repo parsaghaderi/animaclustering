@@ -127,7 +127,7 @@ def request_neg(_tagged, ll):
         #TODO use the value here
         _err = graspi.end_negotiate(_tagged.source, handle, True, "neg finished")
         if not _err:
-            mprint("neg with {} finished successfully".format(ll.locator))
+            mprint("neg with {} finished successfully with value {}".format(ll.locator, cbor.loads(answer.value)))
         else:
             mprint("error in ending negotiation {} with {}".format(graspi.etext[_err], ll.locator))
     else:

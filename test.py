@@ -14,6 +14,14 @@ except:
     _old_API = True
     import grasp as graspi
 import acp
+
+def get_neighbors():
+    f = open('/etc/TD_neighbor/locator')
+    l = f.readlines()
+    l = [str(item) for item in l]
+    return l[0], l[1:]
+
+mprint("neighbors {} {}".format(get_neighbors()))
 #########################
 # utility function for setting the value of
 # each node randomly. 

@@ -131,7 +131,7 @@ def request_neg(_tagged, ll):
 def discovery(_tagged):
     neighbors = set()
     while True:
-        err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000)
+        err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True)
         if (not err) and len(ll) != 0:
             for item in ll:
                 mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))

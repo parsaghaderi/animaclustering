@@ -13,7 +13,8 @@ try:
 except:
     _old_API = True
     import grasp as graspi
-
+import acp
+mprint(acp._get_my_address())
 #########################
 # utility function for setting the value of
 # each node randomly. 

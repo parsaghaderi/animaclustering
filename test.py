@@ -36,8 +36,8 @@ def mprint(msg):
     print("\n#######################")
     print(msg)
     print("#######################\n")
-
-mprint("neighbors {} {}".format(get_neighbors()))
+a, b = get_neighbors()
+mprint("neighbors {} {}".format(a, b))
 
 #########################
 #Registering ASA 

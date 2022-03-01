@@ -29,7 +29,6 @@ def mprint(msg):
     print("\n#######################")
     print(msg)
     print("#######################\n")
-mprint(acp._get_my_address())
 
 
 #########################
@@ -68,7 +67,7 @@ def TAG_OBJ(obj, ASA):
 
 
 asa, err = ASA_REG('neg1')
-obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
+obj, err = OBJ_REG('node', cbor.dumps({acp._get_my_address():get_node_value()}), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listener(_tagged):
@@ -81,12 +80,12 @@ def listener(_tagged):
             mprint(graspi.etext[err])
 
 def request_handler(_tagged, handle, answer):
-    mprint("handling request from {}".format(handle.id_value))
+    # mprint("handling request from {}".format(handle.id_value))
     answer.value = cbor.loads(answer.value)
     mprint("peer offered {}".format(answer.value))
     #TODO do something with the answer
     answer.value = _tagged.objective.value
-    answer.value = cbor.dumps(answer.value)
+    # answer.value = cbor.dumps(answer.value)
     _r = graspi.negotiate_step(_tagged.source, handle, answer, 10000)
     if _old_API:
         err, temp, answer = _r

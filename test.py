@@ -21,7 +21,6 @@ def get_neighbors():
     l = [str(item) for item in l]
     return l[0], l[1:]
 
-mprint("neighbors {} {}".format(get_neighbors()))
 #########################
 # utility function for setting the value of
 # each node randomly. 
@@ -38,6 +37,7 @@ def mprint(msg):
     print(msg)
     print("#######################\n")
 
+mprint("neighbors {} {}".format(get_neighbors()))
 
 #########################
 #Registering ASA 

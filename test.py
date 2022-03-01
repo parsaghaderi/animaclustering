@@ -80,7 +80,7 @@ def listener(_tagged):
             mprint(graspi.etext[err])
 
 def request_handler(_tagged, handle, answer):
-    mprint("handling request from {}".format(type(handle)))
+    mprint("handling request from {}".format(handle.id_value))
     answer.value = cbor.loads(answer.value)
     mprint("peer offered {}".format(answer.value))
     #TODO do something with the answer

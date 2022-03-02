@@ -79,29 +79,23 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA):
 def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
 
-
+# NEIGHBOR Discovery - Start
 asa, err = ASA_REG('neg1')
-# obj, err = OBJ_REG('node', cbor.dumps({str(acp._get_my_address()):get_node_value()}), True, False, 10, asa)
 obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
 
 tagged   = TAG_OBJ(obj, asa)
 
-def listener(_tagged):
-    mprint("listening to incoming requests")
+def discovery_listener(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
-            threading.Thread(target = request_handler, args = [_tagged, handle, answer]).start()
+            threading.Thread(target = neighbor_discovery_listener_handler, args = [_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
 
-def request_handler(_tagged, handle, answer):
-    # mprint("handling request from {}".format(handle.id_value))
+def neighbor_discovery_listener_handler(_tagged, handle, answer):
     answer.value = cbor.loads(answer.value)
-    mprint("peer offered {}".format(answer.value))
-    #TODO do something with the answer
     answer.value = _tagged.objective.value
-    # answer.value = cbor.dumps(answer.value)
     _r = graspi.negotiate_step(_tagged.source, handle, answer, 10000)
     if _old_API:
         err, temp, answer = _r
@@ -109,12 +103,11 @@ def request_handler(_tagged, handle, answer):
     else:
         err, temp, answer, reason = _r
     if (not err) and (temp == None):
-        mprint("neg ended with reason {}".format(reason))
+        pass
     else:
         mprint(graspi.etext[err])
 
-def request_neg(_tagged, ll):
-    mprint("requesting objective {} from {}".format(_tagged.objective.name, ll.locator))
+def request_neg_neighbor_discovery(_tagged, ll):
     if _old_API:
         err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
         reason = answer
@@ -127,7 +120,7 @@ def request_neg(_tagged, ll):
         #TODO use the value here
         _err = graspi.end_negotiate(_tagged.source, handle, True, "neg finished")
         if not _err:
-            mprint("neg with {} finished successfully with value {}".format(ll.locator, cbor.loads(answer.value)))
+            pass
         else:
             mprint("error in ending negotiation {} with {}".format(graspi.etext[_err], ll.locator))
     else:
@@ -135,7 +128,7 @@ def request_neg(_tagged, ll):
 
 def send_request(_tagged):
     for item in NEIGHBOR_INFO:
-        threading.Thread(target=request_neg, args=[_tagged, item]).start()
+        threading.Thread(target=request_neg_neighbor_discovery, args=[_tagged, item]).start()
         
 
 def neighbor_discovery(_tagged):
@@ -155,15 +148,95 @@ def neighbor_discovery(_tagged):
         else:
             mprint(graspi.etext[err])
         sleep(1)
-    # threading.Thread(target=request_neg, args=[_tagged, ll[0]]).start()
 
-# if sp.getoutput('hostname') == "Dijkstra":
-threading.Thread(target=listener, args = [tagged]).start()
-# elif sp.getoutput('hostname') == "Ritchie":
+threading.Thread(target=discovery_listener, args = [tagged]).start()
 threading.Thread(target = neighbor_discovery, args=[tagged]).start()
-# else:
-    # while True:
-    #     grasp._initialise_grasp()
-    #     while True:
-    #         sleep(5)
 
+#neighbor discovery done - locators and weight of neighbors received
+# NEIGHBOR Discovery - Finished
+
+#NEIGHBOR ROLE - Start
+CLUSTER_HEAD = False
+CLUSTER_SET = {acp._get_my_address():[]}
+HEAVIER_NODES = []
+cluster, err = OBJ_REG('cluster_info', None, True, False, 10, asa)
+tagged_cluster = TAG_OBJ(cluster, asa)
+
+def set_heavier():
+    while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
+        sleep(0.5)
+    my_weight = cbor.loads(tagged.objective.value)
+    for item in NEIGHBOR_INFO:
+        if NEIGHBOR_INFO[item] > my_weight:
+            HEAVIER_NODES.append(item)
+threading.Thread(target=set_heavier, args= []).start()
+
+def init():
+    while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
+        sleep(0.5)
+    max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
+    if NEIGHBOR_INFO[max_key] < cbor.loads(tagged.objective.value):
+        max_key = False
+    
+    if not max_key:
+        CLUSTER_HEAD = True
+        #broadcast role as cluster head
+threading.Thread(target = init, args = []).start()
+
+def role_listener(_tagged):
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            threading.Thread(target = role_listener_handler, args = [_tagged, handle, answer]).start()
+        else:
+            mprint(graspi.etext[err])
+        sleep(1)
+threading.Thread(target=role_listener, args=[tagged_cluster]).start()
+
+def role_listener_handler(_tagged, _handle, _answer):
+    _answer.value = cbor.dumps(True)
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        pass
+    else:
+        mprint(graspi.etext[err])
+
+def request_neg_neighbor_role(_tagged, ll):
+    if _old_API:
+        err, handle, answer = graspi.req_negotiate(_tagged.source,
+                                                   _tagged.objective,
+                                                   ll, None)
+        reason = answer
+    else:
+        err, handle, answer, reason = graspi.req_negotiate(_tagged.source,
+                                                   _tagged.objective,
+                                                   ll, None)
+    if cbor.loads(answer.value) == True:
+        #TODO add to list of roles
+        mprint("node {} is ch".format(ll.locator))
+    else:
+        answer.value = cbor.loads(answer.value) #TODO cbor.loads(answer.value).locator
+        mprint("node {} joined {}".format(ll.locator, answer.value.locator))
+        pass
+    _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
+    if not _err:
+        mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))
+    else:
+        mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
+
+def start_role_request():
+    while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
+        sleep(0.5) 
+    sleep(10)
+    for item in NEIGHBOR_INFO:
+        threading.Thread(target=request_neg_neighbor_role, 
+                         args=[tagged_cluster, item])
+        sleep(0.5)
+threading.Thread(target=start_role_request, args=[]).start()
+
+#NEIGHBOR ROLE - finished

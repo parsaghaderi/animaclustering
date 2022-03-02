@@ -132,8 +132,7 @@ def send_request(_tagged):
     while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
         mprint("waiting for weights from neighbors - {}".format(len(NEIGHBOR_INFO)))
         sleep(1)
-    threading.Thread(target=start_role_request, args=[]).start()  
-
+    
 def neighbor_discovery(_tagged):
     neighbors = set()
     while True:
@@ -178,6 +177,8 @@ def set_heavier():
         if NEIGHBOR_INFO[item] > my_weight:
             HEAVIER_NODES.append(item)
     mprint("heavier nodes {}".format(HEAVIER_NODES))
+    threading.Thread(target=start_role_request, args=[]).start()  
+
 threading.Thread(target=set_heavier, args= []).start()
 
 def init():
@@ -245,8 +246,6 @@ def request_neg_neighbor_role(_tagged, ll):
         mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
 
 def start_role_request():
-    while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
-        sleep(0.5) 
     for item in HEAVIER_NODES:
         mprint("requestion {}'s role".format(item.locator))
         threading.Thread(target=request_neg_neighbor_role, 

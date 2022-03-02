@@ -153,7 +153,7 @@ def neighbor_discovery(_tagged):
                 break
         else:
             mprint(graspi.etext[err])
-        sleep(1)
+        sleep(2)
 
 threading.Thread(target=discovery_listener, args = [tagged]).start()
 threading.Thread(target = neighbor_discovery, args=[tagged]).start()

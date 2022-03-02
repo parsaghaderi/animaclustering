@@ -180,20 +180,19 @@ def set_heavier():
 
 threading.Thread(target=set_heavier, args= []).start()
 
-def init():
-    global CLUSTER_HEAD
+def init(ch):
     while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
         sleep(0.5)
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
     if NEIGHBOR_INFO[max_key] < cbor.loads(tagged.objective.value):
-        CLUSTER_HEAD = True
+        ch = True
         mprint("I'm cluster head")
     else:
-        CLUSTER_HEAD = str(max_key.locator)
+        ch = str(max_key.locator)
         mprint("joining {}".format(max_key.locator))
         
         #broadcast role as cluster head
-threading.Thread(target = init, args = []).start()
+threading.Thread(target = init, args = [CLUSTER_HEAD]).start()
 
 def role_listener(_tagged):
     mprint("listening for incoming request for my role")

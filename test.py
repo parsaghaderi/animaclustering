@@ -9,10 +9,9 @@ from time import sleep
 try:
     import graspi
     _old_API = False
-
 except:
-    _old_API = True
     import grasp as graspi
+    _old_API = True
 import acp
 def grasp_run():
     while True:

@@ -176,6 +176,7 @@ def set_heavier():
         if NEIGHBOR_INFO[item] > my_weight:
             HEAVIER_NODES.append(item)
     mprint("heavier nodes {}".format(HEAVIER_NODES))
+    sleep(20)
     threading.Thread(target=start_role_request, args=[]).start()  
 
 threading.Thread(target=set_heavier, args= []).start()

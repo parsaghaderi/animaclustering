@@ -239,7 +239,7 @@ def request_neg_neighbor_role(_tagged, ll):
     #     answer.value = cbor.loads(answer.value) #TODO cbor.loads(answer.value).locator
     #     mprint("node {} joined {}".format(ll.locator, answer.value.locator))
     #     pass
-    mprint("****\nvalue {} recieved\n****".format(type(answer.value)))
+    mprint("****\nvalue {} recieved\n****".format(type(cbor.loads(answer.value))))
     _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
     if not _err:
         mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))

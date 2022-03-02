@@ -240,17 +240,21 @@ def request_neg_neighbor_role(_tagged, ll):
             keep_going = False
             #TODO add to list of roles
             mprint("node {} is ch".format(ll.locator))
+            _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
+            if not _err:
+                mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))
+            else:
+                mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
         elif type(cbor.loads(answer.value)) == str:
             keep_going = False
             answer.value = cbor.loads(answer.value) #TODO cbor.loads(answer.value).locator
             mprint("node {} joined {}".format(ll.locator, answer.value))
-
+            if not _err:
+                mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))
+            else:
+                mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
         # mprint("****\nvalue {} recieved\n****".format(type(cbor.loads(answer.value))))
-        _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
-        if not _err:
-            mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))
-        else:
-            mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
+        
         sleep(1)
 def start_role_request():
     for item in HEAVIER_NODES:

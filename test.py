@@ -234,7 +234,7 @@ def request_neg_neighbor_role(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,
                                                     _tagged.objective,
                                                     ll, None)
-        if type(cbor.loads(answer.value)) == type(None):
+        if type(cbor.loads(answer)) == type(None):
             pass
         elif cbor.loads(answer.value) == True:
             keep_going = False

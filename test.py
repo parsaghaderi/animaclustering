@@ -234,6 +234,8 @@ def request_neg_neighbor_role(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,
                                                     _tagged.objective,
                                                     ll, None)
+        if answer == None:
+            continue
         if cbor.loads(answer.value) == True:
             
             #TODO add to list of roles
@@ -242,8 +244,7 @@ def request_neg_neighbor_role(_tagged, ll):
             keep_going = False
             answer.value = cbor.loads(answer.value) #TODO cbor.loads(answer.value).locator
             mprint("node {} joined {}".format(ll.locator, answer.value))
-        else:
-            continue
+
         # mprint("****\nvalue {} recieved\n****".format(type(cbor.loads(answer.value))))
         _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
         if not _err:

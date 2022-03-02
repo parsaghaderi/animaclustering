@@ -248,6 +248,7 @@ def start_role_request():
     while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
         sleep(0.5) 
     for item in NEIGHBOR_INFO:
+        mprint("requestion {}'s role".format(item.locator))
         threading.Thread(target=request_neg_neighbor_role, 
                          args=[tagged_cluster, item])
         sleep(0.5)

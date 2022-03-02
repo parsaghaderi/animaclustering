@@ -189,7 +189,7 @@ def init():
         CLUSTER_HEAD = True
         mprint("I'm cluster head")
     else:
-        CLUSTER_HEAD = max_key
+        CLUSTER_HEAD = max_key.locator
         mprint("joining {}".format(max_key.locator))
         
         #broadcast role as cluster head

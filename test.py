@@ -211,6 +211,7 @@ def role_listener_handler(_tagged, _handle, _answer):
     else:
         mprint(graspi.etext[err])
 
+
 def request_neg_neighbor_role(_tagged, ll):
     mprint("asking {} for its role".format(ll.locator))
     if _old_API:

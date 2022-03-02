@@ -162,7 +162,7 @@ threading.Thread(target = neighbor_discovery, args=[tagged]).start()
 # NEIGHBOR Discovery - Finished
 
 #NEIGHBOR ROLE - Start
-CLUSTER_HEAD = False
+CLUSTER_HEAD = None
 CLUSTER_SET = {acp._get_my_address():[]}
 HEAVIER_NODES = []
 cluster, err = OBJ_REG('cluster_info', None, True, False, 10, asa)

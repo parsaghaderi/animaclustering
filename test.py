@@ -237,7 +237,7 @@ def request_neg_neighbor_role(_tagged, ll):
         if answer == None:
             continue
         if cbor.loads(answer.value) == True:
-            
+            keep_going = False
             #TODO add to list of roles
             mprint("node {} is ch".format(ll.locator))
         elif type(cbor.loads(answer.value)) == str:

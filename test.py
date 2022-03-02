@@ -218,7 +218,8 @@ def role_listener_handler(_tagged, _handle, _answer):
     if (not err) and (temp == None):
         pass
     else:
-        mprint(graspi.etext[err])
+        mprint("***&&&*** here \n {}".format(graspi.etext[err]))
+        # mprint(graspi.etext[err])
 
 
 def request_neg_neighbor_role(_tagged, ll):

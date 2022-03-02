@@ -249,7 +249,7 @@ def start_role_request():
     for item in HEAVIER_NODES:
         mprint("requestion {}'s role".format(item.locator))
         threading.Thread(target=request_neg_neighbor_role, 
-                         args=[tagged_cluster, item])
+                         args=[tagged_cluster, item]).start()
         sleep(0.5)
 
 def on_ch_recieve():

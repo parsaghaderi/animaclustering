@@ -129,7 +129,7 @@ def request_neg_neighbor_discovery(_tagged, ll):
 def send_request(_tagged):
     for item in NEIGHBOR_INFO:
         threading.Thread(target=request_neg_neighbor_discovery, args=[_tagged, item]).start()
-        
+    threading.Thread(target=start_role_request, args=[]).start()  
 
 def neighbor_discovery(_tagged):
     neighbors = set()
@@ -237,6 +237,6 @@ def start_role_request():
         threading.Thread(target=request_neg_neighbor_role, 
                          args=[tagged_cluster, item])
         sleep(0.5)
-threading.Thread(target=start_role_request, args=[]).start()
+
 
 #NEIGHBOR ROLE - finished

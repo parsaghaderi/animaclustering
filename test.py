@@ -169,9 +169,11 @@ def set_heavier():
     for item in NEIGHBOR_INFO:
         if NEIGHBOR_INFO[item] > my_weight:
             HEAVIER_NODES.append(item)
+    mprint("heavier nodes {}".format(HEAVIER_NODES))
 threading.Thread(target=set_heavier, args= []).start()
 
 def init():
+    global CLUSTER_HEAD
     while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
         sleep(0.5)
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
@@ -180,10 +182,12 @@ def init():
     
     if not max_key:
         CLUSTER_HEAD = True
+        mprint("I'm cluster head")
         #broadcast role as cluster head
 threading.Thread(target = init, args = []).start()
 
 def role_listener(_tagged):
+    mprint("listening for incoming request for my role")
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
@@ -194,7 +198,8 @@ def role_listener(_tagged):
 threading.Thread(target=role_listener, args=[tagged_cluster]).start()
 
 def role_listener_handler(_tagged, _handle, _answer):
-    _answer.value = cbor.dumps(True)
+    mprint("a node requested my role")
+    _answer.value = cbor.dumps(CLUSTER_HEAD)
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
         err, temp, answer = _r
@@ -207,6 +212,7 @@ def role_listener_handler(_tagged, _handle, _answer):
         mprint(graspi.etext[err])
 
 def request_neg_neighbor_role(_tagged, ll):
+    mprint("asking {} for its role".format(ll.locator))
     if _old_API:
         err, handle, answer = graspi.req_negotiate(_tagged.source,
                                                    _tagged.objective,

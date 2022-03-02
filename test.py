@@ -236,7 +236,11 @@ def request_neg_neighbor_role(_tagged, ll):
                                                     _tagged.objective,
                                                     ll, None)
         if answer == None:
-            continue
+            _err = graspi.end_negotiate(_tagged.source,handle, False, "gonna try later")
+            if not _err:
+                mprint("neg ended gonna try again")
+            else:
+                mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
         if cbor.loads(answer.value) == True:
             keep_going = False
             #TODO add to list of roles

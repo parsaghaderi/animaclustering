@@ -223,29 +223,34 @@ def role_listener_handler(_tagged, _handle, _answer):
 
 def request_neg_neighbor_role(_tagged, ll):
     mprint("asking {} for its role".format(ll.locator))
-    if _old_API:
-        err, handle, answer = graspi.req_negotiate(_tagged.source,
-                                                   _tagged.objective,
-                                                   ll, None)
-        reason = answer
-    else:
-        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,
-                                                   _tagged.objective,
-                                                   ll, None)
-    # if cbor.loads(answer.value) == True:
-    #     #TODO add to list of roles
-    #     mprint("node {} is ch".format(ll.locator))
-    # else:
-    #     answer.value = cbor.loads(answer.value) #TODO cbor.loads(answer.value).locator
-    #     mprint("node {} joined {}".format(ll.locator, answer.value.locator))
-    #     pass
-    mprint("****\nvalue {} recieved\n****".format(type(cbor.loads(answer.value))))
-    _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
-    if not _err:
-        mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))
-    else:
-        mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
-
+    keep_going = True
+    while keep_going:
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,
+                                                    _tagged.objective,
+                                                    ll, None)
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,
+                                                    _tagged.objective,
+                                                    ll, None)
+        if type(cbor.loads(answer.value)) == type(None):
+            pass
+        elif cbor.loads(answer.value) == True:
+            keep_going = False
+            #TODO add to list of roles
+            mprint("node {} is ch".format(ll.locator))
+        else:
+            answer.value = cbor.loads(answer.value) #TODO cbor.loads(answer.value).locator
+            mprint("node {} joined {}".format(ll.locator, answer.value.locator))
+            pass
+        mprint("****\nvalue {} recieved\n****".format(type(cbor.loads(answer.value))))
+        _err = graspi.end_negotiate(_tagged.source,handle, True, "neg finished")
+        if not _err:
+            mprint("neg for role finished with node {} with value".format(ll.locator, cbor.loads(answer.value)))
+        else:
+            mprint("neg over role with {} disrupted {}".format(ll.locator,graspi.etext[_err]))
+        sleep(1)
 def start_role_request():
     for item in HEAVIER_NODES:
         mprint("requestion {}'s role".format(item.locator))

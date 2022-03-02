@@ -143,7 +143,12 @@ def neighbor_discovery(_tagged):
                 mprint("node {} has objective {}".format(item.locator, _tagged.objective.name))
                 if str(item.locator) in NEIGHBOR_ULA:
                     neighbors.add(item.locator)
-                    NEIGHBOR_INFO[item] = 0
+                    add = True
+                    for i in NEIGHBOR_INFO.keys():
+                        if i.locator == item.locator:
+                            add = False
+                    if add:
+                        NEIGHBOR_INFO[item] = 0
             if len(neighbors) == len(NEIGHBOR_ULA):
                 mprint("found all neighbors \n {}".format(neighbors))
                 threading.Thread(target=send_request, args=[_tagged]).start()

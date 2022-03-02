@@ -162,7 +162,7 @@ threading.Thread(target = neighbor_discovery, args=[tagged]).start()
 # NEIGHBOR Discovery - Finished
 
 #NEIGHBOR ROLE - Start
-CLUSTER_HEAD = None
+CLUSTER_HEAD = False
 CLUSTER_SET = {acp._get_my_address():[]}
 HEAVIER_NODES = []
 cluster, err = OBJ_REG('cluster_info', None, True, False, 10, asa)
@@ -234,7 +234,7 @@ def request_neg_neighbor_role(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,
                                                     _tagged.objective,
                                                     ll, None)
-        if type(cbor.loads(answer)) == type(None):
+        if cbor.loads(answer.value) == False:
             pass
         elif cbor.loads(answer.value) == True:
             keep_going = False

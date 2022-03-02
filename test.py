@@ -130,7 +130,7 @@ def send_request(_tagged):
     for item in NEIGHBOR_INFO:
         threading.Thread(target=request_neg_neighbor_discovery, args=[_tagged, item]).start()
     while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
-        mprint("waiting for weights from neighbors")
+        mprint("waiting for weights from neighbors - {}".format(len(NEIGHBOR_INFO)))
         sleep(1)
     threading.Thread(target=start_role_request, args=[]).start()  
 

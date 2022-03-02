@@ -186,11 +186,12 @@ def init():
         sleep(0.5)
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
     if NEIGHBOR_INFO[max_key] < cbor.loads(tagged.objective.value):
-        max_key = False
-    
-    if not max_key:
         CLUSTER_HEAD = True
         mprint("I'm cluster head")
+    else:
+        CLUSTER_HEAD = max_key
+        mprint("joining {}".format(max_key.locator))
+        
         #broadcast role as cluster head
 threading.Thread(target = init, args = []).start()
 

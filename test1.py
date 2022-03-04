@@ -87,8 +87,8 @@ def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
 
 
-asa, err = ASA_REG('testing')
-obj, err = OBJ_REG('obj', None, True, False, 10, asa)
+asa, err = ASA_REG('node_neg')
+obj, err = OBJ_REG('node', get_node_value(), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listen(_tagged):
@@ -135,13 +135,15 @@ def neg(_tagged, ll):
         mprint("neg failed")
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         
+threading.Thread(target=listen, args=[tagged]).start()
+threading.Thread(target=discover, args=[tagged]).start()
 
-if sp.getoutput('hostname') == 'Dijkstra':
-    tagged.objective.value = cbor.dumps(True)
-    threading.Thread(target=listen, args=[tagged]).start()
-if sp.getoutput('hostname') == 'Ritchie':
-    tagged.objective.value = cbor.dumps(False)
-    threading.Thread(target=listen, args=[tagged]).start()
-if sp.getoutput('hostname') == 'Gingko':
-    tagged.objective.value = cbor.dumps(None)
-    threading.Thread(target=discover, args=[tagged]).start()
+# if sp.getoutput('hostname') == 'Dijkstra':
+#     tagged.objective.value = cbor.dumps(True)
+#     threading.Thread(target=listen, args=[tagged]).start()
+# if sp.getoutput('hostname') == 'Ritchie':
+#     tagged.objective.value = cbor.dumps(False)
+#     threading.Thread(target=listen, args=[tagged]).start()
+# if sp.getoutput('hostname') == 'Gingko':
+#     tagged.objective.value = cbor.dumps(None)
+#     threading.Thread(target=discover, args=[tagged]).start()

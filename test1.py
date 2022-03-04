@@ -88,7 +88,7 @@ def TAG_OBJ(obj, ASA):
 
 
 asa, err = ASA_REG('node_neg')
-obj, err = OBJ_REG('node', get_node_value(), True, False, 10, asa)
+obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listen(_tagged):
@@ -136,6 +136,7 @@ def neg(_tagged, ll):
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         
 threading.Thread(target=listen, args=[tagged]).start()
+sleep(10)
 threading.Thread(target=discover, args=[tagged]).start()
 
 # if sp.getoutput('hostname') == 'Dijkstra':

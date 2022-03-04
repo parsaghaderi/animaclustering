@@ -143,5 +143,5 @@ if sp.getoutput('hostname') == 'Ritchie':
     tagged.objective.value = cbor.dumps(False)
     threading.Thread(target=listen, args=[tagged]).start()
 if sp.getoutput('hostname') == 'Gingko':
-    tagged.objective.value = cbor.dumps(True)
+    tagged.objective.value = cbor.dumps(None)
     threading.Thread(target=discover, args=[tagged]).start()

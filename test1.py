@@ -120,7 +120,7 @@ def neg(_tagged, ll):
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
     if not err:
         mprint("peer offered {}".format(cbor.loads(answer.value)))
-        _err = graspi.end_negotiate(_tagged.source, handle, True, "value received")
+        _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
     else:
         mprint("neg failed")
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")

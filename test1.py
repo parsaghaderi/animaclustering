@@ -110,7 +110,7 @@ def discover(_tagged):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=False)
         if len(ll) != 0:
             mprint("asking {}".format(ll[0].locator))
-            threading.Thread(target=neg, args=[_tagged, ll[0]])
+            threading.Thread(target=neg, args=[_tagged, ll[0]]).start()
 
 def neg(_tagged, ll):
     if _old_API:

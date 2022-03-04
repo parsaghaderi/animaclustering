@@ -95,12 +95,13 @@ def listen(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
+            mprint("incoming request")
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    mprint("peer offered {}".format(cbor.loads(_answer.value)))
+    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
     _answer.value = _tagged.objective.value
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
@@ -129,7 +130,7 @@ def neg(_tagged, ll):
     else:
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
     if not err:
-        mprint("peer {} offered {}".format(ll.locator, cbor.loads(answer.value)))
+        mprint("neg_step value : peer {} offered {}".format(ll.locator, cbor.loads(answer.value)))
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
     else:
         mprint("neg failed")

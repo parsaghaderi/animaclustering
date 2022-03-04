@@ -134,8 +134,9 @@ def neg(_tagged, ll):
         mprint("neg failed")
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
 if sp.getoutput('hostname') == 'Gingko':
+    from grasp import _initialise_grasp
     while True:
-        graspi._initialise_grasp()
+        _initialise_grasp()
         while True:
             pass
 else:

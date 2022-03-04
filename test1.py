@@ -137,11 +137,11 @@ def neg(_tagged, ll):
         
 
 if sp.getoutput('hostname') == 'Dijkstra':
-    tagged.objective.value = cbor.dumps(10)
+    tagged.objective.value = cbor.dumps(True)
     threading.Thread(target=listen, args=[tagged]).start()
 if sp.getoutput('hostname') == 'Ritchie':
-    tagged.objective.value = cbor.dumps(30)
+    tagged.objective.value = cbor.dumps(False)
     threading.Thread(target=listen, args=[tagged]).start()
 if sp.getoutput('hostname') == 'Gingko':
-    tagged.objective.value = cbor.dumps(20)
+    tagged.objective.value = cbor.dumps(True)
     threading.Thread(target=discover, args=[tagged]).start()

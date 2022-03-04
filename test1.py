@@ -116,6 +116,7 @@ def listener_handler(_tagged, _handle, _answer):
 
 def discover(_tagged):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=False)
+        mprint(len(ll))
         for item in ll:
             mprint("asking {}".format(item.locator))
             threading.Thread(target=neg, args=[_tagged, item]).start()

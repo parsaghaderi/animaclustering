@@ -15,7 +15,7 @@ except:
 import acp
 def grasp_run():
     while True:
-        grasp._initialise_grasp()
+        graspi._initialise_grasp()
         while True:
             sleep(5)
 threading.Thread(target=grasp_run, args = [])

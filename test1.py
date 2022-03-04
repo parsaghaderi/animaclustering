@@ -9,18 +9,27 @@ from time import sleep
 try:
     import graspi
     _old_API = False
+    from grasp import _initialise_grasp
+    def init_grasp():
+        while True:
+            _initialise_grasp()
+            while True:
+                pass
+    threading.Thread(target=init_grasp, args = []).start()
 except:
     import grasp as graspi
     _old_API = True
-import acp
-
-from grasp import _initialise_grasp
-def init_grasp():
-    while True:
-        _initialise_grasp()
+    def init_grasp():
         while True:
-            pass
-# threading.Thread(target=init_grasp, args = []).start()
+            graspi._initialise_grasp()
+            while True:
+                pass
+    threading.Thread(target=init_grasp, args = []).start()
+import acp
+from subprocess import Popen, PIPE
+
+
+
 
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')

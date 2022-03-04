@@ -14,6 +14,13 @@ except:
     _old_API = True
 import acp
 
+from grasp import _initialise_grasp
+def init_grasp():
+    while True:
+        _initialise_grasp()
+        while True:
+            pass
+threading.Thread(target=init_grasp, args = []).start()
 
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')
@@ -133,16 +140,11 @@ def neg(_tagged, ll):
     else:
         mprint("neg failed")
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
-if sp.getoutput('hostname') == 'Gingko':
-    from grasp import _initialise_grasp
-    while True:
-        _initialise_grasp()
-        while True:
-            pass
-else:
-    threading.Thread(target=listen, args=[tagged]).start()
-    sleep(20)
-    threading.Thread(target=discover, args=[tagged]).start()
+
+
+threading.Thread(target=listen, args=[tagged]).start()
+sleep(20)
+threading.Thread(target=discover, args=[tagged]).start()
 
 # if sp.getoutput('hostname') == 'Dijkstra':
 #     tagged.objective.value = cbor.dumps(True)

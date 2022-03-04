@@ -20,7 +20,7 @@ def init_grasp():
         _initialise_grasp()
         while True:
             pass
-threading.Thread(target=init_grasp, args = []).start()
+# threading.Thread(target=init_grasp, args = []).start()
 
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')

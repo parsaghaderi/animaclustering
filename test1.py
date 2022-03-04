@@ -28,13 +28,6 @@ def get_neighbors():
     l = [item.rstrip('\n') for item in l]
     return l[0], l[1:]
 
-def grasp_run():
-    while True:
-        graspi._initialise_grasp()
-        while True:
-            pass
-threading.Thread(target=grasp_run, args = []).start()
-
 MY_ULA, NEIGHBOR_ULA = get_neighbors()
 NEIGHBOR_INFO = {}
 

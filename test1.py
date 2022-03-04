@@ -87,14 +87,43 @@ def listen(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
-            pass
+            threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
+
+def listener_handler(_tagged, _handle, _answer):
+    mprint("peer offered {}".format(cbor.loads(_answer.value)))
+    _answer.value = cbor.dumps(_tagged.objective.value)
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        mprint("peer ended neg with reason {}".format(reason))
+    else:
+        mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+
 
 def discover(_tagged):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=False)
         if len(ll) != 0:
             mprint(str(ll[0].locator))
+
+def neg(_tagged, ll):
+    if _old_API:
+        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+        reason = answer
+    else:
+        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+    if not err:
+        mprint("peer offered {}".format(cbor.loads(answer.value)))
+        _err = graspi.end_negotiate(_tagged.source, handle, True, "value received")
+    else:
+        mprint("neg failed")
+        _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
+        
 
 if sp.getoutput('hostname') == 'Dijkstra':
     threading.Thread(target=listen, args=[tagged]).start()

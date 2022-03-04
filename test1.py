@@ -137,7 +137,7 @@ def neg(_tagged, ll):
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         
 threading.Thread(target=listen, args=[tagged]).start()
-sleep(10)
+sleep(20)
 threading.Thread(target=discover, args=[tagged]).start()
 
 # if sp.getoutput('hostname') == 'Dijkstra':

@@ -25,6 +25,14 @@ def get_neighbors():
     l = f.readlines()
     l = [item.rstrip('\n') for item in l]
     return l[0], l[1:]
+
+def grasp_run():
+    while True:
+        graspi._initialise_grasp()
+        while True:
+            pass
+threading.Thread(target=grasp_run, args = []).start()
+
 MY_ULA, NEIGHBOR_ULA = get_neighbors()
 NEIGHBOR_INFO = {}
 
@@ -108,9 +116,10 @@ def listener_handler(_tagged, _handle, _answer):
 
 def discover(_tagged):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=False)
-        if len(ll) != 0:
-            mprint("asking {}".format(ll[0].locator))
-            threading.Thread(target=neg, args=[_tagged, ll[0]]).start()
+        for item in ll:
+            mprint("asking {}".format(item.locator))
+            threading.Thread(target=neg, args=[_tagged, item]).start()
+            sleep(5)
 
 def neg(_tagged, ll):
     if _old_API:
@@ -119,7 +128,7 @@ def neg(_tagged, ll):
     else:
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
     if not err:
-        mprint("peer offered {}".format(cbor.loads(answer.value)))
+        mprint("peer {} offered {}".format(ll.locator, cbor.loads(answer.value)))
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
     else:
         mprint("neg failed")
@@ -128,6 +137,9 @@ def neg(_tagged, ll):
 
 if sp.getoutput('hostname') == 'Dijkstra':
     tagged.objective.value = cbor.dumps(10)
+    threading.Thread(target=listen, args=[tagged]).start()
+if sp.getoutput('hostname') == 'Ritchie':
+    tagged.objective.value = cbor.dumps(30)
     threading.Thread(target=listen, args=[tagged]).start()
 if sp.getoutput('hostname') == 'Gingko':
     tagged.objective.value = cbor.dumps(20)

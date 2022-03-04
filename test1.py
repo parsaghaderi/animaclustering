@@ -93,7 +93,7 @@ def listen(_tagged):
 
 def listener_handler(_tagged, _handle, _answer):
     mprint("peer offered {}".format(cbor.loads(_answer.value)))
-    _answer.value = cbor.dumps(_tagged.objective.value)
+    _answer.value = _tagged.objective.value
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
         err, temp, answer = _r

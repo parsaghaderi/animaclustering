@@ -76,9 +76,9 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA):
         
 def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
-
+asa, err = ASA_REG('node_neg')
 if sp.getoutput('hostname') == 'Gingko':
-    asa, err = ASA_REG('node_neg')
+    
     def gremlin():
         while True:
             pass

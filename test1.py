@@ -114,9 +114,9 @@ def discover(_tagged):
     while attempt != 0:
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True)
         mprint(len(ll))
-        # for item in ll:
-        #     mprint("asking {}".format(item.locator))
-        #     # threading.Thread(target=neg, args=[_tagged, item]).start()
+        for item in ll:
+            mprint("asking {}".format(item.locator))
+            # threading.Thread(target=neg, args=[_tagged, item]).start()
         #     sleep(1)
         attempt-=1
 

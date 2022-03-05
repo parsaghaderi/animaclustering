@@ -112,7 +112,8 @@ def listener_handler(_tagged, _handle, _answer):
 def discover(_tagged):
     attempt = 20
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000,
+             relay_ifi=True)
         mprint(len(ll))
         for item in ll:
             mprint("asking {}".format(item.locator))

@@ -8,23 +8,10 @@ from time import sleep
 # import grasp
 try:
     import graspi
-    _old_API = False
-    from grasp import _initialise_grasp
-    def init_grasp():
-        while True:
-            _initialise_grasp()
-            while True:
-                pass
-    threading.Thread(target=init_grasp, args = []).start()
+    _old_API = False    
 except:
     import grasp as graspi
     _old_API = True
-    def init_grasp():
-        while True:
-            graspi._initialise_grasp()
-            while True:
-                pass
-    threading.Thread(target=init_grasp, args = []).start()
 import acp
 from subprocess import Popen, PIPE
 
@@ -92,6 +79,11 @@ def TAG_OBJ(obj, ASA):
 
 
 asa, err = ASA_REG('node_neg')
+def gremlin():
+    while True:
+        pass
+threading.Thread(target=gremlin, args=[]).start()
+
 obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
@@ -144,16 +136,10 @@ def neg(_tagged, ll):
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
 
 
-threading.Thread(target=listen, args=[tagged]).start()
-sleep(20)
-threading.Thread(target=discover, args=[tagged]).start()
-
-# if sp.getoutput('hostname') == 'Dijkstra':
-#     tagged.objective.value = cbor.dumps(True)
-#     threading.Thread(target=listen, args=[tagged]).start()
-# if sp.getoutput('hostname') == 'Ritchie':
-#     tagged.objective.value = cbor.dumps(False)
-#     threading.Thread(target=listen, args=[tagged]).start()
-# if sp.getoutput('hostname') == 'Gingko':
-#     tagged.objective.value = cbor.dumps(None)
-#     threading.Thread(target=discover, args=[tagged]).start()
+if sp.getoutput('hostname') == 'Dijkstra':
+    tagged.objective.value = cbor.dumps(True)
+    threading.Thread(target=listen, args=[tagged]).start()
+if sp.getoutput('hostname') == 'Ritchie':
+    tagged.objective.value = cbor.dumps(False)
+    # threading.Thread(target=listen, args=[tagged]).start()
+    threading.Thread(target=discover, args=[tagged]).start()

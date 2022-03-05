@@ -110,15 +110,15 @@ def listener_handler(_tagged, _handle, _answer):
 
 
 def discover(_tagged):
-    attempt = 20
-    while attempt != 0:
+   
+    while True:
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         mprint(len(ll))
         for item in ll:
             mprint("asking {}".format(item.locator))
             # threading.Thread(target=neg, args=[_tagged, item]).start()
         #     sleep(1)
-        attempt-=1
+       
 
 def neg(_tagged, ll):
     if _old_API:

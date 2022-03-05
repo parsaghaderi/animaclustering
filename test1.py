@@ -149,6 +149,10 @@ if sp.getoutput('hostname') == 'Tarjan':
     threading.Thread(target=listen, args=[tagged]).start()
     # threading.Thread(target=discover, args=[tagged]).start()
 
+if sp.getoutput('hostname') == 'Iverson':
+    tagged.objective.value = cbor.dumps(40)
+    threading.Thread(target=listen, args=[tagged]).start()
+    # threading.Thread(target=discover, args=[tagged]).start()
 
 if sp.getoutput('hostname') == 'Gingko':
     tagged.objective.value = cbor.dumps(30)

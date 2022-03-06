@@ -83,7 +83,7 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':set(), 'neighbors': set()}
+node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':set(), 'neighbors':[]}
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
@@ -119,7 +119,7 @@ def discover(_tagged):
         mprint(len(ll))
         attempt-=1
     for item in ll:
-        node_info['neighbors'].add(str(item.locator))
+        node_info['neighbors'].append(str(item.locator))
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
         threading.Thread(target=neg, args=[_tagged, item]).start()

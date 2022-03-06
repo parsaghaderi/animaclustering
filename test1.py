@@ -165,8 +165,7 @@ def find_heavier():
                 max_key = item
     HEAVIEST = max_key
     HEAVIER = sorted(tmp.items(), key=lambda x: x[1], reverse=True)
-    mprint(HEAVIER
-    )
+    
 def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
@@ -183,12 +182,23 @@ def init():
 
 threading.Thread(target=init, args=[]).start()
 
-# def on_update_rcv():
-#     who_to_join = False
-#     if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True: 
-#         node_info['cluster_head'] = str(HEAVIEST)
-#         node_info['cluster_set'] = []
-#         tagged.objective.value = cbor.dumps(node_info)
-#     else:
-#         for item in HEAVIER:
+def on_update_rcv():
+    
+    joined = False
+
+    for item in HEAVIER:
+        if node_info['cluster_head'] == str(item.locator) and NEIGHBOR_INFO[item]['cluster_head'] != True:
+            mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
+        if NEIGHBOR_INFO[item]['cluster_head'] == True:
+            mprint("joining {}".format(item.locator))
+            joined = True
+            node_info['cluster_head'] = str(item.locator)
+            node_info['cluster_set'] = []
+            tagged.objective.value = cbor.dumps(node_info)
+            break
         
+    if not joined:
+        mprint("I'm cluster head")
+        node_info['cluster_head'] = True
+        node_info['cluster_set'] = [str(acp._get_my_address())]
+        tagged.objective.value = cbor.dumps(node_info)

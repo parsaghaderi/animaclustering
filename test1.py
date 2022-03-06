@@ -137,7 +137,7 @@ def neg(_tagged, ll):
         if not err:
 
             NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
-            mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
+            # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
         else:

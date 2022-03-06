@@ -120,6 +120,8 @@ def discover(_tagged):
     for item in ll:
         #mprint("asking {}".format(item.locator))
         threading.Thread(target=neg, args=[_tagged, item]).start()
+        threading.Thread(target=req_role_update, args=[_tagged, item]).start()
+
 
        
 
@@ -167,16 +169,18 @@ def init():
         tagged.objective.value = cbor.dumps(node_info)
         
 
-def req_role_update(_tagged, ll):
+def req_role_update(_tagged):
     while True:
-        for item in NEIGHBOR_INFO.keys():
-            if _old_API:
-                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
-                reason = answer
-            else:
-                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-            if not err:
-                mprint(cbor.loads(answer.locator))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        if not err:
+            mprint(cbor.loads(answer.locator))
+        else:
+            mprint(graspi.etext[err])
+        sleep(5)
 
 
 threading.Thread(target=init, args=[]).start()

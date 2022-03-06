@@ -168,20 +168,4 @@ def init():
         node_info['cluster_set'] = [str(acp._get_my_address())]
         tagged.objective.value = cbor.dumps(node_info)
         
-
-def req_role_update(_tagged, ll):
-    while True:
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-        if not err:
-            mprint(cbor.loads(answer.locator))
-        else:
-            mprint(graspi.etext[err])
-        sleep(5)
-
-
-# threading.Thread(target=init, args=[]).start()
-
+threading.Thread(target=init, args=[]).start()

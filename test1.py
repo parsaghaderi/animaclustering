@@ -120,7 +120,7 @@ def discover(_tagged):
     for item in ll:
         #mprint("asking {}".format(item.locator))
         threading.Thread(target=neg, args=[_tagged, item]).start()
-        threading.Thread(target=req_role_update, args=[_tagged, item]).start()
+        # threading.Thread(target=req_role_update, args=[_tagged, item]).start()
 
 
        
@@ -134,7 +134,7 @@ def neg(_tagged, ll):
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
     if not err:
 
-        NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)['weight']
+        NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
         mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
         
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
@@ -183,5 +183,5 @@ def req_role_update(_tagged, ll):
         sleep(5)
 
 
-threading.Thread(target=init, args=[]).start()
+# threading.Thread(target=init, args=[]).start()
 

@@ -169,7 +169,7 @@ def init():
         tagged.objective.value = cbor.dumps(node_info)
         
 
-def req_role_update(_tagged):
+def req_role_update(_tagged, ll):
     while True:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO

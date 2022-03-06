@@ -1,3 +1,4 @@
+from asyncio import threads
 from audioop import reverse
 from base64 import decode
 import os
@@ -27,7 +28,8 @@ def get_neighbors():
 
 MY_ULA, NEIGHBOR_ULA = get_neighbors()
 NEIGHBOR_INFO = {}
-
+NEIGHBOR_UPDATE = {}
+# NEIGHBORING = {str(acp._get_my_address()):[]}
 #########################
 # utility function for setting the value of
 # each node randomly. 
@@ -121,6 +123,7 @@ def discover(_tagged):
     for item in ll:
         if not node_info['neighbors'].__contains__(str(item.locator)):
             node_info['neighbors'].append(str(item.locator))
+            NEIGHBOR_UPDATE[item.locator] = False
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
         threading.Thread(target=neg, args=[_tagged, item]).start()
@@ -144,6 +147,7 @@ def neg(_tagged, ll):
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))
                 _tagged.objective.value = cbor.dumps(node_info)
+                NEIGHBOR_UPDATE[ll.locator] = True
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
         else:
             mprint("neg failed")
@@ -213,7 +217,85 @@ def on_update_rcv():
             node_info['cluster_set'].append(str(acp._get_my_address()))
             tagged.objective.value = cbor.dumps(node_info)
 
-def topology():
-    while len(NEIGHBOR_ULA) != len(NEIGHBOR_INFO):
-        sleep(3)
-    
+
+topology, err = OBJ_REG('topology',{node_info['ula']:node_info['neighbors']}, True, False, 10, asa)
+topology_tagged = TAG_OBJ(topology, asa)
+topo_lock = False
+
+def topo_listen(_tagged):
+    NEIGHBORING = {}
+    # NEIGHBORING = dict.fromkeys(NEIGHBOR_INFO.keys(), False)
+    for item in NEIGHBOR_INFO.keys():
+        NEIGHBORING[str(item)] = [item, False]
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            #mprint("incoming request")
+            answer.value = cbor.loads(answer.value)
+            while topo_lock:
+                sleep(0.1)
+            #TODO check where to put this
+            topo_lock = True
+            _tagged.objective.value.update(answer.value)
+            topo_lock = False
+            for items in answer.value.keys():
+                NEIGHBORING[items] = True
+            threads = []
+            for items in NEIGHBORING:
+                if not NEIGHBORING[items][1]:
+                    threads.append(threading.Thread(target=topo_request, args=[_tagged, items[0]]))
+            for items in threads:
+                items.start()
+            for items in threads:
+                items.join()
+            threading.Thread(target=topo_handler, args=[_tagged, handle, answer]).start()
+        else:
+            mprint(graspi.etext[err])
+threading.Thread(target=topo_listen, args=[topology_tagged]).start()
+
+def topo_handler(_tagged, _handle, _answer):
+    global topo_lock
+    _answer.value = cbor.loads(_answer.value)
+    while topo_lock:
+        sleep(0.1)
+    topo_lock = True
+    _tagged.objective.value.update(_answer.value)
+    topo_lock = False
+    _answer.value = cbor.dumps(_tagged.objective.value)
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 500000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        pass
+    else:
+        mprint("topo neg err {}".format(graspi.etext[err]))
+
+
+def topo_discovery(_tagged):
+    for item in NEIGHBOR_INFO:
+        threading.Thread(target = topo_request, args=[_tagged, item]).start()
+
+
+def topo_request(_tagged, ll):
+    global topo_lock
+    while topo_lock:
+        sleep(0.1)
+    topo_lock = True
+    _tagged.objective.value = cbor.dumps(_tagged.objective.value)
+    if _old_API:
+        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+        reason = answer
+    else:
+        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+    _tagged.objective.value = cbor.loads(_tagged.objective.value)
+    topo_lock = False
+    if not err:
+        answer.value = cbor.loads(answer.value)
+        while topo_lock:
+            sleep(0.1)
+        topo_lock = True
+        _tagged.objective.value.update(answer.value)
+        topo_lock = False

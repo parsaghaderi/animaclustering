@@ -134,14 +134,15 @@ def neg(_tagged, ll):
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
 
 
-if sp.getoutput('hostname') == 'Dijkstra':
-    tagged.objective.value = cbor.dumps(10)
-    # threading.Thread(target=listen, args=[tagged]).start()
-    threading.Thread(target=discover, args=[tagged]).start()
-else:
+# if sp.getoutput('hostname') == 'Dijkstra':
+tagged.objective.value = cbor.dumps(10)
+# threading.Thread(target=listen, args=[tagged]).start()
+threading.Thread(target=listen, args=[tagged]).start()
+
+threading.Thread(target=discover, args=[tagged]).start()
+# else:
 # if sp.getoutput('hostname') == 'Ritchie':
-    tagged.objective.value = cbor.dumps(20)
-    threading.Thread(target=listen, args=[tagged]).start()
+# tagged.objective.value = cbor.dumps(20)
 # threading.Thread(target=discover, args=[tagged]).start()
 
 # if sp.getoutput('hostname') == 'Tarjan':

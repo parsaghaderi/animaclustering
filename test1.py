@@ -82,7 +82,7 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[]}
+node_info = {'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[]}
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
@@ -112,7 +112,7 @@ def listener_handler(_tagged, _handle, _answer):
         pass
 
 def discover(_tagged):
-    attempt = 5
+    attempt = 3
     while attempt != 0:
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         mprint(len(ll))

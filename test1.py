@@ -183,7 +183,7 @@ def init():
     else:
         mprint("I'm cluster head")
         node_info['cluster_head'] = True
-        node_info['cluster_set'].append([str(acp._get_my_address())])
+        node_info['cluster_set'].append(str(acp._get_my_address()))
         tagged.objective.value = cbor.dumps(node_info)
     sleep(10)
     threading.Thread(target=on_update_rcv, args=[]).start()
@@ -210,7 +210,7 @@ def on_update_rcv():
             mprint("I'm cluster head")
             node_info['cluster_head'] = True
             node_info['cluster_set'] = []
-            node_info['cluster_set'].append([str(acp._get_my_address())])
+            node_info['cluster_set'].append(str(acp._get_my_address()))
             tagged.objective.value = cbor.dumps(node_info)
 
 def topology():

@@ -6,7 +6,6 @@ import cbor
 import subprocess as sp
 from time import sleep
 
-from matplotlib.font_manager import _Weight
 # import grasp
 try:
     import graspi

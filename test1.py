@@ -83,7 +83,7 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[], 'neighbors':[]}
+node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[], 'neighbors':[]} #TODO didn't accept set
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
@@ -119,7 +119,8 @@ def discover(_tagged):
         mprint(len(ll))
         attempt-=1
     for item in ll:
-        node_info['neighbors'].append(str(item.locator))
+        if not node_info['neighbors'].__contains__(str(item.locator)):
+            node_info['neighbors'].append(str(item.locator))
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
         threading.Thread(target=neg, args=[_tagged, item]).start()
@@ -140,7 +141,8 @@ def neg(_tagged, ll):
             NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
             mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll.locator]['cluster_head'] == str(acp._get_my_address()):
-                node_info['cluster_set'].append(str(ll.locator))
+                if not node_info['cluster_set'].__contains__(str(ll.locator)):
+                    node_info['cluster_set'].append(str(ll.locator))
                 _tagged.objective.value = cbor.dumps(node_info)
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
         else:

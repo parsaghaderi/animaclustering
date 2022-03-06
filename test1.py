@@ -122,13 +122,16 @@ def discover(_tagged):
        
 
 def neg(_tagged, ll):
+    NEIGHBOR_INFO[ll.locator] = 0
     if _old_API:
         err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
         reason = answer
     else:
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
     if not err:
-        mprint("neg_step value : peer {} offered {}".format(ll.locator, cbor.loads(answer.value)))
+        NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value[1])
+        mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
+        
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
     else:
         mprint("neg failed")

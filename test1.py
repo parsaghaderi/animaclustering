@@ -83,7 +83,7 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-node_info = {'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[]}
+node_info = {'weight':get_node_value(), 'cluster_head':False, 'cluster_set':set()}
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
@@ -139,7 +139,7 @@ def neg(_tagged, ll):
             NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
             mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll.locator]['cluster_head'] == str(acp._get_my_address()):
-                node_info['cluster_set'].append(str(ll.locator))
+                node_info['cluster_set'].add(str(ll.locator))
                 _tagged.objective.value = cbor.dumps(node_info)
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
         else:
@@ -180,7 +180,7 @@ def init():
     else:
         mprint("I'm cluster head")
         node_info['cluster_head'] = True
-        node_info['cluster_set'] = [str(acp._get_my_address())]
+        node_info['cluster_set'].add([str(acp._get_my_address())])
         tagged.objective.value = cbor.dumps(node_info)
     sleep(10)
     threading.Thread(target=on_update_rcv, args=[]).start()
@@ -199,12 +199,13 @@ def on_update_rcv():
                 mprint("joining {}".format(item))
                 joined = True
                 node_info['cluster_head'] = str(item)
-                node_info['cluster_set'] = []
+                node_info['cluster_set'] = set()
                 tagged.objective.value = cbor.dumps(node_info)
                 break
             
         if not joined:
             mprint("I'm cluster head")
             node_info['cluster_head'] = True
-            node_info['cluster_set'] = [str(acp._get_my_address())]
+            node_info['cluster_set'] = set()
+            node_info['cluster_set'].add([str(acp._get_my_address())])
             tagged.objective.value = cbor.dumps(node_info)

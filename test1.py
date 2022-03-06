@@ -186,20 +186,20 @@ threading.Thread(target=init, args=[]).start()
 def on_update_rcv():
     
     joined = False
-
-    for item in HEAVIER:
-        if node_info['cluster_head'] == str(item) and NEIGHBOR_INFO[item]['cluster_head'] != True:
-            mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
-        if NEIGHBOR_INFO[item]['cluster_head'] == True:
-            mprint("joining {}".format(item))
-            joined = True
-            node_info['cluster_head'] = str(item)
-            node_info['cluster_set'] = []
+    if not node_info['cluster_head']:
+        for item in HEAVIER:
+            if node_info['cluster_head'] == str(item) and NEIGHBOR_INFO[item]['cluster_head'] != True:
+                mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
+            if NEIGHBOR_INFO[item]['cluster_head'] == True:
+                mprint("joining {}".format(item))
+                joined = True
+                node_info['cluster_head'] = str(item)
+                node_info['cluster_set'] = []
+                tagged.objective.value = cbor.dumps(node_info)
+                break
+            
+        if not joined:
+            mprint("I'm cluster head")
+            node_info['cluster_head'] = True
+            node_info['cluster_set'] = [str(acp._get_my_address())]
             tagged.objective.value = cbor.dumps(node_info)
-            break
-        
-    if not joined:
-        mprint("I'm cluster head")
-        node_info['cluster_head'] = True
-        node_info['cluster_set'] = [str(acp._get_my_address())]
-        tagged.objective.value = cbor.dumps(node_info)

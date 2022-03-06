@@ -186,7 +186,7 @@ def on_update_rcv():
     
     joined = False
 
-    for item in HEAVIER:
+    for item in HEAVIER.keys():
         if node_info['cluster_head'] == str(item.locator) and NEIGHBOR_INFO[item]['cluster_head'] != True:
             mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
         if NEIGHBOR_INFO[item]['cluster_head'] == True:

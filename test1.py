@@ -152,30 +152,43 @@ HEAVIEST = False
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
 def find_heavier():
-    global HEAVIEST
+    global HEAVIEST,HEAVIER
+    tmp = {}
     max_weight = cbor.loads(obj.value)['weight']
     max_key = False
     for item in NEIGHBOR_INFO:
         if NEIGHBOR_INFO[item]['weight'] > cbor.loads(obj.value)['weight']:
-            HEAVIER.append(item)
+            # HEAVIER.append(item)
+            tmp[item] = NEIGHBOR_INFO[item]['weight']
             if  NEIGHBOR_INFO[item]['weight'] > max_weight:
                 max_weight = NEIGHBOR_INFO[item]['weight']
                 max_key = item
     HEAVIEST = max_key
-
+    HEAVIER = sorted(tmp.items(), key=lambda x: x[1], reverse=True)
+    mprint(HEAVIER
+    )
 def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
     find_heavier()
     if HEAVIEST != False:
-        mprint("joining {}".format(str(HEAVIEST)))
-        node_info['cluster_head'] = str(HEAVIEST)
-        node_info['cluster_set'] = []
-        tagged.objective.value = cbor.dumps(node_info)
+        mprint("want to join {}".format(str(HEAVIEST)))
     else:
         mprint("I'm cluster head")
         node_info['cluster_head'] = True
         node_info['cluster_set'] = [str(acp._get_my_address())]
         tagged.objective.value = cbor.dumps(node_info)
-        
+    sleep(10)
+    threading.Thread(target=on_update_rcv, args=[]).start()
+
 threading.Thread(target=init, args=[]).start()
+
+# def on_update_rcv():
+#     who_to_join = False
+#     if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True: 
+#         node_info['cluster_head'] = str(HEAVIEST)
+#         node_info['cluster_set'] = []
+#         tagged.objective.value = cbor.dumps(node_info)
+#     else:
+#         for item in HEAVIER:
+        

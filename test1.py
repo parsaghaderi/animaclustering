@@ -138,31 +138,16 @@ def neg(_tagged, ll):
         mprint("neg failed")
         _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
 
-
-# if sp.getoutput('hostname') == 'Dijkstra':
-
-# threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=listen, args=[tagged]).start()
-
 threading.Thread(target=discover, args=[tagged]).start()
-# else:
-# if sp.getoutput('hostname') == 'Ritchie':
-# tagged.objective.value = cbor.dumps(20)
-# threading.Thread(target=discover, args=[tagged]).start()
-
-# if sp.getoutput('hostname') == 'Tarjan':
-#     tagged.objective.value = cbor.dumps(30)
-#     threading.Thread(target=listen, args=[tagged]).start()
-#     # threading.Thread(target=discover, args=[tagged]).start()
-
-# if sp.getoutput('hostname') == 'Iverson':
-    # tagged.objective.value = cbor.dumps(40)
-    # threading.Thread(target=listen, args=[tagged]).start()
-    # threading.Thread(target=discover, args=[tagged]).start()
-
-# if sp.getoutput('hostname') == 'Gingko':
-#     tagged.objective.value = cbor.dumps(30)
-#     # threading.Thread(target=listen, args=[tagged]).start()
-#     threading.Thread(target=discover, args=[tagged]).start()
 
 
+
+CLUSTER_HEAD = False
+CLUSTER_SET  = []
+
+def init():
+    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
+        sleep(2)
+    mprint("got all neighbors info")
+threading.Thread(target=init, args=[]).start()

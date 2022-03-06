@@ -140,7 +140,7 @@ def neg(_tagged, ll):
             # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll.locator]['cluster_head'] == str(acp._get_my_address()):
                 node_info['cluster_set'].append(str(ll.locator))
-                obj.objective.value = cbor.dumps(node_info)
+                _tagged.objective.value = cbor.dumps(node_info)
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
         else:
             mprint("neg failed")

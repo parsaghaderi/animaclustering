@@ -89,13 +89,13 @@ def listen(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
-            mprint("incoming request")
+            #mprint("incoming request")
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
+    #mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
     _answer.value = _tagged.objective.value
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
@@ -104,10 +104,11 @@ def listener_handler(_tagged, _handle, _answer):
     else:
         err, temp, answer, reason = _r
     if (not err) and (temp == None):
-        mprint("peer ended neg with reason {}".format(reason))
+        #mprint("peer ended neg with reason {}".format(reason))
+        pass
     else:
-        mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
-
+        #mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+        pass
 
 def discover(_tagged):
     attempt = 5
@@ -116,7 +117,7 @@ def discover(_tagged):
         mprint(len(ll))
         attempt-=1
     for item in ll:
-        mprint("asking {}".format(item.locator))
+        #mprint("asking {}".format(item.locator))
         threading.Thread(target=neg, args=[_tagged, item]).start()
 
        

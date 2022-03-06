@@ -13,7 +13,6 @@ except:
     import grasp as graspi
     _old_API = True
 import acp
-from subprocess import Popen, PIPE
 
 
 
@@ -82,7 +81,8 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-obj, err = OBJ_REG('node', cbor.dumps(get_node_value()), True, False, 10, asa)
+
+obj, err = OBJ_REG('node', cbor.dumps([acp._get_my_address(), get_node_value()]), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listen(_tagged):
@@ -90,7 +90,7 @@ def listen(_tagged):
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             mprint("incoming request")
-            # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
 
@@ -116,7 +116,7 @@ def discover(_tagged):
         mprint(len(ll))
         for item in ll:
             mprint("asking {}".format(item.locator))
-            # threading.Thread(target=neg, args=[_tagged, item]).start()
+            threading.Thread(target=neg, args=[_tagged, item]).start()
         #     sleep(1)
        
 

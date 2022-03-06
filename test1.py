@@ -159,7 +159,7 @@ def init():
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
     if NEIGHBOR_INFO[max_key] > cbor.loads(obj.value)['weight']:
         mprint("joining {}".format(max_key))
-        node_info['cluster_head'] = max_key
+        node_info['cluster_head'] = str(max_key)
         node_info['cluster_set'] = []
         tagged.objective.value = cbor.dumps(node_info)
     else:

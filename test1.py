@@ -82,7 +82,7 @@ def gremlin():
 threading.Thread(target=gremlin, args=[]).start()
 
 
-obj, err = OBJ_REG('node', cbor.dumps([acp._get_my_address(), get_node_value()]), True, False, 10, asa)
+obj, err = OBJ_REG('node', cbor.dumps([str(acp._get_my_address()), get_node_value()]), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listen(_tagged):

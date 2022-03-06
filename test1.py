@@ -164,8 +164,9 @@ def find_heavier():
                 max_weight = NEIGHBOR_INFO[item]['weight']
                 max_key = item
     HEAVIEST = max_key
-    HEAVIER = sorted(tmp.items(), key=lambda x: x[1], reverse=True)
-    
+    tmp_sorted = sorted(tmp.items(), key=lambda x: x[1], reverse=True)
+    for item in tmp_sorted.keys():
+        HEAVIER.append(item)
 def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
@@ -186,7 +187,7 @@ def on_update_rcv():
     
     joined = False
 
-    for item in HEAVIER.keys():
+    for item in HEAVIER:
         if node_info['cluster_head'] == str(item.locator) and NEIGHBOR_INFO[item]['cluster_head'] != True:
             mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
         if NEIGHBOR_INFO[item]['cluster_head'] == True:

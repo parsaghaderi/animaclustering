@@ -5,6 +5,8 @@ import threading
 import cbor
 import subprocess as sp
 from time import sleep
+
+from matplotlib.font_manager import _Weight
 # import grasp
 try:
     import graspi
@@ -81,8 +83,8 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-
-obj, err = OBJ_REG('node', cbor.dumps([str(acp._get_my_address()), get_node_value()]), True, False, 10, asa)
+node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[]}
+obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
 def listen(_tagged):
@@ -130,7 +132,8 @@ def neg(_tagged, ll):
     else:
         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
     if not err:
-        NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)[1]
+
+        NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)['weight']
         mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
         
         _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
@@ -146,6 +149,10 @@ threading.Thread(target=discover, args=[tagged]).start()
 CLUSTER_HEAD = False
 CLUSTER_SET  = []
 CLUSTER_ID = None
+
+# cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
+# tagged_clustering = TAG_OBJ(cluster_obj, asa)
+
 def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
@@ -154,6 +161,7 @@ def init():
         mprint("joining {}".format(max_key))
     else:
         mprint("I'm cluster head")
+
 
 
 

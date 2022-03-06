@@ -147,7 +147,6 @@ threading.Thread(target=discover, args=[tagged]).start()
 
 CLUSTER_HEAD = False
 CLUSTER_SET  = []
-CLUSTER_ID = None
 
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
@@ -158,11 +157,26 @@ def init():
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
     if NEIGHBOR_INFO[max_key] > cbor.loads(obj.value)['weight']:
         mprint("joining {}".format(max_key))
+        node_info['cluster_head'] = max_key
+        node_info['cluster_set'] = []
+        tagged.objective.value = cbor.dumps(node_info)
     else:
         mprint("I'm cluster head")
+        node_info['cluster_head'] = True
+        node_info['cluster_set'] = [str(acp._get_my_address())]
+        tagged.objective.value = cbor.dumps(node_info)
+        
 
-
-
+def req_role_update(_tagged, ll):
+    while True:
+        for item in NEIGHBOR_INFO.keys():
+            if _old_API:
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+                reason = answer
+            else:
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            if not err:
+                mprint(cbor.loads(answer.locator))
 
 
 threading.Thread(target=init, args=[]).start()

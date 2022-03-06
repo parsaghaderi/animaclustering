@@ -164,7 +164,7 @@ def find_heavier():
                 max_weight = NEIGHBOR_INFO[item]['weight']
                 max_key = item
     HEAVIEST = max_key
-    tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse=True))
+    tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1]))
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
 def init():

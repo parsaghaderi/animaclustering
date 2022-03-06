@@ -157,7 +157,7 @@ def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
-    if NEIGHBOR_INFO[max_key] > cbor.loads(obj.value)['weight']:
+    if NEIGHBOR_INFO[max_key]['weight'] > cbor.loads(obj.value)['weight']:
         mprint("joining {}".format(max_key))
         node_info['cluster_head'] = str(max_key)
         node_info['cluster_set'] = []

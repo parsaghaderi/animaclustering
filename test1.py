@@ -147,19 +147,29 @@ threading.Thread(target=discover, args=[tagged]).start()
 
 
 
-CLUSTER_HEAD = False
-CLUSTER_SET  = []
-
+HEAVIER = []
+HEAVIEST = False
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
+def find_heavier():
+    global HEAVIEST
+    max_weight = cbor.loads(obj.value)['weight']
+    max_key = False
+    for item in NEIGHBOR_INFO:
+        if NEIGHBOR_INFO[item]['weight'] > cbor.loads(obj.value)['weight']:
+            HEAVIER.append(item)
+            if  NEIGHBOR_INFO[item]['weight'] > max_weight:
+                max_weight = NEIGHBOR_INFO[item]['weight']
+                max_key = item
+    HEAVIEST = max_key
 
 def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
-    max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
-    if NEIGHBOR_INFO[max_key]['weight'] > cbor.loads(obj.value)['weight']:
-        mprint("joining {}".format(max_key))
-        node_info['cluster_head'] = str(max_key)
+    find_heavier()
+    if HEAVIEST != False:
+        mprint("joining {}".format(str(HEAVIEST)))
+        node_info['cluster_head'] = str(HEAVIEST)
         node_info['cluster_set'] = []
         tagged.objective.value = cbor.dumps(node_info)
     else:

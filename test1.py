@@ -156,7 +156,7 @@ def init():
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
     max_key = max(NEIGHBOR_INFO, key=NEIGHBOR_INFO.get)
-    if NEIGHBOR_INFO[max_key] > cbor.loads(obj.value)[1]:
+    if NEIGHBOR_INFO[max_key] > cbor.loads(obj.value)['weight']:
         mprint("joining {}".format(max_key))
     else:
         mprint("I'm cluster head")

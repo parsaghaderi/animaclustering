@@ -11,7 +11,7 @@ def gremlin():
     while True:
         time.sleep(60)
 if sp.getoutput('hostname') == 'Gingko':
-    threading.Thread(target=gremlin, args=[]).start()
+    gremlin()
 import random
 import threading
 import cbor

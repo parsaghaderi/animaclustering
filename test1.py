@@ -128,6 +128,7 @@ def discover(_tagged):
        
 
 def neg(_tagged, ll):
+    global NEIGHBOR_INFO
     while True:
         NEIGHBOR_INFO[ll.locator] = 0
         if _old_API:
@@ -271,6 +272,7 @@ def topo_handler(_tagged, _handle, _answer):
 
 
 def topo_discovery(_tagged):
+    global NEIGHBOR_INFO
     for item in NEIGHBOR_INFO:
         mprint("asking item {}".format(str(item.locator)))
         # threading.Thread(target = topo_request, args=[_tagged, item]).start()

@@ -237,17 +237,19 @@ def topo_listen(_tagged):
             _tagged.objective.value.update(answer.value)
             topo_lock = False
             for items in answer.value.keys():
-                # NEIGHBORING[items][1] = True
+                NEIGHBORING[items][1] = True
                 mprint("******\n{}\n*******".format(items))
             threads = []
             for items in NEIGHBORING:
                 if not NEIGHBORING[items][1]:
+
                     threads.append(threading.Thread(target=topo_request, args=[_tagged, items[0]]))
             for items in threads:
                 items.start()
             for items in threads:
                 items.join()
             threading.Thread(target=topo_handler, args=[_tagged, handle, answer]).start()
+
         else:
             mprint(graspi.etext[err])
 threading.Thread(target=topo_listen, args=[topology_tagged]).start()

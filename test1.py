@@ -229,15 +229,18 @@ def topo_listen(_tagged):
         NEIGHBORING[str(item.locator)] = [item, False]
         mprint("&&&&&&&\n{}\n&&&&&&&".format(str(item.locator)))
     while True:
+        mprint(1)
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             #mprint("incoming request")
             answer.value = cbor.loads(answer.value)
+            mprint(2)
             while topo_lock:
                 sleep(0.1)
             #TODO check where to put this
             topo_lock = True
             _tagged.objective.value.update(answer.value)
+            mprint(3)
             topo_lock = False
             for items in answer.value.keys():
                 NEIGHBORING[items][1] = True

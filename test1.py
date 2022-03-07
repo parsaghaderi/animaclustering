@@ -248,7 +248,7 @@ def topo_listen(_tagged):
             threads = []
             for items in NEIGHBORING:
                 if not NEIGHBORING[items][1]:
-
+                    mprint(4)
                     threads.append(threading.Thread(target=topo_request, args=[_tagged, items[0]]))
             for items in threads:
                 items.start()

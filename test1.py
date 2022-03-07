@@ -130,7 +130,7 @@ def discover(_tagged):
 def neg(_tagged, ll):
     global NEIGHBOR_INFO
     while True:
-        NEIGHBOR_INFO[ll] = 0
+        NEIGHBOR_INFO[ll.locator] = 0
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
             reason = answer
@@ -138,7 +138,7 @@ def neg(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
 
-            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)
+            NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
             # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()):
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
@@ -279,6 +279,7 @@ def topo_discovery(_tagged):
         mprint("asking item {}".format(str(item)))
         threading.Thread(target = topo_request, args=[_tagged, item]).start()
 threading.Thread(target=topo_discovery, args=[tagged]).start()
+
 def topo_request(_tagged, ll):
     mprint("asking {} for topo map".format(str(ll)))
     global topo_lock

@@ -130,7 +130,7 @@ def discover(_tagged):
 def neg(_tagged, ll):
     global NEIGHBOR_INFO
     while True:
-        NEIGHBOR_INFO[ll.locator] = 0
+        NEIGHBOR_INFO[ll] = 0
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
             reason = answer
@@ -138,9 +138,9 @@ def neg(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
 
-            NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
+            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)
             # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
-            if NEIGHBOR_INFO[ll.locator]['cluster_head'] == str(acp._get_my_address()):
+            if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()):
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))
                 _tagged.objective.value = cbor.dumps(node_info)

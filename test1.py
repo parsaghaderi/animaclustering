@@ -280,7 +280,8 @@ def topo_discovery(_tagged):
     for item in NEIGHBOR_INFO.keys():
         mprint("asking item {}".format(str(item)))
         threading.Thread(target = topo_request, args=[_tagged, item]).start()
-threading.Thread(target=topo_discovery, args=[topology_tagged]).start()
+if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=topo_discovery, args=[topology_tagged]).start()
 
 def topo_request(_tagged, ll):
     # mprint("asking {} for topo map".format(str(ll.locator))) #√

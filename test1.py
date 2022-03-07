@@ -220,6 +220,7 @@ topology_tagged = TAG_OBJ(topology, asa)
 topo_lock = False
 
 def topo_listen(_tagged):
+    global topo_lock
     NEIGHBORING = {}
     # NEIGHBORING = dict.fromkeys(NEIGHBOR_INFO.keys(), False)
     for item in NEIGHBOR_INFO.keys():

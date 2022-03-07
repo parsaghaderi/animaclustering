@@ -234,6 +234,7 @@ def topo_listen(_tagged):
         if not err:
             #mprint("incoming request")
             answer.value = cbor.loads(answer.value)
+            mprint("____{}____".format(answer.value))
             mprint(2)
             while topo_lock:
                 sleep(0.1)

@@ -254,7 +254,7 @@ threading.Thread(target=topo_listen, args=[topology_tagged]).start()
 
 def topo_handler(_tagged, _handle, _answer):
     global topo_lock
-    _answer.value = cbor.loads(_answer.value)
+    # _answer.value = cbor.loads(_answer.value)
     while topo_lock:
         sleep(0.1)
     topo_lock = True
@@ -304,3 +304,4 @@ def topo_request(_tagged, ll):
         topo_lock = True
         _tagged.objective.value.update(answer.value)
         topo_lock = False
+        #end neg

@@ -123,7 +123,7 @@ def discovery(_tagged):
     while True:
         err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True)
         if (not err) and len(ll) != 0:
-            mprint(len(ll))
+            mprint(str(ll.locator))
         sleep(2)
 
 threading.Thread(target=listen, args=[tagged]).start()

@@ -138,7 +138,7 @@ def neg(_tagged, ll):
         if not err:
 
             NEIGHBOR_INFO[ll.locator] = cbor.loads(answer.value)
-            mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
+            # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll.locator]['cluster_head'] == str(acp._get_my_address()):
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))
@@ -273,8 +273,7 @@ def topo_handler(_tagged, _handle, _answer):
 def topo_discovery(_tagged):
     for item in NEIGHBOR_INFO:
         mprint("asking item {}".format(str(item.locator)))
-        threading.Thread(target = topo_request, args=[_tagged, item]).start()
-
+        # threading.Thread(target = topo_request, args=[_tagged, item]).start()
 threading.Thread(target=topo_discovery, args=[tagged]).start()
 def topo_request(_tagged, ll):
     mprint("asking {} for topo map".format(str(ll.locator)))

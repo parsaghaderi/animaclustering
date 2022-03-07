@@ -223,6 +223,8 @@ def topo_listen(_tagged):
     global topo_lock
     NEIGHBORING = {}
     # NEIGHBORING = dict.fromkeys(NEIGHBOR_INFO.keys(), False)
+    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
+        sleep(0.1)
     for item in NEIGHBOR_INFO.keys():
         NEIGHBORING[str(item.locator)] = [item, False]
         mprint("&&&&&&&\n{}\n&&&&&&&".format(str(item.locator)))

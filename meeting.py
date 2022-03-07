@@ -4,10 +4,10 @@ import subprocess as sp
 import threading
 # if sp.getoutput('hostname') == 'Gingko':
 def gremlin():
-    print("Starting GRASP daemon")
-    grasp._initialise_grasp()
-    grasp.init_bubble_text("GRASP daemon")
-    grasp.tprint("Daemon running")
+    # print("Starting GRASP daemon")
+    # grasp._initialise_grasp()
+    # grasp.init_bubble_text("GRASP daemon")
+    # grasp.tprint("Daemon running")
     while True:
         time.sleep(60)
 threading.Thread(target=gremlin, args=[]).start()

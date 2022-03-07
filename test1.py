@@ -225,6 +225,7 @@ def topo_listen(_tagged):
     # NEIGHBORING = dict.fromkeys(NEIGHBOR_INFO.keys(), False)
     for item in NEIGHBOR_INFO.keys():
         NEIGHBORING[str(item.locator)] = [item, False]
+        mprint("&&&&&&&\n{}\n&&&&&&&".format(str(item.locator)))
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:

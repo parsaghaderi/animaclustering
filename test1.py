@@ -232,6 +232,7 @@ def topo_listen(_tagged):
         mprint(1)
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
+            mprint(5)
             #mprint("incoming request")
             answer.value = cbor.loads(answer.value)
             mprint("____{}____".format(answer.value))

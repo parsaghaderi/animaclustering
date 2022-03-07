@@ -237,7 +237,7 @@ def topo_listen(_tagged):
             _tagged.objective.value.update(answer.value)
             topo_lock = False
             for items in answer.value.keys():
-                NEIGHBORING[items] = True
+                NEIGHBORING[items][1] = True
             threads = []
             for items in NEIGHBORING:
                 if not NEIGHBORING[items][1]:

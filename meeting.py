@@ -4,13 +4,14 @@ import subprocess as sp
 import threading
 # if sp.getoutput('hostname') == 'Gingko':
 def gremlin():
-    # print("Starting GRASP daemon")
-    # grasp._initialise_grasp()
-    # grasp.init_bubble_text("GRASP daemon")
-    # grasp.tprint("Daemon running")
+    print("Starting GRASP daemon")
+    grasp._initialise_grasp()
+    grasp.init_bubble_text("GRASP daemon")
+    grasp.tprint("Daemon running")
     while True:
         time.sleep(60)
-threading.Thread(target=gremlin, args=[]).start()
+if sp.getoutput('hostname') == 'Gingko':
+    threading.Thread(target=gremlin, args=[]).start()
 import random
 import threading
 import cbor
@@ -126,6 +127,6 @@ def discovery(_tagged):
             for item in ll:
                 mprint(str(item.locator))
         sleep(2)
-
-threading.Thread(target=listen, args=[tagged]).start()
-threading.Thread(target=discovery, args=[tagged]).start()
+if sp.getoutput('hostname') != 'Gingko':
+    threading.Thread(target=listen, args=[tagged]).start()
+    threading.Thread(target=discovery, args=[tagged]).start()

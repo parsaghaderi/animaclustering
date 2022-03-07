@@ -280,7 +280,7 @@ def topo_discovery(_tagged):
         threading.Thread(target = topo_request, args=[_tagged, item]).start()
 threading.Thread(target=topo_discovery, args=[tagged]).start()
 def topo_request(_tagged, ll):
-    mprint("asking {} for topo map".format(str(ll.locator)))
+    mprint("asking {} for topo map".format(str(ll)))
     global topo_lock
     while topo_lock:
         sleep(0.1)

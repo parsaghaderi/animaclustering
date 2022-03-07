@@ -273,6 +273,8 @@ def topo_handler(_tagged, _handle, _answer):
 
 def topo_discovery(_tagged):
     global NEIGHBOR_INFO
+    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
+        sleep(1)
     for item in NEIGHBOR_INFO.keys():
         mprint("asking item {}".format(str(item.locator)))
         # threading.Thread(target = topo_request, args=[_tagged, item]).start()

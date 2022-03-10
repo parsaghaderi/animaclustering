@@ -154,8 +154,6 @@ threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover, args=[tagged]).start()
 
 
-def print_cluster():
-
 HEAVIER = []
 HEAVIEST = False
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))

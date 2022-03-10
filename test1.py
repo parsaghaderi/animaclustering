@@ -213,7 +213,14 @@ def on_update_rcv():
             node_info['cluster_set'].append(str(acp._get_my_address()))
             tagged.objective.value = cbor.dumps(node_info)
 
-
+def keep_track():
+    while True:
+        if node_info['cluster_head'] == True:
+            print(node_info['cluster_set'])
+        else:
+            print(node_info['cluster_head'])
+        sleep(5)
+threading.Thread(target=keep_track, args=[]).start()
 # topology, err = OBJ_REG('topology',{node_info['ula']:node_info['neighbors']}, True, False, 10, asa)
 # topology_tagged = TAG_OBJ(topology, asa)
 # topo_lock = False

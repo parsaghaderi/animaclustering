@@ -155,163 +155,163 @@ threading.Thread(target=discover, args=[tagged]).start()
 
 
 
-HEAVIER = []
-HEAVIEST = False
-# cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
-# tagged_clustering = TAG_OBJ(cluster_obj, asa)
-def find_heavier():
-    global HEAVIEST,HEAVIER
-    tmp = {}
-    max_weight = cbor.loads(obj.value)['weight']
-    max_key = False
-    for item in NEIGHBOR_INFO:
-        if NEIGHBOR_INFO[item]['weight'] > cbor.loads(obj.value)['weight']:
-            # HEAVIER.append(item)
-            tmp[item] = NEIGHBOR_INFO[item]['weight']
-            if  NEIGHBOR_INFO[item]['weight'] > max_weight:
-                max_weight = NEIGHBOR_INFO[item]['weight']
-                max_key = item
-    HEAVIEST = max_key
-    tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
-    for item in tmp_sorted.keys():
-        HEAVIER.append(item)
-def init():
-    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
-        sleep(2)
-    find_heavier()
-    if HEAVIEST != False:
-        mprint("want to join {}".format(str(HEAVIEST)))
-    else:
-        mprint("I'm cluster head")
-        node_info['cluster_head'] = True
-        node_info['cluster_set'].append(str(acp._get_my_address()))
-        tagged.objective.value = cbor.dumps(node_info)
-    sleep(10)
-    threading.Thread(target=on_update_rcv, args=[]).start()
+# HEAVIER = []
+# HEAVIEST = False
+# # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
+# # tagged_clustering = TAG_OBJ(cluster_obj, asa)
+# def find_heavier():
+#     global HEAVIEST,HEAVIER
+#     tmp = {}
+#     max_weight = cbor.loads(obj.value)['weight']
+#     max_key = False
+#     for item in NEIGHBOR_INFO:
+#         if NEIGHBOR_INFO[item]['weight'] > cbor.loads(obj.value)['weight']:
+#             # HEAVIER.append(item)
+#             tmp[item] = NEIGHBOR_INFO[item]['weight']
+#             if  NEIGHBOR_INFO[item]['weight'] > max_weight:
+#                 max_weight = NEIGHBOR_INFO[item]['weight']
+#                 max_key = item
+#     HEAVIEST = max_key
+#     tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
+#     for item in tmp_sorted.keys():
+#         HEAVIER.append(item)
+# def init():
+#     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
+#         sleep(2)
+#     find_heavier()
+#     if HEAVIEST != False:
+#         mprint("want to join {}".format(str(HEAVIEST)))
+#     else:
+#         mprint("I'm cluster head")
+#         node_info['cluster_head'] = True
+#         node_info['cluster_set'].append(str(acp._get_my_address()))
+#         tagged.objective.value = cbor.dumps(node_info)
+#     sleep(10)
+#     threading.Thread(target=on_update_rcv, args=[]).start()
 
-threading.Thread(target=init, args=[]).start()
+# threading.Thread(target=init, args=[]).start()
 
-def on_update_rcv():
-    global NEIGHBOR_INFO
-    joined = False
-    if not node_info['cluster_head']:
-        for item in HEAVIER:
-            # mprint("{}".format(NEIGHBOR_INFO[item]))
-            # if node_info['cluster_head'] == str(item) and NEIGHBOR_INFO[item]['cluster_head'] != True:
-            #     mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
-            if NEIGHBOR_INFO[item]['cluster_head'] == True:
-                mprint("joining {}".format(item))
-                joined = True
-                node_info['cluster_head'] = str(item)
-                node_info['cluster_set'] = []
-                tagged.objective.value = cbor.dumps(node_info)
-                break
+# def on_update_rcv():
+#     global NEIGHBOR_INFO
+#     joined = False
+#     if not node_info['cluster_head']:
+#         for item in HEAVIER:
+#             # mprint("{}".format(NEIGHBOR_INFO[item]))
+#             # if node_info['cluster_head'] == str(item) and NEIGHBOR_INFO[item]['cluster_head'] != True:
+#             #     mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
+#             if NEIGHBOR_INFO[item]['cluster_head'] == True:
+#                 mprint("joining {}".format(item))
+#                 joined = True
+#                 node_info['cluster_head'] = str(item)
+#                 node_info['cluster_set'] = []
+#                 tagged.objective.value = cbor.dumps(node_info)
+#                 break
             
-        if not joined:
-            mprint("I'm cluster head")
-            node_info['cluster_head'] = True
-            node_info['cluster_set'] = []
-            node_info['cluster_set'].append(str(acp._get_my_address()))
-            tagged.objective.value = cbor.dumps(node_info)
+#         if not joined:
+#             mprint("I'm cluster head")
+#             node_info['cluster_head'] = True
+#             node_info['cluster_set'] = []
+#             node_info['cluster_set'].append(str(acp._get_my_address()))
+#             tagged.objective.value = cbor.dumps(node_info)
 
 
-topology, err = OBJ_REG('topology',{node_info['ula']:node_info['neighbors']}, True, False, 10, asa)
-topology_tagged = TAG_OBJ(topology, asa)
-topo_lock = False
+# topology, err = OBJ_REG('topology',{node_info['ula']:node_info['neighbors']}, True, False, 10, asa)
+# topology_tagged = TAG_OBJ(topology, asa)
+# topo_lock = False
 
-def topo_listen(_tagged):
-    global topo_lock
-    NEIGHBORING = {}
-    # NEIGHBORING = dict.fromkeys(NEIGHBOR_INFO.keys(), False)
-    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
-        sleep(0.1)
-    for item in NEIGHBOR_INFO.keys():
-        NEIGHBORING[str(item.locator)] = [item, False]
-        mprint("&&&&&&&\n{}\n&&&&&&&".format(str(item.locator)))
-    while True:
-        mprint(1)
-        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-        if not err:
-            mprint(5)
-            #mprint("incoming request")
-            answer.value = cbor.loads(answer.value)
-            mprint("____{}____".format(answer.value))
-            mprint(2)
-            while topo_lock:
-                sleep(0.1)
-            #TODO check where to put this
-            topo_lock = True
-            _tagged.objective.value.update(answer.value)
-            mprint(3)
-            topo_lock = False
-            for items in answer.value.keys():
-                NEIGHBORING[items][1] = True
-                # mprint("******\n{}\n*******".format(type(items)))
-            threads = []
-            for items in NEIGHBORING:
-                if not NEIGHBORING[items][1]:
-                    mprint(4)
-                    threads.append(threading.Thread(target=topo_request, args=[_tagged, items[0]]))
-            for items in threads:
-                items.start()
-            for items in threads:
-                items.join()
-            threading.Thread(target=topo_handler, args=[_tagged, handle, answer]).start()
+# def topo_listen(_tagged):
+#     global topo_lock
+#     NEIGHBORING = {}
+#     # NEIGHBORING = dict.fromkeys(NEIGHBOR_INFO.keys(), False)
+#     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
+#         sleep(0.1)
+#     for item in NEIGHBOR_INFO.keys():
+#         NEIGHBORING[str(item.locator)] = [item, False]
+#         mprint("&&&&&&&\n{}\n&&&&&&&".format(str(item.locator)))
+#     while True:
+#         mprint(1)
+#         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+#         if not err:
+#             mprint(5)
+#             #mprint("incoming request")
+#             answer.value = cbor.loads(answer.value)
+#             mprint("____{}____".format(answer.value))
+#             mprint(2)
+#             while topo_lock:
+#                 sleep(0.1)
+#             #TODO check where to put this
+#             topo_lock = True
+#             _tagged.objective.value.update(answer.value)
+#             mprint(3)
+#             topo_lock = False
+#             for items in answer.value.keys():
+#                 NEIGHBORING[items][1] = True
+#                 # mprint("******\n{}\n*******".format(type(items)))
+#             threads = []
+#             for items in NEIGHBORING:
+#                 if not NEIGHBORING[items][1]:
+#                     mprint(4)
+#                     threads.append(threading.Thread(target=topo_request, args=[_tagged, items[0]]))
+#             for items in threads:
+#                 items.start()
+#             for items in threads:
+#                 items.join()
+#             threading.Thread(target=topo_handler, args=[_tagged, handle, answer]).start()
 
-        else:
-            mprint(graspi.etext[err])
-threading.Thread(target=topo_listen, args=[topology_tagged]).start()
+#         else:
+#             mprint(graspi.etext[err])
+# threading.Thread(target=topo_listen, args=[topology_tagged]).start()
 
-def topo_handler(_tagged, _handle, _answer):
-    global topo_lock
-    # _answer.value = cbor.loads(_answer.value)
-    while topo_lock:
-        sleep(0.1)
-    topo_lock = True
-    _tagged.objective.value.update(_answer.value)
-    topo_lock = False
-    _answer.value = cbor.dumps(_tagged.objective.value)
-    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 500000)
-    if _old_API:
-        err, temp, answer = _r
-        reason = answer
-    else:
-        err, temp, answer, reason = _r
-    if (not err) and (temp == None):
-        pass
-    else:
-        mprint("topo neg err {}".format(graspi.etext[err]))
+# def topo_handler(_tagged, _handle, _answer):
+#     global topo_lock
+#     # _answer.value = cbor.loads(_answer.value)
+#     while topo_lock:
+#         sleep(0.1)
+#     topo_lock = True
+#     _tagged.objective.value.update(_answer.value)
+#     topo_lock = False
+#     _answer.value = cbor.dumps(_tagged.objective.value)
+#     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 500000)
+#     if _old_API:
+#         err, temp, answer = _r
+#         reason = answer
+#     else:
+#         err, temp, answer, reason = _r
+#     if (not err) and (temp == None):
+#         pass
+#     else:
+#         mprint("topo neg err {}".format(graspi.etext[err]))
 
 
-def topo_discovery(_tagged):
-    global NEIGHBOR_INFO
-    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
-        sleep(1)
-    for item in NEIGHBOR_INFO.keys():
-        mprint("asking item {}".format(str(item)))
-        threading.Thread(target = topo_request, args=[_tagged, item]).start()
-if sp.getoutput('hostname') == 'Dijkstra':
-    threading.Thread(target=topo_discovery, args=[topology_tagged]).start()
+# def topo_discovery(_tagged):
+#     global NEIGHBOR_INFO
+#     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
+#         sleep(1)
+#     for item in NEIGHBOR_INFO.keys():
+#         mprint("asking item {}".format(str(item)))
+#         threading.Thread(target = topo_request, args=[_tagged, item]).start()
+# if sp.getoutput('hostname') == 'Dijkstra':
+#     threading.Thread(target=topo_discovery, args=[topology_tagged]).start()
 
-def topo_request(_tagged, ll):
-    # mprint("asking {} for topo map".format(str(ll.locator))) #√
-    global topo_lock
-    while topo_lock:
-        sleep(0.1)
-    topo_lock = True
-    _tagged.objective.value = cbor.dumps(_tagged.objective.value)
-    if _old_API:
-        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
-        reason = answer
-    else:
-        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-    _tagged.objective.value = cbor.loads(_tagged.objective.value)
-    topo_lock = False
-    if not err:
-        answer.value = cbor.loads(answer.value)
-        while topo_lock:
-            sleep(0.1)
-        topo_lock = True
-        _tagged.objective.value.update(answer.value)
-        topo_lock = False
-        #end neg
+# def topo_request(_tagged, ll):
+#     # mprint("asking {} for topo map".format(str(ll.locator))) #√
+#     global topo_lock
+#     while topo_lock:
+#         sleep(0.1)
+#     topo_lock = True
+#     _tagged.objective.value = cbor.dumps(_tagged.objective.value)
+#     if _old_API:
+#         err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+#         reason = answer
+#     else:
+#         err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+#     _tagged.objective.value = cbor.loads(_tagged.objective.value)
+#     topo_lock = False
+#     if not err:
+#         answer.value = cbor.loads(answer.value)
+#         while topo_lock:
+#             sleep(0.1)
+#         topo_lock = True
+#         _tagged.objective.value.update(answer.value)
+#         topo_lock = False
+#         #end neg

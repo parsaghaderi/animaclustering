@@ -18,7 +18,7 @@ def grasp_run():
         graspi._initialise_grasp()
         while True:
             sleep(5)
-threading.Thread(target=grasp_run, args = [])
+threading.Thread(target=grasp_run, args = []).start()
 
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')

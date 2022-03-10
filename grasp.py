@@ -4495,7 +4495,7 @@ def _initialise_grasp():
 
         try:
             #_l = input("Listen to own multicasts? Y/N:")#TODO changed
-            _l = 'Y'
+            _l = 'N'
             if _l:
                 if _l[0] == "N" or _l[0] == "n":
                     _listen_self = False

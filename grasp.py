@@ -4455,7 +4455,7 @@ def _initialise_grasp():
                                    # Leave it False for "production" mode.
         try:
             #_l = input("Test mode (many extra diagnostics)? Y/N:") #TODO changed
-            _l = 'N'
+            _l = 'Y'
             if _l:
                 if _l[0] == "Y" or _l[0] == "y":
                     test_mode = True

@@ -128,7 +128,7 @@ def discovery(_tagged):
                 mprint(str(item.locator))
         sleep(2)
 
-if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus' or sp.getoutput('hostname') == 'Iverson':
+if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
     threading.Thread(target=listen, args=[tagged]).start()
 
 if sp.getoutput('hostname') == 'Dijkstra':

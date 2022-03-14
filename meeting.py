@@ -97,6 +97,7 @@ asa, err = ASA_REG('test')
 obj, err = OBJ_REG('obj', None, True, False, 10, asa)
 tagged = TAG_OBJ(obj, asa)
 def listen(_tagged):
+    mprint("start listening")
     while True:
         while True:
             err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
@@ -123,6 +124,7 @@ def listen_handler(_tagged, _handle, _answer):
         mprint(graspi.etext[err])
 
 def discovery(_tagged):
+    mprint("start discovery")
     while True:
         err, ll = graspi.discover(_tagged.source, _tagged.objective, 500000, flush=True)
         if (not err) and len(ll) != 0:

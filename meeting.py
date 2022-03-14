@@ -10,7 +10,7 @@ def gremlin():
     grasp.tprint("Daemon running")
     while True:
         time.sleep(60)
-if sp.getoutput('hostname') == 'Gingko' or sp.getoutput('hostname') == 'Iverson':
+if sp.getoutput('hostname') == 'Gingko':
     gremlin()
 import random
 import threading
@@ -122,15 +122,15 @@ def listen_handler(_tagged, _handle, _answer):
 
 def discovery(_tagged):
     while True:
-        err, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True)
+        err, ll = graspi.discover(_tagged.source, _tagged.objective, 500000, flush=True)
         if (not err) and len(ll) != 0:
             for item in ll:
                 mprint(str(item.locator))
         sleep(2)
 
-if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Backus':
+if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus' or sp.getoutput('hostname') == 'Iverson':
     threading.Thread(target=listen, args=[tagged]).start()
 
-if sp.getoutput('hostname') == 'Ritchie':
+if sp.getoutput('hostname') == 'Dijkstra':
     # threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discovery, args=[tagged]).start()

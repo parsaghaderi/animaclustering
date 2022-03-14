@@ -128,9 +128,9 @@ def discovery(_tagged):
                 mprint(str(item.locator))
         sleep(2)
 
-if sp.getoutput('hostname') != 'Dijkstra' or sp.getoutput('hostname') != 'Backus':
+if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
 
-if sp.getoutput('hostname') != 'Ritchie':
+if sp.getoutput('hostname') == 'Ritchie':
     # threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discovery, args=[tagged]).start()

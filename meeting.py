@@ -131,6 +131,6 @@ def discovery(_tagged):
 if sp.getoutput('hostname') != 'Dijkstra' or sp.getoutput('hostname') != 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
 
-if sp.getoutput('hostname') != 'Gingko':
+if sp.getoutput('hostname') != 'Ritchie':
     # threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discovery, args=[tagged]).start()

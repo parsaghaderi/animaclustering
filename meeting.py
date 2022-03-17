@@ -138,10 +138,3 @@ if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan'
 if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':
     # threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discovery, args=[tagged]).start()
-
-if sp.getoutput('hostname') == 'Gingko':
-    
-    while True:
-        threading.Thread(target=grasp.dump_all, args=[]).start()
-        print("-----------------grasp.dump_all()-----------------")
-        sleep(30)

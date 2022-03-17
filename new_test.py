@@ -95,16 +95,16 @@ def discovery(_tagged):
                 mprint(str(item.locator))
         sleep(2)
 
-if sp.getoutput('hostname') == 'Dijkstra':
+if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':
     while True:
         threading.Thread(target=discovery, args=[tagged]).start()       
         sleep(3)
-if sp.getoutput('hostname') == 'Gingko':
-    grasp._initialise_grasp()
-    grasp.init_bubble_text("GRASP daemon")
-    grasp.tprint("Daemon running")
-    while True:
-        time.sleep(60)
+# if sp.getoutput('hostname') == 'Gingko':
+#     grasp._initialise_grasp()
+#     grasp.init_bubble_text("GRASP daemon")
+#     grasp.tprint("Daemon running")
+#     while True:
+#         time.sleep(60)
 
 if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
     threading.Thread(target=listen, args=[tagged]).start()

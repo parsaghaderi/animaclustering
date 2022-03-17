@@ -138,5 +138,4 @@ if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan'
     threading.Thread(target=listen, args=[tagged]).start()
 
 if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':
-    # threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discovery, args=[tagged]).start()

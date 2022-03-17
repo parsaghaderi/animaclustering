@@ -4475,7 +4475,7 @@ def _initialise_grasp():
                                    # diagnostics for incoming messages
         try:
             #_l = input("Diagnostics for inbound message parse errors? Y/N:")#TODO changed
-            _l = 'N'
+            _l = 'Y'
             if _l:
                 if _l[0] == "N" or _l[0] == "n":
                     _mess_check = False

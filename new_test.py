@@ -107,4 +107,4 @@ if sp.getoutput('hostname') == 'Gingko':
         time.sleep(60)
 
 if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
-    threading.Thread(target=listen, args=[tagged])
+    threading.Thread(target=listen, args=[tagged]).start()

@@ -126,7 +126,7 @@ def listen_handler(_tagged, _handle, _answer):
 def discovery(_tagged):
     mprint("start discovery")
     while True:
-        err, ll = graspi.discover(_tagged.source, _tagged.objective, 500000, flush=True)
+        err, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         print(len(ll))
         sleep(2)
 

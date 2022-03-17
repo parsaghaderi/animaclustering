@@ -132,7 +132,7 @@ def discovery(_tagged):
             print(graspi.etext[err])
         sleep(2)
 
-if sp.getoutput('hostname') == 'Ritchi' or sp.getoutput('hostname') == 'Tarjan':
+if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
     threading.Thread(target=listen, args=[tagged]).start()
 
 if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':

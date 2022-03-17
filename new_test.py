@@ -200,7 +200,7 @@ def on_update_rcv():
             # if node_info['cluster_head'] == str(item) and NEIGHBOR_INFO[item]['cluster_head'] != True:
             #     mprint("cluster head joined another cluster {}, should start looking for a new cluster head".format(NEIGHBOR_INFO[item]['cluster_head']))
             if NEIGHBOR_INFO[item]['cluster_head'] == True:
-                mprint("joining {}".format(item))
+                mprint("joining {}".format(item.locator))
                 joined = True
                 node_info['cluster_head'] = str(item)
                 node_info['cluster_set'] = []

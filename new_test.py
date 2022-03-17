@@ -95,9 +95,8 @@ def discovery(_tagged):
         sleep(2)
 
 if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':
-    while True:
-        threading.Thread(target=discovery, args=[tagged]).start()       
-        sleep(3)
+    threading.Thread(target=discovery, args=[tagged]).start()       
+    
 # if sp.getoutput('hostname') == 'Gingko':
 #     grasp._initialise_grasp()
 #     grasp.init_bubble_text("GRASP daemon")

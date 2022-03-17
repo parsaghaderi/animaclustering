@@ -1,0 +1,3 @@
+* can't extract neg-requester locator from the requester
+* can't discover non-neighbor objectives (more than 1)
+* can't figure out how gremlin works!!!!!!!!!!!!!!!!!!!!!!!!!!

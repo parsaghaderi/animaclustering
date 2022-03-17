@@ -99,13 +99,11 @@ tagged = TAG_OBJ(obj, asa)
 def listen(_tagged):
     mprint("start listening")
     while True:
-        while True:
-            err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-            if not err:
-                pass
-                # threading.Thread(target = listen_handler, args = [_tagged, handle, answer]).start()
-            else:
-                mprint(graspi.etext[err])
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            pass
+        else:
+            mprint(graspi.etext[err])
 
 def listen_handler(_tagged, _handle, _answer):
     _answer.value = cbor.loads(_answer.value)
@@ -127,7 +125,10 @@ def discovery(_tagged):
     mprint("start discovery")
     while True:
         err, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-        print(len(ll))
+        if not err:
+            print(len(ll))
+        else:
+            print(graspi.etext[err])
         sleep(2)
 
 if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Gingko':

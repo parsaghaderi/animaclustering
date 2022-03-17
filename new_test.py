@@ -126,7 +126,8 @@ def discovery(_tagged):
     while True:
         err, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         if not err:
-            print(ll[0].locator)
+            for item in ll:
+                print(item.locator)
         else:
             print(graspi.etext[err])
         sleep(2)

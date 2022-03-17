@@ -132,8 +132,8 @@ def discovery(_tagged):
             print(graspi.etext[err])
         sleep(2)
 
-if sp.getoutput('hostname') == 'Gingko':
+if sp.getoutput('hostname') == 'Ritchi' or sp.getoutput('hostname') == 'Tarjan':
     threading.Thread(target=listen, args=[tagged]).start()
 
-if sp.getoutput('hostname') == 'Dijkstra':
+if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':
     threading.Thread(target=discovery, args=[tagged]).start()

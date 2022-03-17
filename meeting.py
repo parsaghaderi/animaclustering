@@ -130,6 +130,8 @@ def discovery(_tagged):
         if (not err) and len(ll) != 0:
             for item in ll:
                 mprint(str(item.locator))
+        if err:
+            mrpint(graspi.etext[err])
         sleep(2)
 
 if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':

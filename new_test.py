@@ -179,7 +179,8 @@ def init():
         sleep(2)
     find_heavier()
     if HEAVIEST != False:
-        mprint("want to join {}".format(str(HEAVIEST)))
+        mprint("want to join {}".format(str(HEAVIEST.locator)))
+
     else:
         mprint("I'm cluster head")
         node_info['cluster_head'] = True

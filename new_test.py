@@ -29,6 +29,27 @@ except:
     _old_API = True
 import acp
 
+
+
+
+def get_neighbors():
+    f = open('/etc/TD_neighbor/locators')
+    l = f.readlines()
+    l = [item.rstrip('\n') for item in l]
+    return l[0], l[1:]
+
+MY_ULA, NEIGHBOR_ULA = get_neighbors()
+NEIGHBOR_INFO = {}
+NEIGHBOR_UPDATE = {}
+# NEIGHBORING = {str(acp._get_my_address()):[]}
+#########################
+# utility function for setting the value of
+# each node randomly. 
+#########################
+def get_node_value():
+    return random.random()
+    
+
 #########################
 # utility print function
 #########################
@@ -71,10 +92,10 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA):
 def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
 
+
 asa, err = ASA_REG('test')
 obj, err = OBJ_REG('obj', None, True, False, 10, asa)
-tagged   = TAG_OBJ(obj, asa)
-
+tagged = TAG_OBJ(obj, asa)
 def listen(_tagged):
     mprint("start listening")
     while True:
@@ -84,25 +105,34 @@ def listen(_tagged):
         else:
             mprint(graspi.etext[err])
 
+def listen_handler(_tagged, _handle, _answer):
+    _answer.value = cbor.loads(_answer.value)
+    mprint(_answer.value)
+    _answer.value = _tagged.objective.value
+    _answer.value = cbor.dumps(_answer.value)
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        pass
+    else:
+        mprint(graspi.etext[err])
 
 def discovery(_tagged):
     mprint("start discovery")
     while True:
-        err, ll = graspi.discover(_tagged.source, _tagged.objective, 500000, flush=True)
-        if (not err) and len(ll) != 0:
-            for item in ll:
-                mprint(str(item.locator))
+        err, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        if not err:
+            print(ll[0].locator)
+        else:
+            print(graspi.etext[err])
         sleep(2)
 
-if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Gingko':
-    threading.Thread(target=discovery, args=[tagged]).start()       
-    
-# if sp.getoutput('hostname') == 'Gingko':
-#     grasp._initialise_grasp()
-#     grasp.init_bubble_text("GRASP daemon")
-#     grasp.tprint("Daemon running")
-#     while True:
-#         time.sleep(60)
-
-if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
+if sp.getoutput('hostname') == 'Gingko':
     threading.Thread(target=listen, args=[tagged]).start()
+
+if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=discovery, args=[tagged]).start()

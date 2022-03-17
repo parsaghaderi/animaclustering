@@ -78,12 +78,11 @@ tagged   = TAG_OBJ(obj, asa)
 def listen(_tagged):
     mprint("start listening")
     while True:
-        while True:
-            err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-            if not err:
-                pass
-            else:
-                mprint(graspi.etext[err])
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            pass
+        else:
+            mprint(graspi.etext[err])
 
 
 def discovery(_tagged):

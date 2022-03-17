@@ -127,11 +127,7 @@ def discovery(_tagged):
     mprint("start discovery")
     while True:
         err, ll = graspi.discover(_tagged.source, _tagged.objective, 500000, flush=True)
-        if (not err) and len(ll) != 0:
-            for item in ll:
-                mprint(str(item.locator))
-        if err:
-            mrpint(graspi.etext[err])
+        print(len(ll))
         sleep(2)
 
 if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Gingko':

@@ -130,7 +130,7 @@ def discover(_tagged):
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
         # threading.Thread(target=neg, args=[_tagged, item]).start()
-        threading.Thread(target=run_neg, args=[tagged, item]).start()
+        threading.Thread(target=run_neg, args=[_tagged, item]).start()
 
 
 def neg(_tagged, ll):

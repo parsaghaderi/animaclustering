@@ -106,7 +106,7 @@ def listener_handler(_tagged, _handle, _answer):
     else:
         err, temp, answer, reason = _r
     if (not err) and (temp == None):
-        
+        pass
     else:
         #mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass

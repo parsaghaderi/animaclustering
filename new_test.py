@@ -166,6 +166,7 @@ HEAVIEST = False
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
 def find_heavier():
+    global DONE
     while not DONE:
         pass
     global HEAVIEST,HEAVIER
@@ -184,6 +185,9 @@ def find_heavier():
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
 def init():
+    global DONE
+    while not DONE:
+        pass
     while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
         sleep(2)
     find_heavier()

@@ -134,6 +134,7 @@ def neg(_tagged, ll):
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
     atttempt = 3
+    
     while atttempt!=0:
         
         if _old_API:

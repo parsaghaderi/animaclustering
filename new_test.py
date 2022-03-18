@@ -25,6 +25,8 @@ def get_neighbors():
 MY_ULA, NEIGHBOR_ULA = get_neighbors()
 NEIGHBOR_INFO = {}
 NEIGHBOR_UPDATE = {}
+locators = {}
+CH = None
 # NEIGHBORING = {str(acp._get_my_address()):[]}
 #########################
 # utility function for setting the value of
@@ -96,8 +98,9 @@ def listen(_tagged):
 
 def listener_handler(_tagged, _handle, _answer):
     #mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
-    tmp_answer = cbor.loads(_answer.value)
-    mprint("sent from peer {}".format(tmp_answer))
+    # tmp_answer = cbor.loads(_answer.value)
+    # mprint("sent from peer {}".format(tmp_answer))
+
     _answer.value = _tagged.objective.value
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
@@ -108,7 +111,7 @@ def listener_handler(_tagged, _handle, _answer):
     if (not err) and (temp == None):
         pass
     else:
-        #mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+        mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass
 
 def discover(_tagged):
@@ -121,6 +124,7 @@ def discover(_tagged):
         if not node_info['neighbors'].__contains__(str(item.locator)):
             node_info['neighbors'].append(str(item.locator))
             NEIGHBOR_UPDATE[item.locator] = False
+            locators[item.locator] = item
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
         threading.Thread(target=neg, args=[_tagged, item]).start()
@@ -207,6 +211,7 @@ def on_update_rcv():
                 node_info['cluster_head'] = str(item.locator)
                 node_info['cluster_set'] = []
                 tagged.objective.value = cbor.dumps(node_info)
+                CH = item
                 break
             
         if not joined:
@@ -220,4 +225,30 @@ def keep_track():
         else:
             print(node_info['cluster_head'])
         sleep(5)
-threading.Thread(target=keep_track, args=[]).start()
+# threading.Thread(target=keep_track, args=[]).start()
+
+
+
+ch_obj, err = OBJ_REG('ch', None, True, False, 10, asa)
+tagged_ch   = TAG_OBJ(ch_obj, asa)
+
+def CH_discovery(_tagged):
+    while node_info['cluster_head'] != True:
+        sleep(2)
+    while True:
+        _, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        mprint("{} cluster heads found".format(len(ll)))
+        sleep(3)
+
+def CH_listen(_tagged):
+    while node_info['cluster_head'] != True:
+        sleep(2)
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            pass
+        else:
+            mprint(graspi.etext[err])
+
+threading.Thread(target=CH_listen,    args=[tagged_ch]).start()
+threading.Thread(target=CH_discovery, args=[tagged_ch]).start()

@@ -240,6 +240,7 @@ ch_lock = False
 
 
 def generate_topology(): #call after discovery
+    mprint("generating the topology")
     global ch_lock
     while ch_lock:
         pass
@@ -250,11 +251,11 @@ def generate_topology(): #call after discovery
         if NEIGHBOR_INFO[item]['cluster_head'] == str(acp._get_my_address()):
             topology[NEIGHBOR_INFO[item]['ula']] = NEIGHBOR_INFO[item]['neighbors']
     
-    # tagged_ch.objective.value = cbor.dumps(topology) #take care of it in listen handler
+    tagged_ch.objective.value = topology #take care of it in listen handler
     ch_lock = False
-
+    mprint("topology created {}".format(topology))
 def CH_neg(_tagged, ll):
-    
+    mprint("sending ch-neg message to {}".format(str(ll.locator)))
     while True:
         global ch_lock
         while ch_lock:
@@ -278,6 +279,7 @@ def CH_neg(_tagged, ll):
         sleep(5) #todo change dynamically
 
 def CH_listen_handler(_tagged, _handle, _answer):
+    mprint("handling incoming request from another ch")
     global ch_lock
     while ch_lock:
         pass
@@ -285,6 +287,7 @@ def CH_listen_handler(_tagged, _handle, _answer):
     # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
     _answer.value = cbor.loads(_answer.value)
     tagged_ch.objective.value.update(_answer.value)
+    mprint("updated map on listen-handler {}".format(tagged_ch.objective.value))
     mprint("map updated {}".format(tagged_ch.objective.value))
     _answer.value = cbor.dumps(tagged_ch.objective.value)
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
@@ -313,6 +316,7 @@ def CH_discovery(_tagged):
 
         sleep(3)
         attempt-=1
+    mprint("{} cluster heads found")
     generate_topology()
     sleep(10) #TODO to reach stability, change later
     for item in CH_locators:

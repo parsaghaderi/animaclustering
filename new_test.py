@@ -136,7 +136,8 @@ def discover(_tagged):
 def neg(_tagged, ll):
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
-    while True:
+    atttempt = 3
+    while atttempt!=0:
         
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
@@ -157,6 +158,7 @@ def neg(_tagged, ll):
             mprint("neg failed")
             _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         sleep(3)
+        atttempt-=1
 threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover, args=[tagged]).start()
 

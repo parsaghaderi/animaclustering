@@ -235,30 +235,7 @@ def keep_track():
 ch_obj, err = OBJ_REG('ch', None, True, False, 10, asa)
 tagged_ch   = TAG_OBJ(ch_obj, asa)
 ch_lock = False
-def CH_discovery(_tagged):
-    while node_info['cluster_head'] != True:
-        sleep(2)
-    attempt = 5
-    while attempt!= 0: #TODO change, now the network is stable, so we can do it. later for dynamic networks
-        _, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True, minimum_TTL=50000)
-        for item in ll:
-            if not CH_locators.keys().__contains__(item.locator):
-                CH_locators[item.locator] = item
-        sleep(3)
-        attempt-=1
 
-def CH_listen(_tagged):
-    while node_info['cluster_head'] != True:
-        sleep(2)
-    while True:
-        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-        if not err:
-            pass
-        else:
-            mprint(graspi.etext[err])
-
-threading.Thread(target=CH_listen,    args=[tagged_ch]).start()
-threading.Thread(target=CH_discovery, args=[tagged_ch]).start()
 
 def generate_topology(): #call after discovery
     global ch_lock
@@ -321,3 +298,33 @@ def CH_listen_handler(_tagged, _handle, _answer):
         mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass
 
+
+def CH_discovery(_tagged):
+    while node_info['cluster_head'] != True:
+        sleep(2)
+    attempt = 5
+    while attempt!= 0: #TODO change, now the network is stable, so we can do it. later for dynamic networks
+        _, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        for item in ll:
+            if not CH_locators.keys().__contains__(item.locator):
+                CH_locators[item.locator] = item
+
+        sleep(3)
+        attempt-=1
+    generate_topology()
+    sleep(10) #TODO to reach stability, change later
+    for item in CH_locators:
+        threading.Thread(target=CH_neg, args=[_tagged, CH_locators[item]]).start()
+
+def CH_listen(_tagged):
+    while node_info['cluster_head'] != True:
+        sleep(2)
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            threading.Thread(target=CH_listen_handler, args=[_tagged, handle, answer]).start()
+        else:
+            mprint(graspi.etext[err])
+
+threading.Thread(target=CH_listen,    args=[tagged_ch]).start()
+threading.Thread(target=CH_discovery, args=[tagged_ch]).start()

@@ -166,6 +166,8 @@ HEAVIEST = False
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
 def find_heavier():
+    while not DONE:
+        pass
     global HEAVIEST,HEAVIER
     tmp = {}
     max_weight = cbor.loads(obj.value)['weight']

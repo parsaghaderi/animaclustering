@@ -96,6 +96,8 @@ def listen(_tagged):
 
 def listener_handler(_tagged, _handle, _answer):
     #mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
+    tmp_answer = cbor.loads(_answer.value)
+    mprint("sent from peer {}".format(tmp_answer))
     _answer.value = _tagged.objective.value
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
@@ -104,8 +106,7 @@ def listener_handler(_tagged, _handle, _answer):
     else:
         err, temp, answer, reason = _r
     if (not err) and (temp == None):
-        #mprint("peer ended neg with reason {}".format(reason))
-        pass
+        
     else:
         #mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass
@@ -129,15 +130,16 @@ def discover(_tagged):
 
 def neg(_tagged, ll):
     global NEIGHBOR_INFO
+    NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
     while True:
-        NEIGHBOR_INFO[ll] = 0 #√
+        
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
             reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
-
+            
             NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
             # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
@@ -194,7 +196,7 @@ threading.Thread(target=init, args=[]).start()
 def on_update_rcv():
     global NEIGHBOR_INFO
     joined = False
-    if not node_info['cluster_head']:
+    if node_info['cluster_head'] == False:
         for item in HEAVIER:
             # mprint("{}".format(NEIGHBOR_INFO[item]))
             # if node_info['cluster_head'] == str(item) and NEIGHBOR_INFO[item]['cluster_head'] != True:
@@ -202,17 +204,14 @@ def on_update_rcv():
             if NEIGHBOR_INFO[item]['cluster_head'] == True:
                 mprint("joining {}".format(item.locator))
                 joined = True
-                node_info['cluster_head'] = str(item)
+                node_info['cluster_head'] = str(item.locator)
                 node_info['cluster_set'] = []
                 tagged.objective.value = cbor.dumps(node_info)
                 break
             
         if not joined:
             mprint("I'm cluster head")
-            node_info['cluster_head'] = True
-            node_info['cluster_set'] = []
-            node_info['cluster_set'].append(str(acp._get_my_address()))
-            tagged.objective.value = cbor.dumps(node_info)
+            
 
 def keep_track():
     while True:

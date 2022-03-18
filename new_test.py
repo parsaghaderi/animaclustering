@@ -116,6 +116,14 @@ def listener_handler(_tagged, _handle, _answer):
         mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass
 
+def run_neg(_tagged,ll):
+    global DONE
+    attempt = 5
+    while attempt!=0:
+        threading.Thread(target=neg, args=[_tagged, ll]).start()
+        attempt-=1
+    DONE = True
+
 def discover(_tagged):
     attempt = 3
     while attempt != 0:
@@ -129,8 +137,8 @@ def discover(_tagged):
             locators[item.locator] = item
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
-        # threading.Thread(target=neg, args=[_tagged, item]).start()
-        threading.Thread(target=run_neg, args=[_tagged, item]).start()
+        threading.Thread(target=neg, args=[_tagged, item]).start()
+        # threading.Thread(target=run_neg, args=[_tagged, item]).start()
 
 
 def neg(_tagged, ll):
@@ -235,13 +243,6 @@ def keep_track():
             print(node_info['cluster_head'])
         sleep(5)
 # threading.Thread(target=keep_track, args=[]).start()
-def run_neg(_tagged,ll):
-    global DONE
-    attempt = 5
-    while attempt!=0:
-        threading.Thread(target=neg, args=[_tagged, ll]).start()
-        attempt-=1
-    DONE = True
 
 # ch_obj, err = OBJ_REG('ch', None, True, False, 10, asa)
 # tagged_ch   = TAG_OBJ(ch_obj, asa)

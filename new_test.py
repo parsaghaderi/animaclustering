@@ -130,9 +130,6 @@ def discover(_tagged):
     for item in ll:
         threading.Thread(target=neg, args=[_tagged, item]).start()
 
-
-       
-
 def neg(_tagged, ll):
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
@@ -159,6 +156,7 @@ def neg(_tagged, ll):
             _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         sleep(3)
         atttempt-=1
+
 threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover, args=[tagged]).start()
 
@@ -234,103 +232,103 @@ def keep_track():
 
 
 
-ch_obj, err = OBJ_REG('ch', None, True, False, 10, asa)
-tagged_ch   = TAG_OBJ(ch_obj, asa)
-ch_lock = False
+# ch_obj, err = OBJ_REG('ch', None, True, False, 10, asa)
+# tagged_ch   = TAG_OBJ(ch_obj, asa)
+# ch_lock = False
 
 
-def generate_topology(): #call after discovery
-    mprint("generating the topology")
-    global ch_lock
-    while ch_lock:
-        pass
-    ch_lock = True#semaphore
-    topology = {}
-    topology[str(acp._get_my_address())] = node_info['neighbors']
-    for item in NEIGHBOR_INFO:
-        if NEIGHBOR_INFO[item]['cluster_head'] == str(acp._get_my_address()):
-            topology[NEIGHBOR_INFO[item]['ula']] = NEIGHBOR_INFO[item]['neighbors']
+# def generate_topology(): #call after discovery
+#     mprint("generating the topology")
+#     global ch_lock
+#     while ch_lock:
+#         pass
+#     ch_lock = True#semaphore
+#     topology = {}
+#     topology[str(acp._get_my_address())] = node_info['neighbors']
+#     for item in NEIGHBOR_INFO:
+#         if NEIGHBOR_INFO[item]['cluster_head'] == str(acp._get_my_address()):
+#             topology[NEIGHBOR_INFO[item]['ula']] = NEIGHBOR_INFO[item]['neighbors']
     
-    tagged_ch.objective.value = topology #take care of it in listen handler
-    ch_lock = False
-    mprint("topology created {}".format(topology))
-def CH_neg(_tagged, ll):
-    mprint("sending ch-neg message to {}".format(str(ll.locator)))
-    while True:
-        global ch_lock
-        while ch_lock:
-            pass
-        ch_lock = True
-        tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-        if not err:
-            tmp_map = cbor.loads(answer.value)
-            tagged_ch.objective.value = cbor.loads(tagged_ch.objective.value)
-            tagged_ch.objective.value.update(tmp_map)
-            mprint("updated map {}".format(tagged_ch.objective.value))
-            # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value) #take care of it somewhere else
+#     tagged_ch.objective.value = topology #take care of it in listen handler
+#     ch_lock = False
+#     mprint("topology created {}".format(topology))
+# def CH_neg(_tagged, ll):
+#     mprint("sending ch-neg message to {}".format(str(ll.locator)))
+#     while True:
+#         global ch_lock
+#         while ch_lock:
+#             pass
+#         ch_lock = True
+#         tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
+#         if _old_API:
+#             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+#             reason = answer
+#         else:
+#             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+#         if not err:
+#             tmp_map = cbor.loads(answer.value)
+#             tagged_ch.objective.value = cbor.loads(tagged_ch.objective.value)
+#             tagged_ch.objective.value.update(tmp_map)
+#             mprint("updated map {}".format(tagged_ch.objective.value))
+#             # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value) #take care of it somewhere else
 
-            _err = graspi.end_negotiate(_tagged.source, handle, True, reason = "map updated")
-            ch_lock = False
-        sleep(5) #todo change dynamically
+#             _err = graspi.end_negotiate(_tagged.source, handle, True, reason = "map updated")
+#             ch_lock = False
+#         sleep(5) #todo change dynamically
 
-def CH_listen_handler(_tagged, _handle, _answer):
-    mprint("handling incoming request from another ch")
-    global ch_lock
-    while ch_lock:
-        pass
-    ch_lock = True
-    # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
-    _answer.value = cbor.loads(_answer.value)
-    tagged_ch.objective.value.update(_answer.value)
-    mprint("updated map on listen-handler {}".format(tagged_ch.objective.value))
-    mprint("map updated {}".format(tagged_ch.objective.value))
-    _answer.value = cbor.dumps(tagged_ch.objective.value)
-    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
-    ch_lock = False
-    if _old_API:
-        err, temp, answer = _r
-        reason = answer
-    else:
-        err, temp, answer, reason = _r
-    if (not err) and (temp == None):
-        pass
-    else:
-        mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
-        pass
+# def CH_listen_handler(_tagged, _handle, _answer):
+#     mprint("handling incoming request from another ch")
+#     global ch_lock
+#     while ch_lock:
+#         pass
+#     ch_lock = True
+#     # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
+#     _answer.value = cbor.loads(_answer.value)
+#     tagged_ch.objective.value.update(_answer.value)
+#     mprint("updated map on listen-handler {}".format(tagged_ch.objective.value))
+#     mprint("map updated {}".format(tagged_ch.objective.value))
+#     _answer.value = cbor.dumps(tagged_ch.objective.value)
+#     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+#     ch_lock = False
+#     if _old_API:
+#         err, temp, answer = _r
+#         reason = answer
+#     else:
+#         err, temp, answer, reason = _r
+#     if (not err) and (temp == None):
+#         pass
+#     else:
+#         mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+#         pass
 
 
-def CH_discovery(_tagged):
-    while node_info['cluster_head'] != True:
-        sleep(2)
-    attempt = 5
-    while attempt!= 0: #TODO change, now the network is stable, so we can do it. later for dynamic networks
-        _, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True, minimum_TTL=50000)
-        for item in ll:
-            if not CH_locators.keys().__contains__(item.locator):
-                CH_locators[item.locator] = item
+# def CH_discovery(_tagged):
+#     while node_info['cluster_head'] != True:
+#         sleep(2)
+#     attempt = 5
+#     while attempt!= 0: #TODO change, now the network is stable, so we can do it. later for dynamic networks
+#         _, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True, minimum_TTL=50000)
+#         for item in ll:
+#             if not CH_locators.keys().__contains__(item.locator):
+#                 CH_locators[item.locator] = item
 
-        sleep(3)
-        attempt-=1
-    mprint("{} cluster heads found")
-    generate_topology()
-    sleep(10) #TODO to reach stability, change later
-    for item in CH_locators:
-        threading.Thread(target=CH_neg, args=[_tagged, CH_locators[item]]).start()
+#         sleep(3)
+#         attempt-=1
+#     mprint("{} cluster heads found")
+#     generate_topology()
+#     sleep(10) #TODO to reach stability, change later
+#     for item in CH_locators:
+#         threading.Thread(target=CH_neg, args=[_tagged, CH_locators[item]]).start()
 
-def CH_listen(_tagged):
-    while node_info['cluster_head'] != True:
-        sleep(2)
-    while True:
-        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-        if not err:
-            threading.Thread(target=CH_listen_handler, args=[_tagged, handle, answer]).start()
-        else:
-            mprint(graspi.etext[err])
+# def CH_listen(_tagged):
+#     while node_info['cluster_head'] != True:
+#         sleep(2)
+#     while True:
+#         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+#         if not err:
+#             threading.Thread(target=CH_listen_handler, args=[_tagged, handle, answer]).start()
+#         else:
+#             mprint(graspi.etext[err])
 
-threading.Thread(target=CH_listen,    args=[tagged_ch]).start()
-threading.Thread(target=CH_discovery, args=[tagged_ch]).start()
+# threading.Thread(target=CH_listen,    args=[tagged_ch]).start()
+# threading.Thread(target=CH_discovery, args=[tagged_ch]).start()

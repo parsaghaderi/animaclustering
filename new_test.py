@@ -27,6 +27,7 @@ NEIGHBOR_INFO = {}
 NEIGHBOR_UPDATE = {}
 locators = {}
 CH = None
+CH_locators = {}
 # NEIGHBORING = {str(acp._get_my_address()):[]}
 #########################
 # utility function for setting the value of
@@ -233,14 +234,18 @@ def keep_track():
 
 ch_obj, err = OBJ_REG('ch', None, True, False, 10, asa)
 tagged_ch   = TAG_OBJ(ch_obj, asa)
-
+ch_lock = False
 def CH_discovery(_tagged):
     while node_info['cluster_head'] != True:
         sleep(2)
-    while True:
+    attempt = 5
+    while attempt!= 0: #TODO change, now the network is stable, so we can do it. later for dynamic networks
         _, ll = graspi.discover(_tagged.source, _tagged.objective, 10000, flush=True, minimum_TTL=50000)
-        mprint("{} cluster heads found".format(len(ll)))
+        for item in ll:
+            if not CH_locators.keys().__contains__(item.locator):
+                CH_locators[item.locator] = item
         sleep(3)
+        attempt-=1
 
 def CH_listen(_tagged):
     while node_info['cluster_head'] != True:
@@ -254,3 +259,65 @@ def CH_listen(_tagged):
 
 threading.Thread(target=CH_listen,    args=[tagged_ch]).start()
 threading.Thread(target=CH_discovery, args=[tagged_ch]).start()
+
+def generate_topology(): #call after discovery
+    global ch_lock
+    while ch_lock:
+        pass
+    ch_lock = True#semaphore
+    topology = {}
+    topology[str(acp._get_my_address())] = node_info['neighbors']
+    for item in NEIGHBOR_INFO:
+        if NEIGHBOR_INFO[item]['cluster_head'] == str(acp._get_my_address()):
+            topology[NEIGHBOR_INFO[item]['ula']] = NEIGHBOR_INFO[item]['neighbors']
+    
+    # tagged_ch.objective.value = cbor.dumps(topology) #take care of it in listen handler
+    ch_lock = False
+
+def CH_neg(_tagged, ll):
+    
+    while True:
+        global ch_lock
+        while ch_lock:
+            pass
+        ch_lock = True
+        tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        if not err:
+            tmp_map = cbor.loads(answer.value)
+            tagged_ch.objective.value = cbor.loads(tagged_ch.objective.value)
+            tagged_ch.objective.value.update(tmp_map)
+            mprint("updated map {}".format(tagged_ch.objective.value))
+            # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value) #take care of it somewhere else
+
+            _err = graspi.end_negotiate(_tagged.source, handle, True, reason = "map updated")
+            ch_lock = False
+        sleep(5) #todo change dynamically
+
+def CH_listen_handler(_tagged, _handle, _answer):
+    global ch_lock
+    while ch_lock:
+        pass
+    ch_lock = True
+    # tagged_ch.objective.value = cbor.dumps(tagged_ch.objective.value)
+    _answer.value = cbor.loads(_answer.value)
+    tagged_ch.objective.value.update(_answer.value)
+    mprint("map updated {}".format(tagged_ch.objective.value))
+    _answer.value = cbor.dumps(tagged_ch.objective.value)
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+    ch_lock = False
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        pass
+    else:
+        mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+        pass
+

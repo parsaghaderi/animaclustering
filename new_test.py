@@ -133,30 +133,26 @@ def discover(_tagged):
 def neg(_tagged, ll):
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
-    atttempt = 3
-    
-    while atttempt!=0:
+    if _old_API:
+        err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+        reason = answer
+    else:
+        err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+    if not err:
         
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-        if not err:
-            
-            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-            # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
-            if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
-                if not node_info['cluster_set'].__contains__(str(ll.locator)):
-                    node_info['cluster_set'].append(str(ll.locator))
-                _tagged.objective.value = cbor.dumps(node_info)
-                NEIGHBOR_UPDATE[ll.locator] = True
-            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-        else:
-            mprint("neg failed")
-            _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
-        sleep(3)
-        atttempt-=1
+        NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+        # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
+        if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
+            if not node_info['cluster_set'].__contains__(str(ll.locator)):
+                node_info['cluster_set'].append(str(ll.locator))
+            _tagged.objective.value = cbor.dumps(node_info)
+            NEIGHBOR_UPDATE[ll.locator] = True
+        _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+    else:
+        mprint("neg failed")
+        _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
+    sleep(3)
+        
 
 threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover, args=[tagged]).start()

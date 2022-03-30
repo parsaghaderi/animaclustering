@@ -155,7 +155,7 @@ def neg(_tagged, ll):
         if not err:
             
             NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll.locator]))
+            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))
             if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))

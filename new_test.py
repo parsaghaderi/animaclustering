@@ -213,7 +213,7 @@ def init():
         node_info['cluster_set'].append(str(acp._get_my_address()))
         tagged.objective.value = cbor.dumps(node_info)
     sleep(10)
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    threading.Thread(target=on_update_rcv, args=[]).start()
 
 threading.Thread(target=init, args=[]).start()
 

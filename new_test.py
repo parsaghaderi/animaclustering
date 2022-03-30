@@ -205,6 +205,7 @@ def find_heavier():
 
 def init():
     global DONE
+    global HEAVIER,HEAVIEST
     while not DONE:
         pass
     # while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA): #TODO check if we actually need this. we have DONE

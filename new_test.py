@@ -211,14 +211,13 @@ def init():
     # while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA): #TODO check if we actually need this. we have DONE
     #     sleep(2)
     find_heavier()
-    if HEAVIEST != False:
-        mprint("want to join {}".format(str(HEAVIEST.locator)))
-
-    else:
+    if HEAVIEST == False:
         mprint("I'm cluster head")
         node_info['cluster_head'] = True
         node_info['cluster_set'].append(str(acp._get_my_address()))
         tagged.objective.value = cbor.dumps(node_info)
+    else:
+        mprint("want to join {}".format(str(HEAVIEST.locator)))
     sleep(10)
     threading.Thread(target=on_update_rcv, args=[]).start()
 

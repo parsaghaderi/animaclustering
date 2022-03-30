@@ -99,11 +99,11 @@ def listen(_tagged):
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    #mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
+    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
     # tmp_answer = cbor.loads(_answer.value)
     # mprint("sent from peer {}".format(tmp_answer))
 
-    _answer.value = _tagged.objective.value
+    _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer)
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
         err, temp, answer = _r
@@ -131,17 +131,18 @@ def discover(_tagged):
         mprint(len(ll))
         attempt-=1
     for item in ll:
-        if not node_info['neighbors'].__contains__(str(item.locator)):
+        if not node_info['neighbors'].__contains__(str(item.locator)): #cause timeout in locators are different! adding without checking the address causes duplicate values
             node_info['neighbors'].append(str(item.locator))
             NEIGHBOR_UPDATE[item.locator] = False
             locators[item.locator] = item
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
-        mprint(item.locator)
-        # threading.Thread(target=neg, args=[_tagged, item]).start()
+        # mprint(item.locator) #√
+        threading.Thread(target=neg, args=[_tagged, item]).start()
         # threading.Thread(target=run_neg, args=[_tagged, item]).start()
 
 def neg(_tagged, ll):
+    mprint("start negotiating with {}".format(ll.locator))
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
     attempt = 3
@@ -154,7 +155,7 @@ def neg(_tagged, ll):
         if not err:
             
             NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-            # mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
+            mprint("neg_step value : peer {} offered {}".format(ll.locator, NEIGHBOR_INFO[ll.locator]))
             if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))

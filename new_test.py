@@ -28,7 +28,7 @@ NEIGHBOR_UPDATE = {}
 locators = {}
 CH = None
 CH_locators = {}
-DONE = False
+DONE = False #TODO change the name to something more meaningful
 # NEIGHBORING = {str(acp._get_my_address()):[]}
 #########################
 # utility function for setting the value of
@@ -99,7 +99,7 @@ def listen(_tagged):
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
+    # mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))#√
     # tmp_answer = cbor.loads(_answer.value)
     # mprint("sent from peer {}".format(tmp_answer))
 
@@ -140,8 +140,8 @@ def discover(_tagged):
         # mprint(item.locator) #√
         threading.Thread(target=neg, args=[_tagged, item]).start()
         # threading.Thread(target=run_neg, args=[_tagged, item]).start()
-
 def neg(_tagged, ll):
+    global DONE
     mprint("start negotiating with {}".format(ll.locator))
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
@@ -155,7 +155,7 @@ def neg(_tagged, ll):
         if not err:
             
             NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))
+            # mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
             if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))
@@ -167,6 +167,7 @@ def neg(_tagged, ll):
             _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         sleep(3)
         attempt-=1
+    DONE = True
         
 
 threading.Thread(target=listen, args=[tagged]).start()
@@ -200,8 +201,8 @@ def init():
     global DONE
     while not DONE:
         pass
-    while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA):
-        sleep(2)
+    # while len(NEIGHBOR_INFO) != len(NEIGHBOR_ULA): #TODO check if we actually need this. we have DONE
+    #     sleep(2)
     find_heavier()
     if HEAVIEST != False:
         mprint("want to join {}".format(str(HEAVIEST.locator)))

@@ -14,6 +14,8 @@ except:
 import acp
 
 
+
+
 def get_neighbors():
     f = open('/etc/TD_neighbor/locators')
     l = f.readlines()
@@ -135,11 +137,11 @@ def discover(_tagged):
             locators[item.locator] = item
     _tagged.objective.value = cbor.dumps(node_info)
     for item in ll:
-        threading.Thread(target=neg, args=[_tagged, item]).start()
+        mprint(item.locator)
+        # threading.Thread(target=neg, args=[_tagged, item]).start()
         # threading.Thread(target=run_neg, args=[_tagged, item]).start()
 
 def neg(_tagged, ll):
-    mprint("in neg")
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
     attempt = 3
@@ -165,15 +167,15 @@ def neg(_tagged, ll):
         sleep(3)
         attempt-=1
         
+
 threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover, args=[tagged]).start()
 
+
 HEAVIER = []
 HEAVIEST = False
-
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
-
 def find_heavier():
     global DONE
     while not DONE:
@@ -193,7 +195,6 @@ def find_heavier():
     tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
-
 def init():
     global DONE
     while not DONE:

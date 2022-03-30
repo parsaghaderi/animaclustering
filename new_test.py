@@ -198,6 +198,10 @@ def find_heavier():
     tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
+    if HEAVIEST == False:
+        mprint("the value of my heaviest is {}".format(HEAVIEST))
+    else:
+        mprint("the value of my heaviest is {}".format(str(HEAVIEST.locator)))
 
 def init():
     global DONE

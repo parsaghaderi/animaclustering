@@ -97,9 +97,9 @@ def listen(_tagged):
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
-    tmp_answer = cbor.loads(_answer.value)
-    mprint("sent from peer {}".format(tmp_answer))
+    #mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))
+    # tmp_answer = cbor.loads(_answer.value)
+    # mprint("sent from peer {}".format(tmp_answer))
 
     _answer.value = _tagged.objective.value
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)

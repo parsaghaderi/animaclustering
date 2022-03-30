@@ -187,6 +187,7 @@ def find_heavier():
     max_weight = cbor.loads(obj.value)['weight']
     max_key = False
     for item in NEIGHBOR_INFO:
+        mprint("peer {} has weight {}".format(str(item.locator), NEIGHBOR_INFO[item]['weight']))
         if NEIGHBOR_INFO[item]['weight'] > cbor.loads(obj.value)['weight']:
             # HEAVIER.append(item)
             tmp[item] = NEIGHBOR_INFO[item]['weight']
@@ -197,6 +198,7 @@ def find_heavier():
     tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
+
 def init():
     global DONE
     while not DONE:

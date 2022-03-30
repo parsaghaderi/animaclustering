@@ -241,7 +241,8 @@ def on_update_rcv():
                 break
             
         if not joined:
-            mprint("I'm cluster head")
+            
+            mprint("I'm cluster head - from on-update_rcv")
             node_info['cluster_head'] = True
             node_info['cluster_set'].append(str(acp._get_my_address()))
             tagged.objective.value = cbor.dumps(node_info)

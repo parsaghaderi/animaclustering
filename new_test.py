@@ -191,6 +191,7 @@ threading.Thread(target=discover, args=[tagged]).start()
 
 HEAVIER = []
 HEAVIEST = False
+HEAVY_UPDATE = {}
 # cluster_obj, err = OBJ_REG('clustering', cbor.dumps({CLUSTER_HEAD:CLUSTER_SET}))
 # tagged_clustering = TAG_OBJ(cluster_obj, asa)
 def find_heavier():
@@ -211,8 +212,12 @@ def find_heavier():
                 max_key = item
     HEAVIEST = max_key
     tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
+    order = 1
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
+        HEAVY_UPDATE[item] = [False, order]
+        order+=1
+    mprint("$$$$$$$$$$$$$$${}$$$$$$$$$$$$$$$$".format(tmp_sorted))
     if HEAVIEST == False:
         mprint("the value of my heaviest is {}".format(HEAVIEST))
     else:
@@ -276,14 +281,9 @@ def on_update_rcv():
     threading.Thread(target=run_neg_update, args=[]).start()
 
 
-def keep_track():
-    while True:
-        if node_info['cluster_head'] == True:
-            print(node_info['cluster_set'])
-        else:
-            print(node_info['cluster_head'])
-        sleep(5)
-
+def keep_track():#check ch status from heavier nodes
+    #while in init stop
+    
 
 # threading.Thread(target=keep_track, args=[]).start()
 

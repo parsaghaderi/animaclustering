@@ -238,7 +238,7 @@ def init():
     sleep(10)
     #TODO do the negotiation to get the cluster heads once more
 
-    threading.Thread(target=on_update_rcv, args=[]).start()
+    #threading.Thread(target=on_update_rcv, args=[]).start()
 
 threading.Thread(target=init, args=[]).start()
 

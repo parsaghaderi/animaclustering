@@ -89,16 +89,23 @@ node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'clust
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
+listen_semaphore = False
 def listen(_tagged):
+    global listen_semaphore
     while True:
+        
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             #mprint("incoming request")
+            while not listen_semaphore:
+                sleep(0.25)
+            listen_semaphore=True
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
+    global listen_semaphore
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     
@@ -119,9 +126,11 @@ def listener_handler(_tagged, _handle, _answer):
         err, temp, answer, reason = _r
     if (not err) and (temp == None):
         pass
+        
     else:
         mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass
+    listen_semaphore = False
 
 def run_neg(_tagged,ll):
     global DONE
@@ -214,7 +223,7 @@ def run_neg_update():
     global NEIGHBOR_INFO
     for item in NEIGHBOR_INFO.keys():
         threading.Thread(target=neg, args=[tagged, item, 1]).start()
-
+INIT_CH = False
 def init():
     global NEIGHBOR_ULA
     global DONE
@@ -229,8 +238,6 @@ def init():
         node_info['cluster_head'] = True
         node_info['cluster_set'].append(str(acp._get_my_address()))
         tagged.objective.value = cbor.dumps(node_info)
-        
-        
         threading.Thread(target=run_neg_update, args=[]).start()
         sleep(5*len(NEIGHBOR_ULA))
     else:

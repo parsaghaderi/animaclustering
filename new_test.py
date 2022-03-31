@@ -170,7 +170,7 @@ def neg(_tagged, ll, _attempt = 3):
                 NEIGHBOR_UPDATE[ll.locator] = True
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
         else:
-            mprint("neg failed")
+            mprint("neg failed + {}".format(graspi.etext[_err]))
             _err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         sleep(3)
         attempt-=1

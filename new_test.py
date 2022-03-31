@@ -99,10 +99,16 @@ def listen(_tagged):
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    # mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))#√
-    # tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))#√
+    tmp_answer = cbor.loads(_answer.value)
     # mprint("sent from peer {}".format(tmp_answer))
-
+    #TODO get info from the answer
+    ###########
+    for item in NEIGHBOR_INFO:
+        if NEIGHBOR_INFO[item]['ula'] == tmp_answer['ula']:
+            NEIGHBOR_INFO[item] = tmp_answer
+            break
+    ############
     _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer)
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
@@ -140,12 +146,12 @@ def discover(_tagged):
         # mprint(item.locator) #√
         threading.Thread(target=neg, args=[_tagged, item]).start()
         # threading.Thread(target=run_neg, args=[_tagged, item]).start()
-def neg(_tagged, ll):
+def neg(_tagged, ll, _attempt = 3):
     global DONE
     mprint("start negotiating with {}".format(ll.locator))
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
-    attempt = 3
+    attempt = _attempt
     while attempt!=0:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
@@ -203,7 +209,13 @@ def find_heavier():
     else:
         mprint("the value of my heaviest is {}".format(str(HEAVIEST.locator)))
 
+def run_neg_update():
+    global NEIGHBOR_INFO
+    for item in NEIGHBOR_INFO.keys():
+        threading.Thread(target=neg, args=[tagged, item, 1]).start()
+
 def init():
+    global NEIGHBOR_ULA
     global DONE
     global HEAVIER,HEAVIEST
     while not DONE:
@@ -216,9 +228,15 @@ def init():
         node_info['cluster_head'] = True
         node_info['cluster_set'].append(str(acp._get_my_address()))
         tagged.objective.value = cbor.dumps(node_info)
+        
+        
+        threading.Thread(target=run_neg_update, args=[]).start()
+        sleep(5*len(NEIGHBOR_ULA))
     else:
         mprint("want to join {}".format(str(HEAVIEST.locator)))
     sleep(10)
+    #TODO do the negotiation to get the cluster heads once more
+
     threading.Thread(target=on_update_rcv, args=[]).start()
 
 threading.Thread(target=init, args=[]).start()
@@ -241,7 +259,6 @@ def on_update_rcv():
                 break
             
         if not joined:
-            
             mprint("I'm cluster head - from on-update_rcv")
             node_info['cluster_head'] = True
             node_info['cluster_set'].append(str(acp._get_my_address()))

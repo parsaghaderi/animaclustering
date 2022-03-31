@@ -89,7 +89,6 @@ node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'clust
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 
-listen_semaphore = True
 def listen(_tagged):
     global listen_semaphore
     while True:
@@ -97,9 +96,6 @@ def listen(_tagged):
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             #mprint("incoming request")
-            while not listen_semaphore:
-                sleep(0.25)
-            listen_semaphore=False
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
@@ -130,7 +126,6 @@ def listener_handler(_tagged, _handle, _answer):
     else:
         mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
         pass
-    listen_semaphore = True
 
 def run_neg(_tagged,ll):
     global DONE

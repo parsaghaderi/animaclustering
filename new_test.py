@@ -215,9 +215,9 @@ def find_heavier():
     order = 1
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
-        HEAVY_UPDATE[item] = [False, order]
+        HEAVY_UPDATE[item] = [False, order, tmp_sorted[item]]
         order+=1
-    mprint("$$$$$$$$$$$$$$${}$$$$$$$$$$$$$$$$".format(tmp_sorted))
+    mprint("$$$$$$$$$$$$$$${}$$$$$$$$$$$$$$$$".format(HEAVY_UPDATE))
     if HEAVIEST == False:
         mprint("the value of my heaviest is {}".format(HEAVIEST))
     else:

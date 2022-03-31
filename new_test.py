@@ -281,8 +281,8 @@ def on_update_rcv():
     threading.Thread(target=run_neg_update, args=[]).start()
 
 
-def keep_track():#check ch status from heavier nodes
-    #while in init stop
+# def keep_track():#check ch status from heavier nodes
+#     #while in init stop
     
 
 # threading.Thread(target=keep_track, args=[]).start()

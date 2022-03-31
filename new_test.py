@@ -153,7 +153,11 @@ def discover(_tagged):
         # threading.Thread(target=run_neg, args=[_tagged, item]).start()
 def neg(_tagged, ll, _attempt = 3):
     global DONE
-    mprint("start negotiating with {}".format(ll.locator))
+    
+    if _attempt!=3:
+        mprint("start negotiation o kire khar {}".format(ll.locator))
+    else:
+        mprint("start negotiating with {}".format(ll.locator))
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
     attempt = _attempt

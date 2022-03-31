@@ -263,8 +263,8 @@ def on_update_rcv():
             node_info['cluster_head'] = True
             node_info['cluster_set'].append(str(acp._get_my_address()))
             tagged.objective.value = cbor.dumps(node_info)
-    threading.Thread(target=run_neg_update, args=[]).start()
     sleep(5*len(NEIGHBOR_ULA))
+    threading.Thread(target=run_neg_update, args=[]).start()
 
 
 def keep_track():

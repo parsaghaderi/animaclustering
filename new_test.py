@@ -99,8 +99,9 @@ def listen(_tagged):
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    mprint("req_neg initial value : peer offered {}".format(cbor.loads(_answer.value)))#√
     tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial value : peer offered {}".format(tmp_answer)))#√
+    
     # mprint("sent from peer {}".format(tmp_answer))
     #TODO get info from the answer
     ###########

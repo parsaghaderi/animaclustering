@@ -237,11 +237,13 @@ def init():
         node_info['cluster_head'] = True
         node_info['cluster_set'].append(str(acp._get_my_address()))
         tagged.objective.value = cbor.dumps(node_info)
-        threading.Thread(target=run_neg_update, args=[]).start()
-        sleep(5*len(NEIGHBOR_ULA))
+        
     else:
         mprint("want to join {}".format(str(HEAVIEST.locator)))
+    threading.Thread(target=run_neg_update, args=[]).start()
+    sleep(5*len(NEIGHBOR_ULA))
     sleep(10)
+
     #TODO do the negotiation to get the cluster heads once more
 
     #threading.Thread(target=on_update_rcv, args=[]).start()

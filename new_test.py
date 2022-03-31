@@ -162,6 +162,7 @@ def neg(_tagged, ll, _attempt = 3):
     global NEIGHBOR_INFO
     NEIGHBOR_INFO[ll] = 0 # initial neg, later it's just updates
     attempt = _attempt
+    _err = None
     while attempt!=0:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO

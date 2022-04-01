@@ -273,18 +273,33 @@ def find_next_heaviest(_heaviest):
 ###########
 
 def init():
-    global INITIAL_NEG, HEAVIEST
+    global tag_lock, tagged
+    global INITIAL_NEG, HEAVIEST, MY_ULA
     while not INITIAL_NEG:
         pass
     sort_weight()
     if HEAVIEST == None:
         mprint("I'm clusterhead")
+        while not tag_lock:
+            pass
+        tag_lock = False
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = True
+        tagged.objective.value['cluster_set'].append(MY_ULA)
+        tag_lock = True
         mprint(node_info['weight'])
         mprint(list(NEIGHBOR_INFO.values()))
 
     else:
         mprint("I want to join {}".format(HEAVIEST.locator))
-        mprint(node_info['weight'])
+        while not tag_lock:
+            pass
+        tag_lock = False
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = False
+        tagged.objective.value['cluster_set']  = []
+        tag_lock = True
+        mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
 
 threading.Thread(target=init, args=[]).start()

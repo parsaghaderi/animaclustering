@@ -110,18 +110,18 @@ def listen(_tagged):
 def discover(_tagged):
     attempt = 5
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 500000, flush=True, minimum_TTL=50000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         mprint(len(ll))
         attempt-=1
     for item in ll:
         mprint(str(item.locator))
 
-if sp.getoutput('hostname') == 'Dijkstra':
+if sp.getoutput('hostname') == 'Ritchie':
     obj, err = OBJ_REG('node', cbor.dumps(10), True, False, 10, asa)
     tagged = TAG_OBJ(obj, asa)
     threading.Thread(target=discover, args=[tagged]).start()
 
-elif sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Gingko':
+elif sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Backus':
     obj, err = OBJ_REG('node', cbor.dumps(20), True, False, 10, asa)
     tagged = TAG_OBJ(obj, asa)
     threading.Thread(target=listen, args=[tagged]).start()

@@ -340,6 +340,7 @@ def on_update_rcv():
                     tag_lock = True
                     mprint(node_info)
                     mprint(NEIGHBOR_INFO)
+                    break
                 else:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(HEAVIEST.locator)))
@@ -349,6 +350,7 @@ def on_update_rcv():
                         tagged.objective.value['cluster_set']  = []
                         tagged.objective.value = cbor.dumps(tagged.objective.value)
                         tag_lock = True
+                        break
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch)
                         mprint("trying next heaviest node")

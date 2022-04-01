@@ -133,7 +133,7 @@ def listener_handler(_tagged, _handle, _answer):
     ###########
     while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
         pass
-    
+
     for item in NEIGHBOR_INFO:
         if NEIGHBOR_INFO[item]['ula'] == tmp_answer['ula']:
             NEIGHBOR_INFO[item] = tmp_answer
@@ -166,7 +166,7 @@ def discover(_tagged):
         mprint(len(ll))
         attempt-=1
     for item in ll:
-        NEIGHBOR_INFO[item.locator] = 0
+        NEIGHBOR_INFO[item] = 0
 threading.Thread(target=discover, args=[tagged]).start()
 
 ############

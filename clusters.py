@@ -101,7 +101,7 @@ NEIGHBOR_UPDATE = {}
 ##########
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
 ##########
-node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[], 'neighbors':[]} 
+node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA} 
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tag_lock = True
 tagged   = TAG_OBJ(obj, asa)

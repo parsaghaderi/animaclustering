@@ -116,7 +116,7 @@ def discover(_tagged):
     for item in ll:
         mprint(str(item.locator))
 
-if sp.getoutput('hostname') == 'Gingko':
+if sp.getoutput('hostname') == 'Dijkstra':
     obj, err = OBJ_REG('node', cbor.dumps(10), True, False, 10, asa)
     tagged = TAG_OBJ(obj, asa)
     threading.Thread(target=discover, args=[tagged]).start()

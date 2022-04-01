@@ -313,9 +313,9 @@ def init():
     threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initi:)al init
 
-
+CLUSTERING_DONE = False
 def on_update_rcv():
-    global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock
+    global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
     if TO_JOIN != None:
         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True:
             mprint("Joining {}".format(HEAVIEST.locator))
@@ -354,5 +354,18 @@ def on_update_rcv():
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch)
                         mprint("trying next heaviest node")
-
+    CLUSTERING_DONE = True
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    
+
+def show():
+    while not CLUSTERING_DONE:
+        pass
+    sleep(60)
+    mprint("clustering done")
+    mprint(node_info)
+    mprint(NEIGHBOR_INFO)
+
+threading.Thread(target=show, args=[]).start()
+cluster, err   = OBJ_REG('CH', None, True, 10, asa)
+tagged_cluster = TAG_OBJ(cluster, asa)

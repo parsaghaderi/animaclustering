@@ -274,11 +274,11 @@ def init():
     if HEAVIEST == None:
         mprint("I'm clusterhead")
         mprint(node_info['weight'])
-        mprint(list(NEIGHBOR_INFO.values))
+        mprint(list(NEIGHBOR_INFO.values()))
 
     else:
         mprint("I want to join {}".format(HEAVIEST.locator))
         mprint(node_info['weight'])
-        mprint(list(NEIGHBOR_INFO.values))
+        mprint(list(NEIGHBOR_INFO.values()))
 
 threading.Thread(target=init, args=[]).start()

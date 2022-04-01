@@ -99,14 +99,6 @@ NEIGHBOR_UPDATE = {}
 ##########
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
 ##########
-
-if sp.getoutput('hostname') == 'Gingko':
-    obj, err = OBJ_REG('node', cbor.dumps(10), True, False, 10, asa)
-    tagged = TAG_OBJ(obj, asa)
-elif sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
-    obj, err = OBJ_REG('node', cbor.dumps(20), True, False, 10, asa)
-    tagged = TAG_OBJ(obj, asa)
-
 def listen(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
@@ -124,8 +116,19 @@ def discover(_tagged):
     for item in ll:
         mprint(str(item.locator))
 
-threading.Thread(target=listen, args=[tagged]).start()
-threading.Thread(target=discover, args=[tagged]).start()
+if sp.getoutput('hostname') == 'Gingko':
+    obj, err = OBJ_REG('node', cbor.dumps(10), True, False, 10, asa)
+    tagged = TAG_OBJ(obj, asa)
+    threading.Thread(target=discover, args=[tagged]).start()
+
+elif sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
+    obj, err = OBJ_REG('node', cbor.dumps(20), True, False, 10, asa)
+    tagged = TAG_OBJ(obj, asa)
+    threading.Thread(target=listen, args=[tagged]).start()
+
+
+
+
 
 # node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(), 'cluster_head':False, 'cluster_set':[], 'neighbors':[]} 
 # obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)

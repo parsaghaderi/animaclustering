@@ -179,7 +179,7 @@ def run_neg(_tagged, _locators):
     while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
         pass
     for item in _locators:
-        threading.Thread(target=neg, args=[_tagged, item, 1]).start()
+        threading.Thread(target=neg, args=[_tagged, item]).start()
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
     INITIAL_NEG = True

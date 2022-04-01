@@ -4,7 +4,6 @@ import cbor
 import subprocess as sp
 from time import sleep
 
-from new_test import find_heavier
 
 # import grasp
 try:

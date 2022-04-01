@@ -309,7 +309,7 @@ def init():
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
-    sleep(15)
+    sleep(30)
     threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initi:)al init
 
@@ -354,5 +354,5 @@ def on_update_rcv():
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch)
                         mprint("trying next heaviest node")
-    sleep(30)
+
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()

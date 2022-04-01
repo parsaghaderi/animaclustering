@@ -135,11 +135,8 @@ def listener_handler(_tagged, _handle, _answer):
         pass
 
     for item in NEIGHBOR_INFO:
-        if NEIGHBOR_INFO[item]['ula'] == tmp_answer['ula']:
-            mprint("yes")
+        if str(item.locator) == tmp_answer['ula']:
             NEIGHBOR_INFO[item] = tmp_answer
-            break
-   
     ############
     while not tag_lock:
         pass

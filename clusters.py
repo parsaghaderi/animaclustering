@@ -4,6 +4,8 @@ import cbor
 import subprocess as sp
 from time import sleep
 
+from new_test import find_heavier
+
 # import grasp
 try:
     import graspi
@@ -167,16 +169,22 @@ def discover(_tagged):
         NEIGHBOR_INFO[item] = 0
 threading.Thread(target=discover, args=[tagged]).start()
 
+INITIAL_NEG = False
+
 ############
 # run neg for initial step of exchanging information w/ neighbors
 ############
 def run_neg(_tagged, _locators):
+    global INITIAL_NEG
     while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
         pass
     for item in _locators:
         threading.Thread(target=neg, args=[_tagged, item, 1]).start()
-threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    while list(NEIGHBOR_INFO.values()).__contains__(0):
+        pass
+    INITIAL_NEG = True
 
+threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
 
 
 ############
@@ -217,3 +225,58 @@ def neg(_tagged, ll, _attempt = 3):
         sleep(3)
         attempt-=1
         
+
+
+HEAVIER = {}
+LIGHTER = {}
+HEAVIEST = None
+
+def sort_weight():
+    global NEIGHBOR_INFO, HEAVIER, LIGHTER, HEAVIEST
+    my_weight = node_info['weight']
+    max_weight = my_weight
+    heavy = {} #TODO room for optimization
+    light = {} #TODO room for optimization
+    for item in NEIGHBOR_INFO:
+        if NEIGHBOR_INFO[item]['weight']> my_weight:
+            HEAVIER[item] = ['weight']
+        else:
+            LIGHTER[item] = ['weight']
+
+        if NEIGHBOR_INFO[item]['weight']> max_weight:
+            HEAVIEST = item #locator #TODO subject to change if it joins another cluster
+
+#########
+# @param _heaviest takes the current heaviest(locator), return next one in line
+# @return locator of the 2nd heaviest node
+#########
+def find_next_heaviest(_heaviest):
+    global HEAVIER, HEAVIEST
+    tmp_max = 0
+    tmp_heaviest = None
+    for item in HEAVIER:
+        if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
+            tmp_max = HEAVIER[item]
+            tmp_heaviest = item
+    return tmp_heaviest
+
+###########
+# init process
+###########
+
+def init():
+    global INITIAL_NEG, HEAVIEST
+    while not INITIAL_NEG:
+        pass
+    sort_weight()
+    if HEAVIEST == None:
+        mprint("I'm clusterhead")
+        mprint(node_info['weight'])
+        mprint(list(NEIGHBOR_INFO.values))
+
+    else:
+        mprint("I want to join {}".format(HEAVIEST.locator))
+        mprint(node_info['weight'])
+        mprint(list(NEIGHBOR_INFO.values))
+
+threading.Thread(target=init, args=[]).start()

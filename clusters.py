@@ -199,10 +199,9 @@ def neg(_tagged, ll, _attempt = 3):
 
     if _attempt!=3:
         mprint("start negotiation o kire khar {}".format(ll.locator))
-    else:
-        mprint("start negotiating with {}".format(ll.locator))
     attempt = _attempt
     while attempt!=0:
+        mprint("start negotiating with {} for {}th time".format(ll.locator, attempt))
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
             reason = answer

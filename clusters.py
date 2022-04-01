@@ -321,7 +321,7 @@ def on_update_rcv():
             mprint("Joining {}".format(HEAVIEST.locator))
             tag_lock = False
             tagged.objective.value = cbor.loads(tagged.objective.value)
-            tagged.objective.value['cluster_head'] = HEAVIEST.locator
+            tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
             tagged.objective.value['cluster_set']  = []
             tagged.objective.value = cbor.dumps(tagged.objective.value)
             tag_lock = True
@@ -342,10 +342,10 @@ def on_update_rcv():
                     mprint(NEIGHBOR_INFO)
                 else:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
-                        mprint("Joining {}".format(HEAVIEST.locator))
+                        mprint("Joining {}".format(str(HEAVIEST.locator)))
                         tag_lock = False
                         tagged.objective.value = cbor.loads(tagged.objective.value)
-                        tagged.objective.value['cluster_head'] = HEAVIEST.locator
+                        tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
                         tagged.objective.value['cluster_set']  = []
                         tagged.objective.value = cbor.dumps(tagged.objective.value)
                         tag_lock = True

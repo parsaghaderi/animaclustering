@@ -134,11 +134,11 @@ def listener_handler(_tagged, _handle, _answer):
     while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
         pass
 
-    for item in NEIGHBOR_INFO:
+    # for item in NEIGHBOR_INFO:
         # if NEIGHBOR_INFO[item]['ula'] == tmp_answer['ula']:
         #     NEIGHBOR_INFO[item] = tmp_answer
         #     break
-        mprint(NEIGHBOR_INFO[item])
+    mprint(tmp_answer)
     ############
     while not tag_lock:
         pass

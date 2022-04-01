@@ -224,6 +224,7 @@ def neg(_tagged, ll, _attempt = 3):
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
             else:
                 mprint("neg failed + {}".format(graspi.etext[err]))
+                attempt+=1
         except:
             attempt+=1
         try:

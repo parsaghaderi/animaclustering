@@ -121,7 +121,7 @@ if sp.getoutput('hostname') == 'Dijkstra':
     tagged = TAG_OBJ(obj, asa)
     threading.Thread(target=discover, args=[tagged]).start()
 
-elif sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan':
+elif sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Gingko':
     obj, err = OBJ_REG('node', cbor.dumps(20), True, False, 10, asa)
     tagged = TAG_OBJ(obj, asa)
     threading.Thread(target=listen, args=[tagged]).start()

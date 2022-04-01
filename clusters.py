@@ -253,6 +253,9 @@ def sort_weight():
 
         if NEIGHBOR_INFO[item]['weight']> max_weight:
             HEAVIEST = item #locator #TODO subject to change if it joins another cluster
+    mprint(HEAVIER)
+    mprint(LIGHTER)
+    mprint(HEAVIEST)
 
 #########
 # @param _heaviest takes the current heaviest(locator), return next one in line
@@ -303,3 +306,4 @@ def init():
         mprint(list(NEIGHBOR_INFO.values()))
 
 threading.Thread(target=init, args=[]).start()
+

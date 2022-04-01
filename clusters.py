@@ -343,10 +343,10 @@ def on_update_rcv():
                     break
                 else:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
-                        mprint("Joining {}".format(str(HEAVIEST.locator)))
+                        mprint("Joining {}".format(str(tmp_ch.locator)))
                         tag_lock = False
                         tagged.objective.value = cbor.loads(tagged.objective.value)
-                        tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
+                        tagged.objective.value['cluster_head'] = str(tmp_ch.locator)
                         tagged.objective.value['cluster_set']  = []
                         tagged.objective.value = cbor.dumps(tagged.objective.value)
                         tag_lock = True

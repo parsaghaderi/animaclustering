@@ -75,6 +75,7 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA):
 ###########
 def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
+
 asa, err = ASA_REG('node_neg')
 
 ############
@@ -227,56 +228,56 @@ def neg(_tagged, ll, _attempt = 3):
         
 
 
-HEAVIER = {}
-LIGHTER = {}
-HEAVIEST = None
+# HEAVIER = {}
+# LIGHTER = {}
+# HEAVIEST = None
 
-def sort_weight():
-    global NEIGHBOR_INFO, HEAVIER, LIGHTER, HEAVIEST
-    my_weight = node_info['weight']
-    max_weight = my_weight
-    heavy = {} #TODO room for optimization
-    light = {} #TODO room for optimization
-    for item in NEIGHBOR_INFO:
-        if NEIGHBOR_INFO[item]['weight']> my_weight:
-            HEAVIER[item] = ['weight']
-        else:
-            LIGHTER[item] = ['weight']
+# def sort_weight():
+#     global NEIGHBOR_INFO, HEAVIER, LIGHTER, HEAVIEST
+#     my_weight = node_info['weight']
+#     max_weight = my_weight
+#     heavy = {} #TODO room for optimization
+#     light = {} #TODO room for optimization
+#     for item in NEIGHBOR_INFO:
+#         if NEIGHBOR_INFO[item]['weight']> my_weight:
+#             HEAVIER[item] = ['weight']
+#         else:
+#             LIGHTER[item] = ['weight']
 
-        if NEIGHBOR_INFO[item]['weight']> max_weight:
-            HEAVIEST = item #locator #TODO subject to change if it joins another cluster
+#         if NEIGHBOR_INFO[item]['weight']> max_weight:
+#             HEAVIEST = item #locator #TODO subject to change if it joins another cluster
 
-#########
-# @param _heaviest takes the current heaviest(locator), return next one in line
-# @return locator of the 2nd heaviest node
-#########
-def find_next_heaviest(_heaviest):
-    global HEAVIER, HEAVIEST
-    tmp_max = 0
-    tmp_heaviest = None
-    for item in HEAVIER:
-        if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
-            tmp_max = HEAVIER[item]
-            tmp_heaviest = item
-    return tmp_heaviest
+# #########
+# # @param _heaviest takes the current heaviest(locator), return next one in line
+# # @return locator of the 2nd heaviest node
+# #########
+# def find_next_heaviest(_heaviest):
+#     global HEAVIER, HEAVIEST
+#     tmp_max = 0
+#     tmp_heaviest = None
+#     for item in HEAVIER:
+#         if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
+#             tmp_max = HEAVIER[item]
+#             tmp_heaviest = item
+#     return tmp_heaviest
 
-###########
-# init process
-###########
+# ###########
+# # init process
+# ###########
 
-def init():
-    global INITIAL_NEG, HEAVIEST
-    while not INITIAL_NEG:
-        pass
-    sort_weight()
-    if HEAVIEST == None:
-        mprint("I'm clusterhead")
-        mprint(node_info['weight'])
-        mprint(list(NEIGHBOR_INFO.values))
+# def init():
+#     global INITIAL_NEG, HEAVIEST
+#     while not INITIAL_NEG:
+#         pass
+#     sort_weight()
+#     if HEAVIEST == None:
+#         mprint("I'm clusterhead")
+#         mprint(node_info['weight'])
+#         mprint(list(NEIGHBOR_INFO.values))
 
-    else:
-        mprint("I want to join {}".format(HEAVIEST.locator))
-        mprint(node_info['weight'])
-        mprint(list(NEIGHBOR_INFO.values))
+#     else:
+#         mprint("I want to join {}".format(HEAVIEST.locator))
+#         mprint(node_info['weight'])
+#         mprint(list(NEIGHBOR_INFO.values))
 
-threading.Thread(target=init, args=[]).start()
+# threading.Thread(target=init, args=[]).start()

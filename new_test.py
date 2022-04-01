@@ -104,7 +104,7 @@ def listener_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     
-    # mprint("sent from peer {}".format(tmp_answer))
+    mprint("sent from peer {}".format(tmp_answer))
     #TODO get info from the answer
     ###########
     for item in NEIGHBOR_INFO:

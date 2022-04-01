@@ -247,9 +247,9 @@ def sort_weight():
     light = {} #TODO room for optimization
     for item in NEIGHBOR_INFO:
         if NEIGHBOR_INFO[item]['weight']> my_weight:
-            HEAVIER[item] = ['weight']
+            HEAVIER[item] = NEIGHBOR_INFO[item]['weight']
         else:
-            LIGHTER[item] = ['weight']
+            LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
 
         if NEIGHBOR_INFO[item]['weight']> max_weight:
             HEAVIEST = item #locator #TODO subject to change if it joins another cluster

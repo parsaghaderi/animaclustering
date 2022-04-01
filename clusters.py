@@ -306,7 +306,7 @@ def init():
         tag_lock = True
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
-        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
 threading.Thread(target=init, args=[]).start() #initi:)al init
 
 

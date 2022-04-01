@@ -101,7 +101,6 @@ def listen(_tagged):
             mprint(graspi.etext[err])
 
 def listener_handler(_tagged, _handle, _answer):
-    global listen_semaphore
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     
@@ -212,11 +211,12 @@ def find_heavier():
                 max_key = item
     HEAVIEST = max_key
     tmp_sorted = dict(sorted(tmp.items(), key=lambda item: item[1], reverse = True))
-    order = 1
     for item in tmp_sorted.keys():
         HEAVIER.append(item)
-        HEAVY_UPDATE[item] = [False, order]
-        order+=1
+    if HEAVIEST == False:
+        mprint("the value of my heaviest is {}".format(HEAVIEST))
+    else:
+        mprint("the value of my heaviest is {}".format(str(HEAVIEST.locator)))
     mprint("$$$$$$$$$$$$$$${}$$$$$$$$$$$$$$$$".format(HEAVY_UPDATE))
     if HEAVIEST == False:
         mprint("the value of my heaviest is {}".format(HEAVIEST))

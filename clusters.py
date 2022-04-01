@@ -167,6 +167,8 @@ def discover(_tagged):
         attempt-=1
     for item in ll:
         NEIGHBOR_INFO[item] = 0
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+
 threading.Thread(target=discover, args=[tagged]).start()
 
 INITIAL_NEG = False
@@ -184,7 +186,6 @@ def run_neg(_tagged, _locators):
         pass
     INITIAL_NEG = True
 
-threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
 
 
 ############

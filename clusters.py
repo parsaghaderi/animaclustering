@@ -185,6 +185,7 @@ def run_neg(_tagged, _locators):
         threading.Thread(target=neg, args=[_tagged, item, 1]).start()
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
+    sleep(15)
     INITIAL_NEG = True
 
 

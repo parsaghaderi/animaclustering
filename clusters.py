@@ -115,7 +115,7 @@ def listen(_tagged):
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint(graspi.etext[err])
-
+threading.Thread(target=listen, args=[tagged]).start()
 ###########
 # @param _tagged tagged objective listening for
 # @param _handle handler for the incoming request
@@ -155,3 +155,4 @@ def discover(_tagged):
         attempt-=1
     for item in ll:
         mprint(str(item.locator))
+threading.Thread(target=discover, args=[tagged]).start()

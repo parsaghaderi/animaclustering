@@ -108,9 +108,9 @@ def listen(_tagged):
             mprint(graspi.etext[err])
             
 def discover(_tagged):
-    attempt = 3
+    attempt = 5
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 500000, flush=True, minimum_TTL=50000)
         mprint(len(ll))
         attempt-=1
     for item in ll:

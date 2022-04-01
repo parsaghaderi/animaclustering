@@ -289,6 +289,7 @@ def init():
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
         tagged.objective.value['cluster_set'].append(MY_ULA)
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
         tag_lock = True
         mprint(node_info['weight'])
         mprint(list(NEIGHBOR_INFO.values()))
@@ -301,9 +302,13 @@ def init():
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = False
         tagged.objective.value['cluster_set']  = []
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
         tag_lock = True
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
+        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+threading.Thread(target=init, args=[]).start() #initi:)al init
 
-threading.Thread(target=init, args=[]).start()
 
+def after_updace_rcv():
+    pass

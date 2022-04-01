@@ -208,22 +208,28 @@ def neg(_tagged, ll, _attempt = 3):
             reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-        if not err:
-            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
-            if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
-                if not node_info['cluster_set'].__contains__(str(ll.locator)):
-                    node_info['cluster_set'].append(str(ll.locator))
-                while not tag_lock:
-                    pass
-                tag_lock = False
-                _tagged.objective.value = cbor.dumps(node_info)
-                tag_lock = True
-                NEIGHBOR_UPDATE[ll.locator] = True
-            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-        else:
-            mprint("neg failed + {}".format(graspi.etext[err]))
+        try:
+            if not err:
+                NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+                mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+                if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
+                    if not node_info['cluster_set'].__contains__(str(ll.locator)):
+                        node_info['cluster_set'].append(str(ll.locator))
+                    while not tag_lock:
+                        pass
+                    tag_lock = False
+                    _tagged.objective.value = cbor.dumps(node_info)
+                    tag_lock = True
+                    NEIGHBOR_UPDATE[ll.locator] = True
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+            else:
+                mprint("neg failed + {}".format(graspi.etext[err]))
+        except:
+            attempt+=1
+        try:
             err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
+        except:
+            pass
         sleep(3)
         attempt-=1
         

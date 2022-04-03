@@ -189,7 +189,7 @@ def run_neg(_tagged, _locators):
         pass
     for item in _locators:
         # mprint(item.locator)
-        threading.Thread(target=neg, args=[_tagged, item]).start()
+        threading.Thread(target=neg, args=[_tagged, item, 1]).start()
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
     sleep(15)

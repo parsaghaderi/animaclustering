@@ -120,7 +120,7 @@ def listen(_tagged):
             mprint("incoming request")
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
-            mprint(graspi.etext[err])
+            mprint("in listen error {}" .format(graspi.etext[err]))
 threading.Thread(target=listen, args=[tagged]).start()
 ###########
 # @param _tagged tagged objective listening for
@@ -159,10 +159,10 @@ def listener_handler(_tagged, _handle, _answer):
             pass
             
         else:
-            mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+            mprint("in listen handler - neg with peer interrupted with error code {}".format(graspi.etext[err]))
             pass
     except Exception as err:
-        mprint(err)
+        mprint("exception in linsten handler {}".format(err))
 
 
 def discover(_tagged):
@@ -230,14 +230,14 @@ def neg(_tagged, ll, _attempt = 3):
                     NEIGHBOR_UPDATE[ll.locator] = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
             else:
-                mprint("neg with {} failed + {}".format(str(ll.locator), graspi.etext[err]))
+                mprint("in neg - neg with {} failed + {}".format(str(ll.locator), graspi.etext[err]))
                 attempt+=1
         except:
             attempt+=1
         try:
             err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         except Exception as err:
-            mprint(err)
+            mprint("in neg exception happened {}".format(err))
         sleep(3)
         attempt-=1
         

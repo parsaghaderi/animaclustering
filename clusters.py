@@ -284,6 +284,7 @@ def find_next_heaviest(_heaviest):
 ###########
 TO_JOIN = None
 def init():
+    mprint("deciding the role")
     global tag_lock, tagged
     global INITIAL_NEG, HEAVIEST, MY_ULA, TO_JOIN
     while not INITIAL_NEG:

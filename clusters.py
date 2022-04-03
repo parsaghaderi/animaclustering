@@ -115,7 +115,6 @@ tagged   = TAG_OBJ(obj, asa)
 ##########
 def listen(_tagged):
     while True:
-        
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             mprint("incoming request")
@@ -137,8 +136,8 @@ def listener_handler(_tagged, _handle, _answer):
     #TODO get info from the answer
     #we already know the dict of neighbor_info has been created!
     ###########
-    while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
-        pass
+    # while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #TODO why? 
+    #     pass
 
     for item in NEIGHBOR_INFO:
         if str(item.locator) == tmp_answer['ula']:
@@ -149,18 +148,22 @@ def listener_handler(_tagged, _handle, _answer):
     tag_lock = False
     _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer)
     tag_lock = True
-    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
-    if _old_API:
-        err, temp, answer = _r
-        reason = answer
-    else:
-        err, temp, answer, reason = _r
-    if (not err) and (temp == None):
-        pass
-        
-    else:
-        mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
-        pass
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            pass
+            
+        else:
+            mprint("neg with peer interrupted with error code {}".format(graspi.etext[err]))
+            pass
+    except Exception as err:
+        mprint(err)
+
 
 def discover(_tagged):
     global NEIGHBOR_INFO
@@ -233,8 +236,8 @@ def neg(_tagged, ll, _attempt = 3):
             attempt+=1
         try:
             err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
-        except Exception:
-            mprint(Exception)
+        except Exception as err:
+            mprint(err)
         sleep(3)
         attempt-=1
         

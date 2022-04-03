@@ -183,13 +183,13 @@ INITIAL_NEG = False
 ############
 # run neg for initial step of exchanging information w/ neighbors
 ############
-def run_neg(_tagged, _locators):
+def run_neg(_tagged, _locators, _attempts = 1):
     global INITIAL_NEG
     while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
         pass
     for item in _locators:
         # mprint(item.locator)
-        threading.Thread(target=neg, args=[_tagged, item, 1]).start()
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
     sleep(15)

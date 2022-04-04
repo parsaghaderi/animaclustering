@@ -373,6 +373,7 @@ def on_update_rcv():
         while not tag_lock:
             pass
         tag_lock = False
+        mprint("\033[1;35;1m I'm in on update rcv - I'm cluster head 1\033[0m")
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
         if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
@@ -386,6 +387,7 @@ def on_update_rcv():
     else:
         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
             mprint("Joining {}".format(HEAVIEST.locator))
+            mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
             while not tag_lock:
                     pass
             tag_lock = False
@@ -402,6 +404,7 @@ def on_update_rcv():
             tmp_ch = find_next_heaviest(HEAVIEST)
             if tmp_ch == None:
                 mprint("I'm clusterhead")
+                mprint("\033[1;35;1m I'm in on update rcv - I'm cluster head 2\033[0m")
                 while not tag_lock:
                     pass
                 tag_lock = False
@@ -420,6 +423,7 @@ def on_update_rcv():
                 while tmp_ch != None:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(tmp_ch.locator)))
+                        mprint("\033[1;35;1m I'm in on update rcv - joining 2\033[0m")
                         while not tag_lock:
                             pass
                         tag_lock = False

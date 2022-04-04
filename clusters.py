@@ -166,7 +166,7 @@ def listener_handler(_tagged, _handle, _answer):
         mprint("exception in linsten handler {}".format(err))
 
 
-def discover(_tagged):
+def discover(_tagged, _attempt=3):
     global NEIGHBOR_INFO
     attempt = 3
     while attempt != 0:
@@ -175,7 +175,7 @@ def discover(_tagged):
         attempt-=1
     for item in ll:
         NEIGHBOR_INFO[item] = 0
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
 
 threading.Thread(target=discover, args=[tagged]).start()
 
@@ -347,7 +347,7 @@ def init():
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
     INITIAL_NEG = False
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    threading.Thread(target=discover, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     while not INITIAL_NEG:
         pass
     threading.Thread(target=on_update_rcv, args=[]).start()

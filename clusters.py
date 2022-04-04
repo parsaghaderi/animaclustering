@@ -235,7 +235,7 @@ def neg(_tagged, ll, _attempt = 3):
         try:
             err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
             if err:
-                mprint("\033[1;31;1m in neg error happened {} \033[0m".format(err))
+                mprint("\033[1;31;1m in neg error happened {} \033[0m".format(graspi.etext[err]))
         except Exception as e:
             mprint("\033[1;31;1m in neg exception happened {} \033[0m".format(e))
         attempt-=1

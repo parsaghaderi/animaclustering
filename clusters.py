@@ -322,7 +322,7 @@ def init():
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     while not INITIAL_NEG:
         pass
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
 CLUSTERING_DONE = False
@@ -370,7 +370,7 @@ def on_update_rcv():
                         tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
                         mprint("trying next heaviest node")
     
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     
 
 def show():

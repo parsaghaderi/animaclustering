@@ -466,7 +466,7 @@ def generate_topology():
     while not SYNCH:
         pass
     tmp_map = {}
-    if node_info['cluster_head'] == True:
+    if cbor.loads(tagged.objective.value)['cluster_head'] == True:
         for item in tagged.objective.value['cluster_set']:
             for locators in NEIGHBOR_INFO:
                 if item == str(locators.locator):

@@ -204,14 +204,14 @@ def run_neg(_tagged, _locators, _attempts = 1):
 ############
 def neg(_tagged, ll, _attempt = 3):
     global NEIGHBOR_INFO
-    
+    _try = 1
     if _attempt!=3:
         mprint("start negotiation o kire khar {}".format(ll.locator))
     attempt = _attempt
     while attempt!=0:
-        mprint("start negotiating with {} for {}th time".format(ll.locator, attempt))
+        mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _try))
         if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, None) #TODO
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
             reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
@@ -234,9 +234,12 @@ def neg(_tagged, ll, _attempt = 3):
                 attempt+=1
         try:
             err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
+            if err:
+                mprint("\033[1;31;1m ")
         except Exception as err:
             mprint("\033[1;31;1m in neg exception happened {} \033[0m".format(err))
         attempt-=1
+        _try += 1
         
 #from here
 

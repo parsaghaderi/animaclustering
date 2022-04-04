@@ -270,10 +270,17 @@ def sort_weight():
 # @return locator of the 2nd heaviest node
 #########
 def find_next_heaviest(_heaviest):
+    
     global HEAVIER, HEAVIEST
+    if HEAVIEST == None:
+        return None
     tmp_max = 0
     tmp_heaviest = None
     for item in HEAVIER:
+        mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
+        .format(str(_heaviest.locator), tmp_max, str(tmp_heaviest.locator),
+         str(item.locator), NEIGHBOR_INFO[item]['weight']))
+         
         if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
             tmp_max = HEAVIER[item]
             tmp_heaviest = item
@@ -339,23 +346,24 @@ def on_update_rcv():
             tag_lock = True
             CLUSTERING_DONE = True
         else:
-            while True:
+            tmp_ch = find_next_heaviest(HEAVIEST)
+            if tmp_ch == None:
+                mprint("I'm clusterhead")
+                while not tag_lock:
+                    pass
+                tag_lock = False
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                tagged.objective.value['cluster_head'] = True
+                tagged.objective.value['cluster_set'].append(MY_ULA)
+                tagged.objective.value = cbor.dumps(tagged.objective.value)
+                tag_lock = True 
+                mprint(node_info)
+                mprint(NEIGHBOR_INFO)
+                CLUSTERING_DONE = True
+                
+            else:
                 tmp_ch = find_next_heaviest(HEAVIEST)
-                if tmp_ch == None:
-                    mprint("I'm clusterhead")
-                    while not tag_lock:
-                        pass
-                    tag_lock = False
-                    tagged.objective.value = cbor.loads(tagged.objective.value)
-                    tagged.objective.value['cluster_head'] = True
-                    tagged.objective.value['cluster_set'].append(MY_ULA)
-                    tagged.objective.value = cbor.dumps(tagged.objective.value)
-                    tag_lock = True 
-                    mprint(node_info)
-                    mprint(NEIGHBOR_INFO)
-                    CLUSTERING_DONE = True
-                    break
-                else:
+                while tmp_ch != None:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(tmp_ch.locator)))
                         tag_lock = False

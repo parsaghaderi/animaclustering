@@ -261,7 +261,7 @@ def sort_weight():
         else:
             LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
 
-        
+    HEAVIER = dict(sorted(HEAVIER.items(), key=lambda item: item[1], reverse = True))
     mprint("heavier:{}".format(HEAVIER))
     mprint("lighter:{}".format(LIGHTER))
     mprint("heaviest:{}".format(HEAVIEST))
@@ -272,24 +272,32 @@ def sort_weight():
 #########
 def find_next_heaviest(_heaviest):
     global HEAVIER, HEAVIEST
-    if HEAVIEST == None:
+    heavier_lst = list(HEAVIER.keys())
+    if len(heavier_lst) == 0:
         return None
-    tmp_max = 0
-    tmp_heaviest = None
-    for item in HEAVIER:
-        if tmp_heaviest != None:
-            mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
-            .format(str(_heaviest.locator), tmp_max, str(tmp_heaviest.locator),
-            str(item.locator), NEIGHBOR_INFO[item]['weight']))
-        else:
-            mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
-            .format(str(_heaviest.locator), tmp_max, "none",
-            str(item.locator), NEIGHBOR_INFO[item]['weight']))
-        if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
-            HEAVIEST = tmp_heaviest
-            tmp_max = HEAVIER[item]
-            tmp_heaviest = item
-    return HEAVIEST
+    if heavier_lst.index(_heaviest) == len(heavier_lst)-1:
+        return None
+    else:
+        index = heavier_lst.index(_heaviest)
+        return heavier_lst[index+1]
+    # if HEAVIEST == None:
+    #     return None
+    # tmp_max = 0
+    # tmp_heaviest = None
+    # for item in HEAVIER:
+    #     if tmp_heaviest != None:
+    #         mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
+    #         .format(str(_heaviest.locator), tmp_max, str(tmp_heaviest.locator),
+    #         str(item.locator), NEIGHBOR_INFO[item]['weight']))
+    #     else:
+    #         mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
+    #         .format(str(_heaviest.locator), tmp_max, "none",
+    #         str(item.locator), NEIGHBOR_INFO[item]['weight']))
+    #     if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
+    #         HEAVIEST = tmp_heaviest
+    #         tmp_max = HEAVIER[item]
+    #         tmp_heaviest = item
+    # return HEAVIEST
 
 ###########
 # init process

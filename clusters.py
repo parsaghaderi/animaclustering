@@ -4,7 +4,6 @@ import cbor
 import subprocess as sp
 from time import sleep
 
-from new_test import find_heavier
 
 
 # import grasp
@@ -309,7 +308,7 @@ def init():
         while tmp_ch != None:
             mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
             tmp_ch = find_heavier(tmp_ch)
-            
+
     # if HEAVIEST == None:
     #     mprint("I'm clusterhead")
     #     while not tag_lock:

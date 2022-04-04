@@ -457,8 +457,22 @@ def show():
     mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))
 
+    sleep(10)
+    threading.Thread(target=generate_topology, args=[]).start()
 
 
+def generate_topology():
+    global SYNCH, tagged, NEIGHBOR_INFO
+    while not SYNCH:
+        pass
+    tmp_map = {}
+    if node_info['cluster_head'] == True:
+        for item in tagged.objective.value['cluster_set']:
+            for locators in NEIGHBOR_INFO:
+                if item == str(locators.locator):
+                    tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
+        
+    mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
 
 # def ch_obj():
 #     while not CLUSTERING_DONE:

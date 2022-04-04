@@ -145,6 +145,7 @@ def listener_handler(_tagged, _handle, _answer):
             NEIGHBOR_INFO[item] = tmp_answer
     ############
     while not tag_lock:
+        mprint("stuck here")
         pass
     tag_lock = False
     _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer)
@@ -223,6 +224,7 @@ def neg(_tagged, ll, _attempt = 3):
                     if not node_info['cluster_set'].__contains__(str(ll.locator)):
                         node_info['cluster_set'].append(str(ll.locator))
                     while not tag_lock:
+                        mprint("stuck here")
                         pass
                     tag_lock = False
                     _tagged.objective.value = cbor.dumps(node_info)

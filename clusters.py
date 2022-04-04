@@ -384,6 +384,8 @@ def on_update_rcv():
     else:
         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
             mprint("Joining {}".format(HEAVIEST.locator))
+            while not tag_lock:
+                    pass
             tag_lock = False
             tagged.objective.value = cbor.loads(tagged.objective.value)
             tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
@@ -413,6 +415,8 @@ def on_update_rcv():
                 while tmp_ch != None:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(tmp_ch.locator)))
+                        while not tag_lock:
+                            pass
                         tag_lock = False
                         tagged.objective.value = cbor.loads(tagged.objective.value)
                         tagged.objective.value['cluster_head'] = str(tmp_ch.locator)

@@ -445,7 +445,7 @@ def show():
     global SYNCH, tagged
     while not SYNCH:
         pass
-    sleep(60)
+    sleep(30)
     mprint("clustering done")
     mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))

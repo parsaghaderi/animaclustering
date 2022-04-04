@@ -121,7 +121,7 @@ def listen(_tagged):
             mprint("incoming request")
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
-            mprint("in listen error {}" .format(graspi.etext[err]))
+            mprint("\033[1;31;40m in listen error {}" .format(graspi.etext[err]))
 threading.Thread(target=listen, args=[tagged]).start()
 ###########
 # @param _tagged tagged objective listening for
@@ -159,10 +159,10 @@ def listener_handler(_tagged, _handle, _answer):
             pass
             
         else:
-            mprint("in listen handler - neg with peer interrupted with error code {}".format(graspi.etext[err]))
+            mprint("\033[1;31;40m in listen handler - neg with peer interrupted with error code {}".format(graspi.etext[err]))
             pass
     except Exception as err:
-        mprint("exception in linsten handler {}".format(err))
+        mprint("\033[1;31;40m exception in linsten handler {}".format(err))
 
 
 def discover(_tagged, _attempt=3):

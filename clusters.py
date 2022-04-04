@@ -240,6 +240,7 @@ def neg(_tagged, ll, _attempt = 3):
             mprint("\033[1;31;1m in neg exception happened {} \033[0m".format(e))
         attempt-=1
         _try += 1
+        sleep(3)
         
 #from here
 

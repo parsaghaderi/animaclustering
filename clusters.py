@@ -361,6 +361,7 @@ def init():
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     while not INITIAL_NEG:
         pass
+    sleep(15)
     threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
@@ -443,18 +444,19 @@ def on_update_rcv():
     sleep(15)
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     SYNCH = True
+    sleep(30)
+    threading.Thread(target=show, args=[]).start()
+
     
 
 def show():
     global SYNCH, tagged
     while not SYNCH:
         pass
-    sleep(30)
     mprint("clustering done")
     mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))
 
-threading.Thread(target=show, args=[]).start()
 
 
 

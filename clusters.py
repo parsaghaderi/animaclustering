@@ -358,7 +358,7 @@ def init():
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     while not INITIAL_NEG:
         pass
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
 CLUSTERING_DONE = False

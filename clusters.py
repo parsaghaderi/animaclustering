@@ -343,7 +343,7 @@ def init():
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
     INITIAL_NEG = False
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     while not INITIAL_NEG:
         pass
     # threading.Thread(target=on_update_rcv, args=[]).start()

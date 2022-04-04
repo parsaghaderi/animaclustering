@@ -364,6 +364,8 @@ def on_update_rcv():
                         tagged.objective.value['cluster_set']  = []
                         tagged.objective.value = cbor.dumps(tagged.objective.value)
                         tag_lock = True
+                        mprint(node_info)
+                        mprint(NEIGHBOR_INFO)
                         CLUSTERING_DONE = True
                         break
                     else:
@@ -381,7 +383,7 @@ def show():
     mprint(node_info)
     mprint(NEIGHBOR_INFO)
 
-# threading.Thread(target=show, args=[]).start()
+threading.Thread(target=show, args=[]).start()
 
 
 

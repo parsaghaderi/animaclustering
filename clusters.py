@@ -203,7 +203,7 @@ def run_neg(_tagged, _locators, _attempts = 1):
 # @param _attempt number of attempts for negotiating 
 ############
 def neg(_tagged, ll, _attempt):
-    global NEIGHBOR_INFO
+    global NEIGHBOR_INFO, tag_lock
     _try = 1
     # if _attempt!=3:
     #     mprint("start negotiation with non-default attempt {}".format(ll.locator))
@@ -422,6 +422,7 @@ def on_update_rcv():
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
                         mprint("trying next heaviest node")
+    sleep(15)
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     
 

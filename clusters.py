@@ -216,6 +216,7 @@ def neg(_tagged, ll, _attempt = 3):
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
             if not err:
+                mprint("\033[1:32:1m got answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
                 NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
                 mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
                 if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
@@ -229,6 +230,8 @@ def neg(_tagged, ll, _attempt = 3):
                     tag_lock = True
                     NEIGHBOR_UPDATE[ll.locator] = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1:32:1m neg with {} ended \033[0m".format(str(ll.locator)))
             else:
                 mprint("\033[1;31;1m in neg - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
                 attempt+=1

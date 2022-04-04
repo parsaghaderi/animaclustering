@@ -468,7 +468,7 @@ def generate_topology():
     tmp_map = {}
     tmp_tagged = cbor.loads(tagged.objective.value)
     if len(tmp_tagged['cluster_set']) != 0:
-        for item in tagged.objective.value['cluster_set']:
+        for item in tmp_tagged['cluster_set']:
             for locators in NEIGHBOR_INFO:
                 if item == str(locators.locator) and item != MY_ULA:
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']

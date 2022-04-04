@@ -307,7 +307,7 @@ def init():
     else:
         while tmp_ch != None:
             mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
-            tmp_ch = find_heavier(tmp_ch)
+            tmp_ch = find_next_heaviest(tmp_ch)
 
     # if HEAVIEST == None:
     #     mprint("I'm clusterhead")

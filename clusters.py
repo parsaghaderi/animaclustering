@@ -277,10 +277,14 @@ def find_next_heaviest(_heaviest):
     tmp_max = 0
     tmp_heaviest = None
     for item in HEAVIER:
-        mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
-        .format(str(_heaviest.locator), tmp_max, str(tmp_heaviest.locator),
-         str(item.locator), NEIGHBOR_INFO[item]['weight']))
-         
+        if tmp_heaviest != None:
+            mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
+            .format(str(_heaviest.locator), tmp_max, str(tmp_heaviest.locator),
+            str(item.locator), NEIGHBOR_INFO[item]['weight']))
+        else:
+            mprint("heaviest now {} - tmp_max = {} - tmp_heaviest {} - item:weight = {}={}"
+            .format(str(_heaviest.locator), tmp_max, "none",
+            str(item.locator), NEIGHBOR_INFO[item]['weight']))
         if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
             tmp_max = HEAVIER[item]
             tmp_heaviest = item

@@ -404,7 +404,6 @@ def on_update_rcv():
                 mprint(node_info)
                 mprint(NEIGHBOR_INFO)
                 CLUSTERING_DONE = True
-                
             else:
                 tmp_ch = find_next_heaviest(HEAVIEST)
                 while tmp_ch != None:

@@ -205,8 +205,8 @@ def run_neg(_tagged, _locators, _attempts = 1):
 def neg(_tagged, ll, _attempt = 3):
     global NEIGHBOR_INFO
     _try = 1
-    if _attempt!=3:
-        mprint("start negotiation o kire khar {}".format(ll.locator))
+    # if _attempt!=3:
+    #     mprint("start negotiation with non-default attempt {}".format(ll.locator))
     attempt = _attempt
     while attempt!=0:
         mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _try))
@@ -229,18 +229,23 @@ def neg(_tagged, ll, _attempt = 3):
                     _tagged.objective.value = cbor.dumps(node_info)
                     tag_lock = True
                     NEIGHBOR_UPDATE[ll.locator] = True
-                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                if not _err:
-                    mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+                try:
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                    if not _err:
+                        mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+                    else:
+                        mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+                except Exception as e:
+                    mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
             else:
-                mprint("\033[1;31;1m in neg - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+                mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
                 attempt+=1
-        try:
-            err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
-            if err:
-                mprint("\033[1;31;1m in neg error happened {} \033[0m".format(graspi.etext[err]))
-        except Exception as e:
-            mprint("\033[1;31;1m in neg exception happened {} \033[0m".format(e))
+        # try:
+        #     err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
+        #     if err:
+        #         mprint("\033[1;31;1m in neg error happened {} \033[0m".format(graspi.etext[err]))
+        # except Exception as e:
+        #     mprint("\033[1;31;1m in neg exception happened {} \033[0m".format(e))
         attempt-=1
         _try += 1
         sleep(3)

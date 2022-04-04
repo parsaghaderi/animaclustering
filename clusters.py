@@ -253,17 +253,17 @@ def sort_weight():
     max_weight = my_weight
     for item in NEIGHBOR_INFO:
         if NEIGHBOR_INFO[item]['weight']> my_weight:
-            HEAVIER[item] = NEIGHBOR_INFO[item]['weight']
+            HEAVIER[str(item.locator)] = NEIGHBOR_INFO[item]['weight']
             if NEIGHBOR_INFO[item]['weight']> max_weight:
                 HEAVIEST = item #locator #TODO subject to change if it joins another cluster
                 max_weight = NEIGHBOR_INFO[item]['weight']
         else:
-            LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
+            LIGHTER[str(item.locator)] = NEIGHBOR_INFO[item]['weight']
 
         
-    mprint(HEAVIER)
-    mprint(LIGHTER)
-    mprint(HEAVIEST)
+    mprint("heavier:{}".format(HEAVIER))
+    mprint("lighter:{}".format(LIGHTER))
+    mprint("heaviest:{}".format(HEAVIEST))
 
 #########
 # @param _heaviest takes the current heaviest(locator), return next one in line
@@ -300,12 +300,7 @@ def init():
         pass
     mprint("deciding the role")
     sort_weight()
-    mprint("$$$$\nheaviers\n$$$$")
-    for item in HEAVIER:
-        mprint("node: {} - weight: {}".format(str(item.locator), HEAVIER[item]))
-    mprint("$$$$\nlighter\n$$$$")
-    for item in LIGHTER:
-        mprint("node: {} - weight: {}".format(str(item.locator), HEAVIER[item]))
+    
     # if HEAVIEST == None:
     #     mprint("I'm clusterhead")
     #     while not tag_lock:
@@ -341,110 +336,110 @@ def init():
     # threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
-CLUSTERING_DONE = False
-def on_update_rcv():
-    global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
-    if TO_JOIN != None:
-        if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
-            mprint("Joining {}".format(HEAVIEST.locator))
-            tag_lock = False
-            tagged.objective.value = cbor.loads(tagged.objective.value)
-            tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
-            tagged.objective.value['cluster_set']  = []
-            tagged.objective.value = cbor.dumps(tagged.objective.value)
-            tag_lock = True
-            CLUSTERING_DONE = True
+# CLUSTERING_DONE = False
+# def on_update_rcv():
+#     global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
+#     if TO_JOIN != None:
+#         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
+#             mprint("Joining {}".format(HEAVIEST.locator))
+#             tag_lock = False
+#             tagged.objective.value = cbor.loads(tagged.objective.value)
+#             tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
+#             tagged.objective.value['cluster_set']  = []
+#             tagged.objective.value = cbor.dumps(tagged.objective.value)
+#             tag_lock = True
+#             CLUSTERING_DONE = True
         
-        else:
-            mprint(HEAVIER)
-            tmp_ch = find_next_heaviest(HEAVIEST)
-            if tmp_ch == None:
-                mprint("I'm clusterhead")
-                while not tag_lock:
-                    pass
-                tag_lock = False
-                tagged.objective.value = cbor.loads(tagged.objective.value)
-                tagged.objective.value['cluster_head'] = True
-                tagged.objective.value['cluster_set'].append(MY_ULA)
-                tagged.objective.value = cbor.dumps(tagged.objective.value)
-                tag_lock = True 
-                mprint(node_info)
-                mprint(NEIGHBOR_INFO)
-                CLUSTERING_DONE = True
+#         else:
+#             mprint(HEAVIER)
+#             tmp_ch = find_next_heaviest(HEAVIEST)
+#             if tmp_ch == None:
+#                 mprint("I'm clusterhead")
+#                 while not tag_lock:
+#                     pass
+#                 tag_lock = False
+#                 tagged.objective.value = cbor.loads(tagged.objective.value)
+#                 tagged.objective.value['cluster_head'] = True
+#                 tagged.objective.value['cluster_set'].append(MY_ULA)
+#                 tagged.objective.value = cbor.dumps(tagged.objective.value)
+#                 tag_lock = True 
+#                 mprint(node_info)
+#                 mprint(NEIGHBOR_INFO)
+#                 CLUSTERING_DONE = True
                 
-            else:
-                tmp_ch = find_next_heaviest(HEAVIEST)
-                while tmp_ch != None:
-                    if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
-                        mprint("Joining {}".format(str(tmp_ch.locator)))
-                        tag_lock = False
-                        tagged.objective.value = cbor.loads(tagged.objective.value)
-                        tagged.objective.value['cluster_head'] = str(tmp_ch.locator)
-                        tagged.objective.value['cluster_set']  = []
-                        tagged.objective.value = cbor.dumps(tagged.objective.value)
-                        tag_lock = True
-                        mprint(node_info)
-                        mprint(NEIGHBOR_INFO)
-                        CLUSTERING_DONE = True
-                        break
-                    else:
-                        tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
-                        mprint("trying next heaviest node")
+#             else:
+#                 tmp_ch = find_next_heaviest(HEAVIEST)
+#                 while tmp_ch != None:
+#                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
+#                         mprint("Joining {}".format(str(tmp_ch.locator)))
+#                         tag_lock = False
+#                         tagged.objective.value = cbor.loads(tagged.objective.value)
+#                         tagged.objective.value['cluster_head'] = str(tmp_ch.locator)
+#                         tagged.objective.value['cluster_set']  = []
+#                         tagged.objective.value = cbor.dumps(tagged.objective.value)
+#                         tag_lock = True
+#                         mprint(node_info)
+#                         mprint(NEIGHBOR_INFO)
+#                         CLUSTERING_DONE = True
+#                         break
+#                     else:
+#                         tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
+#                         mprint("trying next heaviest node")
     
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+#     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     
 
-def show():
-    while not CLUSTERING_DONE:
-        pass
-    sleep(60)
-    mprint("clustering done")
-    mprint(node_info)
-    mprint(NEIGHBOR_INFO)
+# def show():
+#     while not CLUSTERING_DONE:
+#         pass
+#     sleep(60)
+#     mprint("clustering done")
+#     mprint(node_info)
+#     mprint(NEIGHBOR_INFO)
 
-threading.Thread(target=show, args=[]).start()
-
-
-
-def ch_obj():
-    while not CLUSTERING_DONE:
-        pass
-    if node_info['cluster_head'] == True:
-        global cluster, tagged_cluster
-        try:
-            cluster, err   = OBJ_REG('CH', None, True, 10, asa)
-            tagged_cluster = TAG_OBJ(cluster, asa)
-        except:
-            mprint("creating cluster head objective error ".format(graspi.etext[err]))
-
-# threading.Thread(target=ch_obj, args=[]).start()
+# threading.Thread(target=show, args=[]).start()
 
 
-def listen_ch(_tagged):
-    err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-    if not err:
-        pass
-        #mprint("incoming request")
-        #threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
-    else:
-        mprint(graspi.etext[err])
+
+# def ch_obj():
+#     while not CLUSTERING_DONE:
+#         pass
+#     if node_info['cluster_head'] == True:
+#         global cluster, tagged_cluster
+#         try:
+#             cluster, err   = OBJ_REG('CH', None, True, 10, asa)
+#             tagged_cluster = TAG_OBJ(cluster, asa)
+#         except:
+#             mprint("creating cluster head objective error ".format(graspi.etext[err]))
+
+# # threading.Thread(target=ch_obj, args=[]).start()
 
 
-def discover_ch(_tagged):
-    global NEIGHBOR_INFO
-    attempt = 3
-    while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-        mprint(len(ll))
-        attempt-=1
-    for item in ll:
-        mprint("ch found at 2 hops away {}".format(item.locator))
+# def listen_ch(_tagged):
+#     err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+#     if not err:
+#         pass
+#         #mprint("incoming request")
+#         #threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+#     else:
+#         mprint(graspi.etext[err])
 
 
-def find_ch():
-    while not CLUSTERING_DONE:
-        pass
-    if node_info['cluster_head'] == True:
-        threading.Thread(target=listen_ch, args=[tagged_cluster]).start()
-        threading.Thread(target=discover_ch, args=[tagged_cluster]).start()
-# threading.Thread(target=find_ch, args=[]).start()
+# def discover_ch(_tagged):
+#     global NEIGHBOR_INFO
+#     attempt = 3
+#     while attempt != 0:
+#         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+#         mprint(len(ll))
+#         attempt-=1
+#     for item in ll:
+#         mprint("ch found at 2 hops away {}".format(item.locator))
+
+
+# def find_ch():
+#     while not CLUSTERING_DONE:
+#         pass
+#     if node_info['cluster_head'] == True:
+#         threading.Thread(target=listen_ch, args=[tagged_cluster]).start()
+#         threading.Thread(target=discover_ch, args=[tagged_cluster]).start()
+# # threading.Thread(target=find_ch, args=[]).start()

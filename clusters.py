@@ -132,13 +132,11 @@ def listener_handler(_tagged, _handle, _answer):
     global tag_lock
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
-    
-    mprint("sent from peer {}".format(tmp_answer))
     #TODO get info from the answer
     #we already know the dict of neighbor_info has been created!
     ###########
-    # while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #TODO why? 
-    #     pass
+    while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #TODO why? 
+        pass
 
     for item in NEIGHBOR_INFO:
         if str(item.locator) == tmp_answer['ula']:

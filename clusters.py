@@ -286,9 +286,10 @@ def find_next_heaviest(_heaviest):
             .format(str(_heaviest.locator), tmp_max, "none",
             str(item.locator), NEIGHBOR_INFO[item]['weight']))
         if item!= HEAVIEST and HEAVIER[item]> tmp_max and HEAVIER[_heaviest] > HEAVIER[item]:
+            HEAVIEST = tmp_heaviest
             tmp_max = HEAVIER[item]
             tmp_heaviest = item
-    return tmp_heaviest
+    return HEAVIEST
 
 ###########
 # init process

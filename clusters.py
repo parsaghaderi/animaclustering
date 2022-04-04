@@ -135,7 +135,7 @@ def listener_handler(_tagged, _handle, _answer):
     #TODO get info from the answer
     #we already know the dict of neighbor_info has been created!
     ###########
-    while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #TODO why? 
+    while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #why? 
         pass
 
     for item in NEIGHBOR_INFO:
@@ -343,7 +343,7 @@ def init():
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
     INITIAL_NEG = False
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     while not INITIAL_NEG:
         pass
     # threading.Thread(target=on_update_rcv, args=[]).start()

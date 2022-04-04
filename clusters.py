@@ -349,7 +349,9 @@ def on_update_rcv():
             tagged.objective.value = cbor.dumps(tagged.objective.value)
             tag_lock = True
             CLUSTERING_DONE = True
+        
         else:
+            mprint(HEAVIER)
             tmp_ch = find_next_heaviest(HEAVIEST)
             if tmp_ch == None:
                 mprint("I'm clusterhead")

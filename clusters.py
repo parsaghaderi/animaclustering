@@ -176,7 +176,7 @@ def discover(_tagged, _attempt=3):
         NEIGHBOR_INFO[item] = 0
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
 
-threading.Thread(target=discover, args=[tagged]).start()
+threading.Thread(target=discover, args=[tagged, 1]).start()
 
 INITIAL_NEG = False
 
@@ -202,7 +202,7 @@ def run_neg(_tagged, _locators, _attempts = 1):
 # @param ll locator of the peer
 # @param _attempt number of attempts for negotiating 
 ############
-def neg(_tagged, ll, _attempt = 3):
+def neg(_tagged, ll, _attempt):
     global NEIGHBOR_INFO
     _try = 1
     # if _attempt!=3:

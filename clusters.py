@@ -215,25 +215,26 @@ def neg(_tagged, ll, _attempt = 3):
             reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-        try:
-            if not err:
-                NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-                mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
-                if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
-                    if not node_info['cluster_set'].__contains__(str(ll.locator)):
-                        node_info['cluster_set'].append(str(ll.locator))
-                    while not tag_lock:
-                        pass
-                    tag_lock = False
-                    _tagged.objective.value = cbor.dumps(node_info)
-                    tag_lock = True
-                    NEIGHBOR_UPDATE[ll.locator] = True
-                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-            else:
-                mprint("in neg - neg with {} failed + {}".format(str(ll.locator), graspi.etext[err]))
+            try:
+                if not err:
+                    NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+                    mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+                    if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
+                        if not node_info['cluster_set'].__contains__(str(ll.locator)):
+                            node_info['cluster_set'].append(str(ll.locator))
+                        while not tag_lock:
+                            pass
+                        tag_lock = False
+                        _tagged.objective.value = cbor.dumps(node_info)
+                        tag_lock = True
+                        NEIGHBOR_UPDATE[ll.locator] = True
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                else:
+                    mprint("in neg - neg with {} failed + {}".format(str(ll.locator), graspi.etext[err]))
+                    attempt+=1
+            except Exception as err:
+                mprint("exception in neg with code {}".format(err))
                 attempt+=1
-        except:
-            attempt+=1
         try:
             err = graspi.end_negotiate(_tagged.source, handle, False, "value not received")
         except Exception as err:
@@ -321,7 +322,7 @@ def init():
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     while not INITIAL_NEG:
         pass
-    threading.Thread(target=on_update_rcv, args=[]).start()
+    # threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
 CLUSTERING_DONE = False

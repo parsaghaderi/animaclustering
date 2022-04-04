@@ -4,6 +4,8 @@ import cbor
 import subprocess as sp
 from time import sleep
 
+from new_test import find_heavier
+
 
 # import grasp
 try:
@@ -253,12 +255,12 @@ def sort_weight():
     max_weight = my_weight
     for item in NEIGHBOR_INFO:
         if NEIGHBOR_INFO[item]['weight']> my_weight:
-            HEAVIER[str(item.locator)] = NEIGHBOR_INFO[item]['weight']
+            HEAVIER[item] = NEIGHBOR_INFO[item]['weight']
             if NEIGHBOR_INFO[item]['weight']> max_weight:
                 HEAVIEST = item #locator #TODO subject to change if it joins another cluster
                 max_weight = NEIGHBOR_INFO[item]['weight']
         else:
-            LIGHTER[str(item.locator)] = NEIGHBOR_INFO[item]['weight']
+            LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
 
         
     mprint("heavier:{}".format(HEAVIER))
@@ -300,7 +302,14 @@ def init():
         pass
     mprint("deciding the role")
     sort_weight()
-    
+    tmp_ch = find_next_heaviest(HEAVIEST)
+    if tmp_ch == None:
+        mprint("tmp_ch == None")
+    else:
+        while tmp_ch != None:
+            mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
+            tmp_ch = find_heavier(tmp_ch)
+            
     # if HEAVIEST == None:
     #     mprint("I'm clusterhead")
     #     while not tag_lock:

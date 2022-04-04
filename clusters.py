@@ -219,10 +219,11 @@ def neg(_tagged, ll, _attempt):
                 mprint("\033[1;32;1m got answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
                 NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
                 mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
-                tag_lock = False
+                
                 if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
                     if not node_info['cluster_set'].__contains__(str(ll.locator)):
                         node_info['cluster_set'].append(str(ll.locator))
+                    tag_lock = False
                     while not tag_lock:
                         mprint("stuck here")
                         pass

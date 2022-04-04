@@ -320,14 +320,14 @@ def init():
         mprint(list(NEIGHBOR_INFO.values()))
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     sleep(30)
-    # threading.Thread(target=on_update_rcv, args=[]).start()
-threading.Thread(target=init, args=[]).start() #initi:)al init
+    threading.Thread(target=on_update_rcv, args=[]).start()
+threading.Thread(target=init, args=[]).start() #initial init
 
 CLUSTERING_DONE = False
 def on_update_rcv():
     global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
     if TO_JOIN != None:
-        if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True:
+        if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
             mprint("Joining {}".format(HEAVIEST.locator))
             tag_lock = False
             tagged.objective.value = cbor.loads(tagged.objective.value)

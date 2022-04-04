@@ -203,7 +203,7 @@ def run_neg(_tagged, _locators, _attempts = 1):
 # @param _attempt number of attempts for negotiating 
 ############
 def neg(_tagged, ll, _attempt):
-    global NEIGHBOR_INFO, tag_lock
+    global NEIGHBOR_INFO, tag_lock, MY_ULA
     _try = 1
     # if _attempt!=3:
     #     mprint("start negotiation with non-default attempt {}".format(ll.locator))
@@ -219,13 +219,13 @@ def neg(_tagged, ll, _attempt):
                 mprint("\033[1;32;1m got answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
                 NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
                 mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
-                if NEIGHBOR_INFO[ll]['cluster_head'] == str(acp._get_my_address()): #√
+                tag_lock = False
+                if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
                     if not node_info['cluster_set'].__contains__(str(ll.locator)):
                         node_info['cluster_set'].append(str(ll.locator))
                     while not tag_lock:
                         mprint("stuck here")
                         pass
-                    tag_lock = False
                     _tagged.objective.value = cbor.dumps(node_info)
                     tag_lock = True
                     NEIGHBOR_UPDATE[ll.locator] = True
@@ -334,7 +334,8 @@ def init():
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
         tagged.objective.value['status'] = 2
-        tagged.objective.value['cluster_set'].append(MY_ULA)
+        if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+            tagged.objective.value['cluster_set'].append(MY_ULA)
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tag_lock = True
         mprint(node_info['weight'])
@@ -371,7 +372,8 @@ def on_update_rcv():
         tag_lock = False
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
-        tagged.objective.value['cluster_set'].append(MY_ULA)
+        if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+            tagged.objective.value['cluster_set'].append(MY_ULA)
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tag_lock = True 
         mprint(node_info)

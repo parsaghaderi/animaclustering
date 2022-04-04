@@ -318,103 +318,103 @@ def init():
             mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
             tmp_ch = find_next_heaviest(tmp_ch)
 
-    # if HEAVIEST == None:
-    #     mprint("I'm clusterhead")
-    #     while not tag_lock:
-    #         pass
-    #     tag_lock = False
-    #     tagged.objective.value = cbor.loads(tagged.objective.value)
-    #     tagged.objective.value['cluster_head'] = True
-    #     tagged.objective.value['status'] = 2
-    #     tagged.objective.value['cluster_set'].append(MY_ULA)
-    #     tagged.objective.value = cbor.dumps(tagged.objective.value)
-    #     tag_lock = True
-    #     mprint(node_info['weight'])
-    #     mprint(list(NEIGHBOR_INFO.values()))
+    if HEAVIEST == None:
+        mprint("I'm clusterhead")
+        while not tag_lock:
+            pass
+        tag_lock = False
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = True
+        tagged.objective.value['status'] = 2
+        tagged.objective.value['cluster_set'].append(MY_ULA)
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
+        tag_lock = True
+        mprint(node_info['weight'])
+        mprint(list(NEIGHBOR_INFO.values()))
 
-    # else:
-    #     mprint("I want to join {}".format(HEAVIEST.locator))
-    #     TO_JOIN = HEAVIEST
-    #     while not tag_lock:
-    #         pass
-    #     tag_lock = False
-    #     tagged.objective.value = cbor.loads(tagged.objective.value)
-    #     tagged.objective.value['cluster_head'] = False #to let lighter nodes know I'm not ch
-    #     tagged.objective.value['status'] = 3
-    #     tagged.objective.value['cluster_set']  = []
-    #     tagged.objective.value = cbor.dumps(tagged.objective.value)
-    #     tag_lock = True
-    #     mprint(node_info)
-    #     mprint(list(NEIGHBOR_INFO.values()))
-    # INITIAL_NEG = False
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
-    # while not INITIAL_NEG:
-    #     pass
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    else:
+        mprint("I want to join {}".format(HEAVIEST.locator))
+        TO_JOIN = HEAVIEST
+        while not tag_lock:
+            pass
+        tag_lock = False
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = False #to let lighter nodes know I'm not ch
+        tagged.objective.value['status'] = 3
+        tagged.objective.value['cluster_set']  = []
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
+        tag_lock = True
+        mprint(node_info)
+        mprint(list(NEIGHBOR_INFO.values()))
+    INITIAL_NEG = False
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    while not INITIAL_NEG:
+        pass
+    threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
-# CLUSTERING_DONE = False
-# def on_update_rcv():
-#     global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
-#     if TO_JOIN != None:
-#         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
-#             mprint("Joining {}".format(HEAVIEST.locator))
-#             tag_lock = False
-#             tagged.objective.value = cbor.loads(tagged.objective.value)
-#             tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
-#             tagged.objective.value['cluster_set']  = []
-#             tagged.objective.value = cbor.dumps(tagged.objective.value)
-#             tag_lock = True
-#             CLUSTERING_DONE = True
+CLUSTERING_DONE = False
+def on_update_rcv():
+    global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
+    if TO_JOIN != None:
+        if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
+            mprint("Joining {}".format(HEAVIEST.locator))
+            tag_lock = False
+            tagged.objective.value = cbor.loads(tagged.objective.value)
+            tagged.objective.value['cluster_head'] = str(HEAVIEST.locator)
+            tagged.objective.value['cluster_set']  = []
+            tagged.objective.value = cbor.dumps(tagged.objective.value)
+            tag_lock = True
+            CLUSTERING_DONE = True
         
-#         else:
-#             mprint(HEAVIER)
-#             tmp_ch = find_next_heaviest(HEAVIEST)
-#             if tmp_ch == None:
-#                 mprint("I'm clusterhead")
-#                 while not tag_lock:
-#                     pass
-#                 tag_lock = False
-#                 tagged.objective.value = cbor.loads(tagged.objective.value)
-#                 tagged.objective.value['cluster_head'] = True
-#                 tagged.objective.value['cluster_set'].append(MY_ULA)
-#                 tagged.objective.value = cbor.dumps(tagged.objective.value)
-#                 tag_lock = True 
-#                 mprint(node_info)
-#                 mprint(NEIGHBOR_INFO)
-#                 CLUSTERING_DONE = True
+        else:
+            mprint(HEAVIER)
+            tmp_ch = find_next_heaviest(HEAVIEST)
+            if tmp_ch == None:
+                mprint("I'm clusterhead")
+                while not tag_lock:
+                    pass
+                tag_lock = False
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                tagged.objective.value['cluster_head'] = True
+                tagged.objective.value['cluster_set'].append(MY_ULA)
+                tagged.objective.value = cbor.dumps(tagged.objective.value)
+                tag_lock = True 
+                mprint(node_info)
+                mprint(NEIGHBOR_INFO)
+                CLUSTERING_DONE = True
                 
-#             else:
-#                 tmp_ch = find_next_heaviest(HEAVIEST)
-#                 while tmp_ch != None:
-#                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
-#                         mprint("Joining {}".format(str(tmp_ch.locator)))
-#                         tag_lock = False
-#                         tagged.objective.value = cbor.loads(tagged.objective.value)
-#                         tagged.objective.value['cluster_head'] = str(tmp_ch.locator)
-#                         tagged.objective.value['cluster_set']  = []
-#                         tagged.objective.value = cbor.dumps(tagged.objective.value)
-#                         tag_lock = True
-#                         mprint(node_info)
-#                         mprint(NEIGHBOR_INFO)
-#                         CLUSTERING_DONE = True
-#                         break
-#                     else:
-#                         tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
-#                         mprint("trying next heaviest node")
+            else:
+                tmp_ch = find_next_heaviest(HEAVIEST)
+                while tmp_ch != None:
+                    if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
+                        mprint("Joining {}".format(str(tmp_ch.locator)))
+                        tag_lock = False
+                        tagged.objective.value = cbor.loads(tagged.objective.value)
+                        tagged.objective.value['cluster_head'] = str(tmp_ch.locator)
+                        tagged.objective.value['cluster_set']  = []
+                        tagged.objective.value = cbor.dumps(tagged.objective.value)
+                        tag_lock = True
+                        mprint(node_info)
+                        mprint(NEIGHBOR_INFO)
+                        CLUSTERING_DONE = True
+                        break
+                    else:
+                        tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
+                        mprint("trying next heaviest node")
     
-#     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     
 
-# def show():
-#     while not CLUSTERING_DONE:
-#         pass
-#     sleep(60)
-#     mprint("clustering done")
-#     mprint(node_info)
-#     mprint(NEIGHBOR_INFO)
+def show():
+    while not CLUSTERING_DONE:
+        pass
+    sleep(60)
+    mprint("clustering done")
+    mprint(node_info)
+    mprint(NEIGHBOR_INFO)
 
-# threading.Thread(target=show, args=[]).start()
+threading.Thread(target=show, args=[]).start()
 
 
 

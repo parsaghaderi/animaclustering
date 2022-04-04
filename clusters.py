@@ -142,10 +142,10 @@ def listener_handler(_tagged, _handle, _answer):
         if str(item.locator) == tmp_answer['ula']:
             NEIGHBOR_INFO[item] = tmp_answer
     ############
-    while not tag_lock:
-        mprint("stuck here")
-        pass
     tag_lock = False
+    while not tag_lock:
+        mprint("stuck here in listen handler")
+        pass
     _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer)
     tag_lock = True
     try:
@@ -225,7 +225,7 @@ def neg(_tagged, ll, _attempt):
                         node_info['cluster_set'].append(str(ll.locator))
                     tag_lock = False
                     while not tag_lock:
-                        mprint("stuck here")
+                        mprint("stuck here in neg")
                         pass
                     _tagged.objective.value = cbor.dumps(node_info)
                     tag_lock = True

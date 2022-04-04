@@ -447,7 +447,7 @@ def show():
         pass
     sleep(60)
     mprint("clustering done")
-    mprint("\033[1;36;1m {} \033[0m".format(tagged.objective.value))
+    mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))
 
 threading.Thread(target=show, args=[]).start()

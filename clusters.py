@@ -318,9 +318,11 @@ def init():
         tag_lock = True
         mprint(node_info)
         mprint(list(NEIGHBOR_INFO.values()))
+    INITIAL_NEG = False
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
-    sleep(30)
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    while not INITIAL_NEG:
+        pass
+    threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
 CLUSTERING_DONE = False

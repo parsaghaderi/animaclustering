@@ -422,8 +422,7 @@ def on_update_rcv():
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
                         mprint("trying next heaviest node")
-    
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     
 
 def show():

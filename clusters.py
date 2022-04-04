@@ -462,17 +462,18 @@ def show():
 
 
 def generate_topology():
-    global SYNCH, tagged, NEIGHBOR_INFO
+    global SYNCH, tagged, NEIGHBOR_INFO, MY_ULA
     while not SYNCH:
         pass
     tmp_map = {}
-    if cbor.loads(tagged.objective.value)['cluster_head'] == True:
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if len(tmp_tagged['cluster_set']) != 0:
         for item in tagged.objective.value['cluster_set']:
             for locators in NEIGHBOR_INFO:
-                if item == str(locators.locator):
+                if item == str(locators.locator) and item != MY_ULA:
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
-        
-    mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
+        tmp_map.update({node_info['ula']:node_info['neighbors']})
+        mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
 
 # def ch_obj():
 #     while not CLUSTERING_DONE:

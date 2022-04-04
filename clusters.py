@@ -339,7 +339,7 @@ def init():
         tag_lock = True
         mprint(node_info['weight'])
         mprint(list(NEIGHBOR_INFO.values()))
-
+        TO_JOIN = None
     else:
         mprint("I want to join {}".format(HEAVIEST.locator))
         TO_JOIN = HEAVIEST
@@ -364,7 +364,20 @@ threading.Thread(target=init, args=[]).start() #initial init
 CLUSTERING_DONE = False
 def on_update_rcv():
     global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE
-    if TO_JOIN != None:
+    if TO_JOIN == None:
+        mprint("I'm clusterhead")
+        while not tag_lock:
+            pass
+        tag_lock = False
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = True
+        tagged.objective.value['cluster_set'].append(MY_ULA)
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
+        tag_lock = True 
+        mprint(node_info)
+        mprint(NEIGHBOR_INFO)
+        CLUSTERING_DONE = True     
+    else:
         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
             mprint("Joining {}".format(HEAVIEST.locator))
             tag_lock = False

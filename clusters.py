@@ -320,7 +320,7 @@ def init():
         mprint(list(NEIGHBOR_INFO.values()))
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys()]).start()
     sleep(30)
-    threading.Thread(target=on_update_rcv, args=[]).start()
+    # threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
 CLUSTERING_DONE = False
@@ -348,7 +348,7 @@ def on_update_rcv():
                     tagged.objective.value['cluster_head'] = True
                     tagged.objective.value['cluster_set'].append(MY_ULA)
                     tagged.objective.value = cbor.dumps(tagged.objective.value)
-                    tag_lock = True
+                    tag_lock = True 
                     mprint(node_info)
                     mprint(NEIGHBOR_INFO)
                     CLUSTERING_DONE = True

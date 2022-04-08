@@ -4524,7 +4524,7 @@ def _initialise_grasp():
         # Listen to own LL multicasts?     # 
         ####################################
 
-        _listen_self = True
+        _listen_self = False
 
         try:
             # _l = input("Listen to own multicasts? Y/N:")

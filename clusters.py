@@ -375,7 +375,7 @@ def on_update_rcv():
         while not tag_lock:
             pass
         tag_lock = False
-        mprint("\033[1;35;1m I'm in on update rcv - I'm cluster head 1\033[0m")
+        mprint("\033[1;35;1m I'm in update rcv - I'm cluster head 1\033[0m")
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
         if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
@@ -486,9 +486,6 @@ cluster_lock = False
 CLUSTERS_INFO = {}
 
 def listen_cluster(_tagged):
-    global node_info, CLUSTER_HEAD
-    while not CLUSTER_HEAD:
-        pass
     mprint("I'm in clusterhead listener")
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
@@ -502,7 +499,8 @@ threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
 def discover_cluster(_tagged, _attempt=3):
     global CLUSTER_HEAD
     while not CLUSTER_HEAD:
-        pass
+        sleep(5)
+        mprint("\033[1;35;1m waiting for cluster_head flag\033[0m")
     mprint("I'm in clusterhead discovery")
     global CLUSTERS_INFO
     attempt = _attempt

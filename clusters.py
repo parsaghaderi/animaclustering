@@ -484,7 +484,7 @@ CLUSTERS_INFO = {}
 
 def listen_cluster(_tagged):
     global node_info
-    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0) and CLUSTERING_DONE!=True:
+    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0):
         pass
 
     while True:
@@ -497,7 +497,7 @@ def listen_cluster(_tagged):
 threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
 
 def discover_cluster(_tagged, _attempt=3):
-    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0) and CLUSTERING_DONE!=True:
+    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0):
         pass
 
     global CLUSTERS_INFO

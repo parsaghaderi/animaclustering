@@ -127,6 +127,7 @@ if sp.getoutput('hostname') == 'Dijkstra':
 
 
 if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Iverson':
+    mprint("start listening")
     threading.Thread(target=listen, args=[tagged]).start()
 
 '''

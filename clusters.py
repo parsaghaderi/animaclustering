@@ -116,7 +116,7 @@ def discover(_tagged, _attempt=3):
 
 
 
-if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Backus':
+if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discover, args=[tagged, 5]).start()
 

@@ -336,8 +336,8 @@ def init():
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
         tagged.objective.value['status'] = 2
-        if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
-            tagged.objective.value['cluster_set'].append(MY_ULA)
+        # if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+        tagged.objective.value['cluster_set'].append(MY_ULA)
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tag_lock = True
         mprint(node_info['weight'])
@@ -378,8 +378,8 @@ def on_update_rcv():
         mprint("\033[1;35;1m I'm in update rcv - I'm cluster head 1\033[0m")
         tagged.objective.value = cbor.loads(tagged.objective.value)
         tagged.objective.value['cluster_head'] = True
-        if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
-            tagged.objective.value['cluster_set'].append(MY_ULA)
+        # if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+        tagged.objective.value['cluster_set'].append(MY_ULA)
         tagged.objective.value['status'] = 2
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tag_lock = True 
@@ -413,8 +413,8 @@ def on_update_rcv():
                 tag_lock = False
                 tagged.objective.value = cbor.loads(tagged.objective.value)
                 tagged.objective.value['cluster_head'] = True
-                if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
-                    tagged.objective.value['cluster_set'].append(MY_ULA)
+                # if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+                tagged.objective.value['cluster_set'].append(MY_ULA)
                 tagged.objective.value['status'] = 2
                 tagged.objective.value = cbor.dumps(tagged.objective.value)
                 tag_lock = True 

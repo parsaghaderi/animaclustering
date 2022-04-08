@@ -511,11 +511,25 @@ def show():
 
 
 
-
-
-
 cluster, err = OBJ_REG("cluster", None, True, False, 10, asa)
 cluster_tagged = TAG_OBJ(cluster, asa)
+
+
+def generate_topology():
+    global SYNCH, NEIGHBOR_INFO, MY_ULA, CLUSTER_HEAD
+    while not SYNCH:
+        pass
+    tmp_map = {}
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if len(tmp_tagged['cluster_set']) != 0:
+        for item in tmp_tagged['cluster_set']:
+            for locators in NEIGHBOR_INFO:
+                if item == str(locators.locator) and item != MY_ULA:
+                    tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
+        tmp_map.update({node_info['ula']:node_info['neighbors']})
+        mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
+        threading.Thread(target=run_cluster, args=[]).start()
+
 
 CLUSTERS_INFO = {}
 def run_cluster():
@@ -556,21 +570,6 @@ def discover_cluster(_tagged, _attempt=3):
         mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
 
 
-def generate_topology():
-    global SYNCH, NEIGHBOR_INFO, MY_ULA, CLUSTER_HEAD
-    while not SYNCH:
-        pass
-    tmp_map = {}
-    tmp_tagged = cbor.loads(tagged.objective.value)
-    if len(tmp_tagged['cluster_set']) != 0:
-        for item in tmp_tagged['cluster_set']:
-            for locators in NEIGHBOR_INFO:
-                if item == str(locators.locator) and item != MY_ULA:
-                    tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
-        tmp_map.update({node_info['ula']:node_info['neighbors']})
-        mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
-        threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 
 
 

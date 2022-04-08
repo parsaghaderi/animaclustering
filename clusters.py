@@ -107,7 +107,7 @@ def discover(_tagged, _attempt=3):
     global NEIGHBOR_INFO
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=100000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
         mprint(len(ll))
         for item in ll:
             mprint("item locator {}".format(str(item.locator)))

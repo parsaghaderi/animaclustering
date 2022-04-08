@@ -86,11 +86,7 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-
-
-
-
-obj, err = OBJ_REG("test", 10, True, False, 10, asa)
+obj, err = OBJ_REG("node", 10, True, False, 10, asa)
 tagged = TAG_OBJ(obj, asa)
 
 def listen(_tagged):

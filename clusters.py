@@ -544,6 +544,9 @@ def run_cluster():
 
 
 def listen_cluster(_tagged):
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if len(tmp_tagged['cluster_set']) == 0:
+        return
     global CLUSTER_HEAD
     mprint("I'm in clusterhead listener")
     while True:
@@ -556,6 +559,9 @@ def listen_cluster(_tagged):
 
 def discover_cluster(_tagged, _attempt=3):
     global CLUSTER_HEAD, CLUSTERS_INFO
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if len(tmp_tagged['cluster_set']) == 0:
+        return
     mprint("I'm in clusterhead discovery")
     global CLUSTERS_INFO
     attempt = _attempt

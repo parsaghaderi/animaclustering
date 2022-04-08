@@ -123,7 +123,7 @@ def discover(_tagged, _attempt=3):
 
 
 if sp.getoutput('hostname') == 'Dijkstra':
-    threading.Thread(target=discover, args=[tagged, 3]).start()
+    threading.Thread(target=discover, args=[tagged, 5]).start()
 
 
 if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus':

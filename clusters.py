@@ -111,7 +111,7 @@ def discover(_tagged, _attempt=3):
         mprint(len(ll))
         for item in ll:
             mprint("item locator {}".format(str(item.locator)))
-            if str(item.locator) == acp._get_my_address()_:
+            if str(item.locator) == acp._get_my_address():
                 attempt+=1
         attempt-=1
     # for item in ll:

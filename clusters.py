@@ -511,9 +511,8 @@ def show():
 
 
 
-cluster, err = OBJ_REG("cluster", None, True, False, 10, asa)
-cluster_tagged = TAG_OBJ(cluster, asa)
-
+cluster_obj, err = OBJ_REG("clusterhead", 10, True, False, 10, asa)
+cluster_tagged = TAG_OBJ(cluster_obj, asa)
 
 def generate_topology():
     global SYNCH, NEIGHBOR_INFO, MY_ULA, CLUSTER_HEAD
@@ -552,8 +551,9 @@ def listen_cluster(_tagged):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
-            mprint("incoming request")
-            threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            # mprint("incoming request")
+            # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            mprint("ok")
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
@@ -566,7 +566,7 @@ def discover_cluster(_tagged, _attempt=3):
     global CLUSTERS_INFO
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=500000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
         for item in ll:
             CLUSTERS_INFO[item] = 0
             mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))

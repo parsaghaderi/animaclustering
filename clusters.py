@@ -111,11 +111,15 @@ def discover(_tagged, _attempt=3):
     while attempt != 0:
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=100000)
         mprint(len(ll))
+        for item in ll:
+            mprint("item locator {}".format(str(item.locator)))
+            if str(item.locator) == MY_ULA:
+                attempt+=1
         attempt-=1
-    for item in ll:
-        mprint("item locator {}".format(str(item.locator)))
-        if str(item.locator) == MY_ULA:
-            attempt+=1
+    # for item in ll:
+    #     mprint("item locator {}".format(str(item.locator)))
+    #     if str(item.locator) == MY_ULA:
+    #         attempt+=1
     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
 
 

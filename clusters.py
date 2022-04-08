@@ -123,7 +123,7 @@ if sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
 
 
-if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Gingko':
+if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Dijkstra':
     mprint("start listening")
     threading.Thread(target=listen, args=[tagged]).start()
     threading.Thread(target=discover, args=[tagged, 5]).start()

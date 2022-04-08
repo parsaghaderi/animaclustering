@@ -453,7 +453,6 @@ def on_update_rcv():
     
 
 def show():
-    global SYNCH, tagged
     while not SYNCH:
         pass
     mprint("clustering done")
@@ -465,7 +464,7 @@ def show():
 
 
 def generate_topology():
-    global SYNCH, tagged, NEIGHBOR_INFO, MY_ULA
+    global SYNCH, NEIGHBOR_INFO, MY_ULA
     while not SYNCH:
         pass
     tmp_map = {}
@@ -513,7 +512,7 @@ def discover_cluster(_tagged, _attempt=3):
         mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
     #threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
 
-threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
+threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 
 # def ch_obj():
 #     while not CLUSTERING_DONE:

@@ -107,7 +107,7 @@ def discover(_tagged, _attempt=3):
     global NEIGHBOR_INFO
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=100000)
         mprint(len(ll))
         attempt-=1
     for item in ll:
@@ -118,8 +118,8 @@ def discover(_tagged, _attempt=3):
 
 if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
-    threading.Thread(target=discover, args=[tagged, 3]).start()
-    
+    threading.Thread(target=discover, args=[tagged, 5]).start()
+
 '''
 ##########
 # MY_ULA str

@@ -475,6 +475,44 @@ def generate_topology():
         tmp_map.update({node_info['ula']:node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
 
+
+
+cluster, err = OBJ_REG("cluster", None, True, False, 10, asa)
+cluster_tagged = TAG_OBJ(cluster, asa)
+cluster_lock = False
+CLUSTERS_INFO = {}
+
+def listen_cluster(_tagged):
+    global node_info
+    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0) and CLUSTERING_DONE!=True:
+        pass
+
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            mprint("incoming request")
+            threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+        else:
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+
+def discover_cluster(_tagged, _attempt=3):
+    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0) and CLUSTERING_DONE!=True:
+        pass
+
+    global CLUSTERS_INFO
+    attempt = _attempt
+    while attempt != 0:
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        mprint(len(ll))
+        attempt-=1
+    for item in ll:
+        CLUSTERS_INFO[item] = 0
+        mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
+    #threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
+
+threading.Thread(target=discover, args=[cluster_tagged, 3]).start()
+
 # def ch_obj():
 #     while not CLUSTERING_DONE:
 #         pass

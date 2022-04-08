@@ -534,12 +534,15 @@ def discover_cluster(_tagged, _attempt=3):
     global CLUSTERS_INFO
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 100000, flush=True, minimum_TTL=50000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=500000)
         for item in ll:
             CLUSTERS_INFO[item] = 0
             mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
         attempt-=1
-    
+    for item in ll:
+        CLUSTERS_INFO[item] = 0
+        mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
+
 
 def generate_topology():
     global SYNCH, NEIGHBOR_INFO, MY_ULA, CLUSTER_HEAD

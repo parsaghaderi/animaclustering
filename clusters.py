@@ -111,7 +111,7 @@ def discover(_tagged, _attempt=3):
         mprint(len(ll))
         for item in ll:
             mprint("item locator {}".format(str(item.locator)))
-            if str(item.locator) == acp._get_my_address():
+            if str(item.locator) == acp._get_my_address()_:
                 attempt+=1
         attempt-=1
     # for item in ll:
@@ -122,9 +122,12 @@ def discover(_tagged, _attempt=3):
 
 
 
-if sp.getoutput('hostname') == 'Dijkstra' or sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus':
+if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=discover, args=[tagged, 3]).start()
+
+
+if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
-    threading.Thread(target=discover, args=[tagged, 5]).start()
 
 '''
 ##########

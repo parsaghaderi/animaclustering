@@ -519,8 +519,6 @@ CLUSTERS_INFO = {}
 
 def listen_cluster(_tagged):
     global CLUSTER_HEAD
-    if CLUSTER_HEAD!=False:
-        return
     mprint("I'm in clusterhead listener")
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
@@ -532,8 +530,6 @@ def listen_cluster(_tagged):
 
 def discover_cluster(_tagged, _attempt=3):
     global CLUSTER_HEAD, CLUSTERS_INFO
-    if CLUSTER_HEAD!=False:
-        return
     mprint("I'm in clusterhead discovery")
     global CLUSTERS_INFO
     attempt = _attempt
@@ -559,7 +555,6 @@ def generate_topology():
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({node_info['ula']:node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        CLUSTER_HEAD = True
         threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
         threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 

@@ -487,6 +487,9 @@ cluster_lock = False
 CLUSTERS_INFO = {}
 
 def listen_cluster(_tagged):
+    while not CLUSTER_HEAD:
+        sleep(5)
+        mprint("\033[1;35;1m waiting for cluster_head flag\033[0m")
     mprint("I'm in clusterhead listener")
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)

@@ -4,6 +4,8 @@ import cbor
 import subprocess as sp
 from time import sleep
 
+from new_test import MY_ULA
+
 
 
 # import grasp
@@ -112,6 +114,8 @@ def discover(_tagged, _attempt=3):
         attempt-=1
     for item in ll:
         mprint("item locator {}".format(str(item.locator)))
+        if str(item.locator) == MY_ULA:
+            attempt+=1
     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
 
 

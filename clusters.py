@@ -4,8 +4,6 @@ import cbor
 import subprocess as sp
 from time import sleep
 
-from new_test import MY_ULA
-
 
 
 # import grasp
@@ -113,7 +111,7 @@ def discover(_tagged, _attempt=3):
         mprint(len(ll))
         for item in ll:
             mprint("item locator {}".format(str(item.locator)))
-            if str(item.locator) == MY_ULA:
+            if str(item.locator) == acp._get_my_address():
                 attempt+=1
         attempt-=1
     # for item in ll:

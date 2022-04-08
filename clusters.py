@@ -489,7 +489,7 @@ def listen_cluster(_tagged):
     global node_info, CLUSTER_HEAD
     while not CLUSTER_HEAD:
         pass
-
+    mprint("I'm in clusterhead listener")
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
@@ -503,7 +503,7 @@ def discover_cluster(_tagged, _attempt=3):
     global CLUSTER_HEAD
     while not CLUSTER_HEAD:
         pass
-
+    mprint("I'm in clusterhead discovery")
     global CLUSTERS_INFO
     attempt = _attempt
     while attempt != 0:

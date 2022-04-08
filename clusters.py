@@ -85,7 +85,7 @@ def gremlin():
     while True:
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
-'''
+
 obj, err = OBJ_REG("node", 10, True, False, 10, asa)
 tagged = TAG_OBJ(obj, asa)
 
@@ -126,8 +126,8 @@ if sp.getoutput('hostname') == 'Backus':
 if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Gingko':
     mprint("start listening")
     threading.Thread(target=listen, args=[tagged]).start()
-'''
 
+'''
 ##########
 # MY_ULA str
 # NEIGHBOR_ULA str
@@ -559,7 +559,7 @@ def generate_topology():
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
         threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
         threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
-
+'''
 
 
 

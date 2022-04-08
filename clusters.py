@@ -538,7 +538,7 @@ def run_cluster():
     global CLUSTERING_DONE
     while not CLUSTER_HEAD:
         pass
-    mrpint("running listen and discovery")
+    mprint("running listen and discovery")
     threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
     threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 

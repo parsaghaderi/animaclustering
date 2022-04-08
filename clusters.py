@@ -86,50 +86,50 @@ def gremlin():
         sleep(1)
 threading.Thread(target=gremlin, args=[]).start()
 
-obj, err = OBJ_REG("node", 10, True, False, 10, asa)
-tagged = TAG_OBJ(obj, asa)
+# obj, err = OBJ_REG("node", 10, True, False, 10, asa)
+# tagged = TAG_OBJ(obj, asa)
 
-def listen(_tagged):
-    while True:
-        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-        if not err:
-            mprint("NO ERRORs")
-            # mprint("incoming request")
-            # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
-        else:
-            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+# def listen(_tagged):
+#     while True:
+#         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+#         if not err:
+#             mprint("NO ERRORs")
+#             # mprint("incoming request")
+#             # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+#         else:
+#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
-def discover(_tagged, _attempt=3):
-    global NEIGHBOR_INFO
-    attempt = _attempt
-    while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
-        mprint(len(ll))
-        for item in ll:
-            mprint("item locator {}".format(str(item.locator)))
-            if str(item.locator) == acp._get_my_address():
-                attempt+=1
-        attempt-=1
-    # for item in ll:
-    #     mprint("item locator {}".format(str(item.locator)))
-    #     if str(item.locator) == MY_ULA:
-    #         attempt+=1
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
-
-
-
-if sp.getoutput('hostname') == 'Backus':
-    threading.Thread(target=discover, args=[tagged, 5]).start()
-    threading.Thread(target=listen, args=[tagged]).start()
+# def discover(_tagged, _attempt=3):
+#     global NEIGHBOR_INFO
+#     attempt = _attempt
+#     while attempt != 0:
+#         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
+#         mprint(len(ll))
+#         for item in ll:
+#             mprint("item locator {}".format(str(item.locator)))
+#             if str(item.locator) == acp._get_my_address():
+#                 attempt+=1
+#         attempt-=1
+#     # for item in ll:
+#     #     mprint("item locator {}".format(str(item.locator)))
+#     #     if str(item.locator) == MY_ULA:
+#     #         attempt+=1
+#     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
 
 
-if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Dijkstra':
-    mprint("start listening")
-    threading.Thread(target=listen, args=[tagged]).start()
-    threading.Thread(target=discover, args=[tagged, 5]).start()
+
+# if sp.getoutput('hostname') == 'Backus':
+#     threading.Thread(target=discover, args=[tagged, 5]).start()
+#     threading.Thread(target=listen, args=[tagged]).start()
 
 
-'''
+# if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Dijkstra':
+#     mprint("start listening")
+#     threading.Thread(target=listen, args=[tagged]).start()
+#     threading.Thread(target=discover, args=[tagged, 5]).start()
+
+
+
 ##########
 # MY_ULA str
 # NEIGHBOR_ULA str
@@ -516,8 +516,18 @@ def show():
 
 cluster, err = OBJ_REG("cluster", None, True, False, 10, asa)
 cluster_tagged = TAG_OBJ(cluster, asa)
-cluster_lock = False
+
 CLUSTERS_INFO = {}
+def run_cluster():
+    global tagged, cluster_tagged
+    global CLUSTER_HEAD
+    global CLUSTERING_DONE
+    while not CLUSTER_HEAD:
+        pass
+    mrpint("running listen and discovery")
+    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+    threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
+
 
 def listen_cluster(_tagged):
     global CLUSTER_HEAD
@@ -561,10 +571,6 @@ def generate_topology():
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
         threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
         threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
-'''
-
-
-
 
 
 

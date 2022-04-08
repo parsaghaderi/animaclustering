@@ -109,7 +109,7 @@ obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tag_lock = True
 tagged   = TAG_OBJ(obj, asa)
 
-
+CLUSTER_HEAD = False
 
 ##########
 # @param _tagged, a tagged objective to listen for
@@ -315,7 +315,7 @@ def find_next_heaviest(_heaviest):
 TO_JOIN = None
 def init():
     global tag_lock, tagged
-    global INITIAL_NEG, HEAVIEST, MY_ULA, TO_JOIN, NEIGHBOR_INFO
+    global INITIAL_NEG, HEAVIEST, MY_ULA, TO_JOIN, NEIGHBOR_INFO, CLUSTER_HEAD
     while not INITIAL_NEG:
         pass
     mprint("deciding the role")
@@ -343,6 +343,7 @@ def init():
         mprint(node_info['weight'])
         mprint(list(NEIGHBOR_INFO.values()))
         TO_JOIN = None
+        CLUSTER_HEAD = True
     else:
         mprint("I want to join {}".format(HEAVIEST.locator))
         TO_JOIN = HEAVIEST
@@ -368,7 +369,7 @@ threading.Thread(target=init, args=[]).start() #initial init
 CLUSTERING_DONE = False
 SYNCH = False
 def on_update_rcv():
-    global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE, SYNCH
+    global NEIGHBOR_INFO, HEAVIER, HEAVIEST, TO_JOIN, tag_lock, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD
     if TO_JOIN == None:
         mprint("I'm clusterhead")
         while not tag_lock:
@@ -384,7 +385,8 @@ def on_update_rcv():
         tag_lock = True 
         mprint(node_info)
         mprint(NEIGHBOR_INFO)
-        CLUSTERING_DONE = True     
+        CLUSTERING_DONE = True 
+        CLUSTER_HEAD = True    
     else:
         if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2:
             mprint("Joining {}".format(HEAVIEST.locator))
@@ -419,6 +421,7 @@ def on_update_rcv():
                 mprint(node_info)
                 mprint(NEIGHBOR_INFO)
                 CLUSTERING_DONE = True
+                CLUSTER_HEAD = True
             else:
                 tmp_ch = find_next_heaviest(HEAVIEST)
                 while tmp_ch != None:
@@ -483,8 +486,8 @@ cluster_lock = False
 CLUSTERS_INFO = {}
 
 def listen_cluster(_tagged):
-    global node_info
-    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0):
+    global node_info, CLUSTER_HEAD
+    while not CLUSTER_HEAD:
         pass
 
     while True:
@@ -497,7 +500,8 @@ def listen_cluster(_tagged):
 threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
 
 def discover_cluster(_tagged, _attempt=3):
-    while (node_info['cluster_head'] == False or len(node_info['cluster_set'])==0):
+    global CLUSTER_HEAD
+    while not CLUSTER_HEAD:
         pass
 
     global CLUSTERS_INFO

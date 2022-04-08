@@ -400,6 +400,8 @@ def on_update_rcv():
             tagged.objective.value['status'] = 4
             tagged.objective.value = cbor.dumps(tagged.objective.value)
             tag_lock = True
+            mprint(node_info)
+            mprint(NEIGHBOR_INFO)
             CLUSTERING_DONE = True
         
         else:

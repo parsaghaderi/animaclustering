@@ -120,6 +120,7 @@ def discover(_tagged, _attempt=3):
 
 if sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=discover, args=[tagged, 5]).start()
+    threading.Thread(target=listen, args=[tagged]).start()
 
 
 if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Gingko':

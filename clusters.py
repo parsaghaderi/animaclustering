@@ -126,7 +126,7 @@ if sp.getoutput('hostname') == 'Dijkstra':
     threading.Thread(target=discover, args=[tagged, 5]).start()
 
 
-if sp.getoutput('hostname') == 'Ritchie' or sp.getoutput('hostname') == 'Backus':
+if sp.getoutput('hostname') == 'Tarjan' or sp.getoutput('hostname') == 'Backus':
     threading.Thread(target=listen, args=[tagged]).start()
 
 '''

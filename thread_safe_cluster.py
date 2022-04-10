@@ -73,6 +73,7 @@ def TAG_OBJ(obj, ASA):
     return graspi.tagged_objective(obj, ASA)
 
 asa, err = ASA_REG('node_neg')
+asa2, err = ASA_REG('cluster_neg')
 
 ############
 # keep running
@@ -150,8 +151,8 @@ def listen(_tagged):
             threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
-threading.Thread(target=listen, args=[tagged]).start()
-
+listen_1 = threading.Thread(target=listen, args=[tagged])
+listen_1.start()
 ###########
 # @param _tagged tagged objective listening for
 # @param _handle handler for the incoming request
@@ -213,8 +214,8 @@ def discover(_tagged, _attempt=3, _phase=1):
         threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
         mprint(NEIGHBOR_LOCATOR_STR)
     #TODO for maintenance you have to do something!
-threading.Thread(target=discover, args=[tagged, 1]).start()
-
+discovery_1 = threading.Thread(target=discover, args=[tagged, 1])
+discovery_1.start()
 ############
 # run neg for initial step of exchanging information w/ neighbors
 ############
@@ -525,15 +526,16 @@ def generate_topology():
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
 
-asa2, err = ASA_REG('cluster_neg')
 cluster_obj, err = OBJ_REG("clusterhead", cbor.dumps(10), True, False, 10, asa2)
 cluster_tagged = TAG_OBJ(cluster_obj, asa2)
 
 CLUSTERS_INFO = {}
 def run_cluster():
     mprint("running listen and discovery")
+    listen_1.join()
     threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
     sleep(30)
+    discovery_1.join()
     threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
 
 def listen_cluster(tagged_obj):

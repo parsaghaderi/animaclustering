@@ -392,7 +392,9 @@ def init():
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tagged_sem.release()
         # tag_lock = True
-        mprint(node_info)
+        tagged_sem.acquire()
+        mprint(cbor.loads(tagged.objective.value))
+        tagged_sem.release()
         mprint(list(NEIGHBOR_INFO.values()))
     INITIAL_NEG = False
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()

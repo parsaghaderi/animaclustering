@@ -166,10 +166,10 @@ def listener_handler(_tagged, _handle, _answer):
     ###########
     # while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #why? 
     #     pass
-    NEIGHBOR_INFO[NEIGHBOR_LOCATOR_STR[tmp_answer['ula']]] =  tmp_answer
-    # for item in NEIGHBOR_INFO:#TODO just deleted
-    #     if str(item.locator) == tmp_answer['ula']:
-    #         NEIGHBOR_INFO[item] = tmp_answer
+    # NEIGHBOR_INFO[NEIGHBOR_LOCATOR_STR[tmp_answer['ula']]] =  tmp_answer
+    for item in NEIGHBOR_INFO:#TODO just deleted
+        if str(item.locator) == tmp_answer['ula']:
+            NEIGHBOR_INFO[item] = tmp_answer
     ############
     
     # while not tag_lock:#TODO just deleted

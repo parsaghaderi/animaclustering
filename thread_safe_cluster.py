@@ -557,12 +557,13 @@ def discover_cluster(_tagged_obj, _attempt=3):
     attempt = _attempt
     while attempt != 0:
         _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
-                            10000, flush=True, minimum_TTL=50000)
-        mprint(len(ll))
+                            100000, flush=True, minimum_TTL=500000)
+        for item in ll:
+            mprint("item clusterhead locator {}".format(str(item.locator)))
+            if str(item.locator) == MY_ULA:
+                attempt+=1
         attempt-=1
-    for item in ll:
-        mprint("item clusterhead locator {}".format(str(item.locator)))
-
+    
 
 
     # tmp_tagged = cbor.loads(tagged.objective.value)

@@ -237,7 +237,7 @@ def run_neg(_tagged, _locators, _attempts = 1):
 # @param _attempt number of attempts for negotiating 
 ############
 def neg(_tagged, ll, _attempt):
-    global NEIGHBOR_INFO, tag_lock, MY_ULA
+    global NEIGHBOR_INFO, MY_ULA, node_info
     _try = 1
     # if _attempt!=3:
     #     mprint("start negotiation with non-default attempt {}".format(ll.locator))
@@ -255,15 +255,23 @@ def neg(_tagged, ll, _attempt):
                 mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
                 
                 if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
-                    if not node_info['cluster_set'].__contains__(str(ll.locator)):
-                        node_info['cluster_set'].append(str(ll.locator))
+                    tagged_sem.acquire()
+                    tagged.objective.value = cbor.loads(tagged.objective.value)
+                    if not tagged.objective.value['cluster_set'].__contains__(str(ll.locator)):
+                        tagged.objective.value['cluster_set'].append(str(ll.locator))
+                    node_info = tagged.objective.value
+                    tagged.objective.value = cbor.dumps(tagged.objective.value)
+                    tagged_sem.release()
+
+                    # if not node_info['cluster_set'].__contains__(str(ll.locator)):TODO just deleted
+                    #     node_info['cluster_set'].append(str(ll.locator))
                     # while not tag_lock:
                     #     mprint("stuck here in neg")
                     #     pass
                     # tag_lock = False
-                    tagged_sem.acquire()
-                    _tagged.objective.value = cbor.dumps(node_info)
-                    tagged_sem.release()
+                    # tagged_sem.acquire() #TODO just deleted
+                    # _tagged.objective.value = tagged.objective.value
+                    # tagged_sem.release()
                     # tag_lock = True
                     NEIGHBOR_UPDATE[ll.locator] = True
                 try:
@@ -292,7 +300,9 @@ def neg(_tagged, ll, _attempt):
 ############
 def show():
     mprint("clustering done")
+    tagged_sem.acquire()
     mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
+    tagged_sem.release()
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))
     mprint("\033[1;33;1m {} \033[0m".format(INITIAL_NEG))
 
@@ -335,7 +345,7 @@ def find_next_heaviest(_heaviest):
 
 
 def init():
-    global tag_lock, tagged
+    global tagged
     global INITIAL_NEG, TO_JOIN, CLUSTER_HEAD#, HEAVIEST, MY_ULA, MY_ULA #TODO just deleted
     while not INITIAL_NEG:
         pass
@@ -360,6 +370,7 @@ def init():
         tagged.objective.value['status'] = 2
         # if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
         tagged.objective.value['cluster_set'].append(MY_ULA)
+        node_info = tagged.objective.value
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tagged_sem.release()
         # tag_lock = True
@@ -392,7 +403,7 @@ def init():
 threading.Thread(target=init, args=[]).start() #initial init
 
 def on_update_rcv():
-    global CLUSTERING_DONE, SYNCH, CLUSTER_HEAD #NEIGHBOR_INFO,HEAVIER,HEAVIER,TO_JOIN,tag_lock,
+    global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD #NEIGHBOR_INFO,HEAVIER,HEAVIER,TO_JOIN,tag_lock,
     if TO_JOIN == None:
         mprint("I'm clusterhead")
         # while not tag_lock:
@@ -405,10 +416,13 @@ def on_update_rcv():
         # if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
         tagged.objective.value['cluster_set'].append(MY_ULA)
         tagged.objective.value['status'] = 2
+        node_info = tagged.objective.value
         tagged.objective.value = cbor.dumps(tagged.objective.value)
         tagged_sem.release()
         # tag_lock = True 
-        mprint(node_info)
+        tagged_sem.acquire()
+        mprint(cbor.loads(tagged.objective.value))
+        tagged_sem.release()
         mprint(NEIGHBOR_INFO)
         CLUSTERING_DONE = True 
         CLUSTER_HEAD = True    
@@ -424,10 +438,13 @@ def on_update_rcv():
             tagged.objective.value['cluster_head'] = str(TO_JOIN.locator)
             tagged.objective.value['cluster_set']  = []
             tagged.objective.value['status'] = 4
+            node_info = tagged.objective.value
             tagged.objective.value = cbor.dumps(tagged.objective.value)
             tagged_sem.release()
             # tag_lock = True
-            mprint(node_info)
+            tagged_sem.acquire()
+            mprint(cbor.loads(tagged.objective.value))
+            tagged_sem.release()
             mprint(NEIGHBOR_INFO)
             CLUSTERING_DONE = True
         
@@ -446,10 +463,13 @@ def on_update_rcv():
                 # if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
                 tagged.objective.value['cluster_set'].append(MY_ULA)
                 tagged.objective.value['status'] = 2
+                node_info = tagged.objective.value
                 tagged.objective.value = cbor.dumps(tagged.objective.value)
                 tagged_sem.release()
                 # tag_lock = True 
-                mprint(node_info)
+                tagged_sem.acquire()
+                mprint(cbor.loads(tagged.objective.value))
+                tagged_sem.release()
                 mprint(NEIGHBOR_INFO)
                 CLUSTERING_DONE = True
                 CLUSTER_HEAD = True
@@ -467,10 +487,13 @@ def on_update_rcv():
                         tagged.objective.value['cluster_head'] = str(tmp_ch.locator)
                         tagged.objective.value['cluster_set']  = []
                         tagged.objective.value['status'] = 4
+                        node_info = tagged.objective.value
                         tagged.objective.value = cbor.dumps(tagged.objective.value)
                         tagged_sem.release()
                         # tag_lock = True
-                        mprint(node_info)
+                        tagged_sem.acquire()
+                        mprint(cbor.loads(tagged.objective.value))
+                        tagged_sem.release()
                         mprint(NEIGHBOR_INFO)
                         CLUSTERING_DONE = True
                         break

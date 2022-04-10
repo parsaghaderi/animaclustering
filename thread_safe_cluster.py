@@ -532,13 +532,15 @@ cluster_tagged = TAG_OBJ(cluster_obj, asa2)
 CLUSTERS_INFO = {}
 def run_cluster():
     mprint("running listen and discovery")
-    # threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
-    # sleep(30)
-    # threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
+    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+    sleep(30)
+    threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 
 def listen_cluster(tagged_obj):
-    while node_info['status']!=2:
+    tmp_tagged = cbor.loads(tagged_obj.objective.value)
+    while len(tmp_tagged['cluster_set']) == 0:
         pass
+    mprint("I'm in clusterhead discovery")
     while True:
         err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
         if not err:
@@ -546,7 +548,6 @@ def listen_cluster(tagged_obj):
             pass
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
-threading.Thread(target=listen, args=[tagged]).start()
 def discover_cluster(_tagged, _attempt=3):
     tmp_tagged = cbor.loads(tagged.objective.value)
     while len(tmp_tagged['cluster_set']) == 0:

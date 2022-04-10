@@ -257,12 +257,14 @@ def neg(_tagged, ll, _attempt):
                 if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
                     if not node_info['cluster_set'].__contains__(str(ll.locator)):
                         node_info['cluster_set'].append(str(ll.locator))
-                    while not tag_lock:
-                        mprint("stuck here in neg")
-                        pass
-                    tag_lock = False
+                    # while not tag_lock:
+                    #     mprint("stuck here in neg")
+                    #     pass
+                    # tag_lock = False
+                    tagged_sem.acquire()
                     _tagged.objective.value = cbor.dumps(node_info)
-                    tag_lock = True
+                    tagged_sem.release()
+                    # tag_lock = True
                     NEIGHBOR_UPDATE[ll.locator] = True
                 try:
                     _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")

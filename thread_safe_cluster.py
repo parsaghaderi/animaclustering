@@ -164,8 +164,8 @@ def listener_handler(_tagged, _handle, _answer):
     #TODO get info from the answer
     #we already know the dict of neighbor_info has been created!
     ###########
-    while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #why? 
-        pass
+    # while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): #why? 
+    #     pass
     NEIGHBOR_INFO[NEIGHBOR_LOCATOR_STR[tmp_answer['ula']]] =  tmp_answer
     # for item in NEIGHBOR_INFO:#TODO just deleted
     #     if str(item.locator) == tmp_answer['ula']:

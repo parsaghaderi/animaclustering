@@ -505,75 +505,75 @@ def show():
     mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))
 
-    sleep(10)
-    threading.Thread(target=generate_topology, args=[]).start()
+    # sleep(10)
+    # threading.Thread(target=generate_topology, args=[]).start()
 
 
 
 
-cluster_obj, err = OBJ_REG("clusterhead", 10, True, False, 10, asa)
-cluster_tagged = TAG_OBJ(cluster_obj, asa)
+# cluster_obj, err = OBJ_REG("clusterhead", 10, True, False, 10, asa)
+# cluster_tagged = TAG_OBJ(cluster_obj, asa)
 
-def generate_topology():
-    global SYNCH, NEIGHBOR_INFO, MY_ULA, CLUSTER_HEAD
-    while not SYNCH:
-        pass
-    tmp_map = {}
-    tmp_tagged = cbor.loads(tagged.objective.value)
-    if len(tmp_tagged['cluster_set']) != 0:
-        for item in tmp_tagged['cluster_set']:
-            for locators in NEIGHBOR_INFO:
-                if item == str(locators.locator) and item != MY_ULA:
-                    tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
-        tmp_map.update({node_info['ula']:node_info['neighbors']})
-        mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        threading.Thread(target=run_cluster, args=[]).start()
-
-
-CLUSTERS_INFO = {}
-def run_cluster():
-    global tagged, cluster_tagged
-    global CLUSTER_HEAD
-    global CLUSTERING_DONE
-    while not CLUSTER_HEAD:
-        pass
-    mprint("running listen and discovery")
-    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
-    threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
+# def generate_topology():
+#     global SYNCH, NEIGHBOR_INFO, MY_ULA, CLUSTER_HEAD
+#     while not SYNCH:
+#         pass
+#     tmp_map = {}
+#     tmp_tagged = cbor.loads(tagged.objective.value)
+#     if len(tmp_tagged['cluster_set']) != 0:
+#         for item in tmp_tagged['cluster_set']:
+#             for locators in NEIGHBOR_INFO:
+#                 if item == str(locators.locator) and item != MY_ULA:
+#                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
+#         tmp_map.update({node_info['ula']:node_info['neighbors']})
+#         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
+#         threading.Thread(target=run_cluster, args=[]).start()
 
 
-def listen_cluster(_tagged):
-    tmp_tagged = cbor.loads(tagged.objective.value)
-    if len(tmp_tagged['cluster_set']) == 0:
-        return
-    global CLUSTER_HEAD
-    mprint("I'm in clusterhead listener")
-    while True:
-        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
-        if not err:
-            # mprint("incoming request")
-            # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
-            mprint("ok")
-        else:
-            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+# CLUSTERS_INFO = {}
+# def run_cluster():
+#     global tagged, cluster_tagged
+#     global CLUSTER_HEAD
+#     global CLUSTERING_DONE
+#     while not CLUSTER_HEAD:
+#         pass
+#     mprint("running listen and discovery")
+#     threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+#     threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 
-def discover_cluster(_tagged, _attempt=3):
-    global CLUSTER_HEAD, CLUSTERS_INFO
-    tmp_tagged = cbor.loads(tagged.objective.value)
-    if len(tmp_tagged['cluster_set']) == 0:
-        return
-    mprint("I'm in clusterhead discovery")
-    global CLUSTERS_INFO
-    attempt = _attempt
-    while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
-        for item in ll:
-            CLUSTERS_INFO[item] = 0
-            mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
-        attempt-=1
-    for item in ll:
-        CLUSTERS_INFO[item] = 0
-        mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
+
+# def listen_cluster(_tagged):
+#     tmp_tagged = cbor.loads(tagged.objective.value)
+#     if len(tmp_tagged['cluster_set']) == 0:
+#         return
+#     global CLUSTER_HEAD
+#     mprint("I'm in clusterhead listener")
+#     while True:
+#         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+#         if not err:
+#             # mprint("incoming request")
+#             # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+#             mprint("ok")
+#         else:
+#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+
+# def discover_cluster(_tagged, _attempt=3):
+#     global CLUSTER_HEAD, CLUSTERS_INFO
+#     tmp_tagged = cbor.loads(tagged.objective.value)
+#     if len(tmp_tagged['cluster_set']) == 0:
+#         return
+#     mprint("I'm in clusterhead discovery")
+#     global CLUSTERS_INFO
+#     attempt = _attempt
+#     while attempt != 0:
+#         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
+#         for item in ll:
+#             CLUSTERS_INFO[item] = 0
+#             mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
+#         attempt-=1
+#     for item in ll:
+#         CLUSTERS_INFO[item] = 0
+#         mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
 
 
 

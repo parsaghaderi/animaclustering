@@ -537,7 +537,7 @@ def run_cluster():
     threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
 
 def listen_cluster(tagged_obj):
-    tmp_tagged = cbor.loads(cluster_tagged.objective.value)
+    tmp_tagged = cbor.loads(tagged_obj.objective.value)
     while len(tmp_tagged['cluster_set']) == 0:
         pass
     mprint("I'm in clusterhead discovery")
@@ -550,7 +550,7 @@ def listen_cluster(tagged_obj):
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
 def discover_cluster(_tagged_obj, _attempt=3):
-    tmp_tagged = cbor.loads(cluster_tagged.objective.value)
+    tmp_tagged = cbor.loads(tagged.objective.value)
     while len(tmp_tagged['cluster_set']) == 0:
         pass
     

@@ -532,7 +532,7 @@ CLUSTERS_INFO = {}
 def run_cluster():
     mprint("running listen and discovery")
     threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
-    sleep(15)
+    sleep(30)
     threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
 
 def listen_cluster(_tagged):

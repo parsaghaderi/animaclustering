@@ -111,11 +111,6 @@ CLUSTERING_DONE = False
 SYNCH = False
 
 
-
-
-
-
-
 ##########
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
 # status 1:not decided, 2:cluster-head, 3:want to join, 4:joined 5:changed (!)
@@ -218,8 +213,8 @@ def run_neg(_tagged, _locators, _attempts = 1):
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
     sleep(15)
+    show()
     INITIAL_NEG = True
-
 
 ############
 # @param _tagged tagged objective for negotiating over
@@ -274,4 +269,9 @@ def neg(_tagged, ll, _attempt):
         attempt-=1
         _try += 1
         sleep(3)
-        
+
+
+def show():
+    mprint("clustering done")
+    mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
+    mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))

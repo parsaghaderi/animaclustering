@@ -204,7 +204,6 @@ threading.Thread(target=discover, args=[tagged, 1]).start()
 # run neg for initial step of exchanging information w/ neighbors
 ############
 def run_neg(_tagged, _locators, _attempts = 1):
-    global INITIAL_NEG
     while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
         pass
     for item in _locators:
@@ -275,3 +274,4 @@ def show():
     mprint("clustering done")
     mprint("\033[1;36;1m {} \033[0m".format(cbor.loads(tagged.objective.value)))
     mprint("\033[1;33;1m {} \033[0m".format(NEIGHBOR_INFO))
+    mprint("\033[1;33;1m {} \033[0m".format(INITIAL_NEG))

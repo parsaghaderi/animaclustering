@@ -526,7 +526,7 @@ def generate_topology():
         threading.Thread(target=run_cluster, args=[]).start()
 
 asa2, err = ASA_REG('cluster_neg')
-cluster_obj, err = OBJ_REG("clusterhead", 10, True, False, 10, asa2)
+cluster_obj, err = OBJ_REG("clusterhead", cbor.dumps(10), True, False, 10, asa2)
 cluster_tagged = TAG_OBJ(cluster_obj, asa2)
 
 CLUSTERS_INFO = {}
@@ -534,10 +534,10 @@ def run_cluster():
     mprint("running listen and discovery")
     threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
     sleep(30)
-    threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
+    threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
 
 def listen_cluster(tagged_obj):
-    tmp_tagged = cbor.loads(tagged.objective.value)
+    tmp_tagged = cbor.loads(cluster_tagged.objective.value)
     while len(tmp_tagged['cluster_set']) == 0:
         pass
     mprint("I'm in clusterhead discovery")
@@ -548,18 +548,34 @@ def listen_cluster(tagged_obj):
             pass
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
-def discover_cluster(_tagged, _attempt=3):
-    tmp_tagged = cbor.loads(tagged.objective.value)
+
+def discover_cluster(_tagged_obj, _attempt=3):
+    tmp_tagged = cbor.loads(cluster_tagged.objective.value)
     while len(tmp_tagged['cluster_set']) == 0:
         pass
-    mprint("I'm in clusterhead discovery")
+    
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
-        for item in ll:
-            CLUSTERS_INFO[item] = 0
-            mprint("\033[1;32;1m locator of cluster found {} - on try {}\033[0m".format(item.locator, _attempt-attempt))
+        _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
+                            10000, flush=True, minimum_TTL=50000)
+        mprint(len(ll))
         attempt-=1
+    for item in ll:
+        mprint("item clusterhead locator {}".format(str(item.locator)))
+
+
+
+    # tmp_tagged = cbor.loads(tagged.objective.value)
+    # while len(tmp_tagged['cluster_set']) == 0:
+    #     pass
+    # mprint("I'm in clusterhead discovery")
+    # attempt = _attempt
+    # while attempt != 0:
+    #     _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
+    #     for item in ll:
+    #         CLUSTERS_INFO[item] = 0
+    #         mprint("\033[1;32;1m locator of cluster found {} - on try {}\033[0m".format(item.locator, _attempt-attempt))
+    #     attempt-=1
     # for item in ll:
     #     CLUSTERS_INFO[item] = 0
     #     mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))

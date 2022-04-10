@@ -537,7 +537,7 @@ def run_cluster():
     threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
 
 def listen_cluster(tagged_obj):
-    tmp_tagged = cbor.loads(tagged_obj.objective.value)
+    tmp_tagged = cbor.loads(tagged.objective.value)
     while len(tmp_tagged['cluster_set']) == 0:
         pass
     mprint("I'm in clusterhead discovery")

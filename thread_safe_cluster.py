@@ -220,8 +220,8 @@ threading.Thread(target=discover, args=[tagged, 1]).start()
 ############
 def run_neg(_tagged, _locators, _attempts = 1):
     global INITIAL_NEG
-    while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA):
-        pass
+    # while len(NEIGHBOR_INFO)!=len(NEIGHBOR_ULA): 
+    #     pass
     for item in _locators:
         # mprint(item.locator)
         threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()

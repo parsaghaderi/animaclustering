@@ -522,4 +522,45 @@ def generate_topology():
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({node_info['ula']:node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        # threading.Thread(target=run_cluster, args=[]).start()
+        threading.Thread(target=run_cluster, args=[]).start()
+
+
+cluster_obj, err = OBJ_REG("clusterhead", 10, True, False, 10, asa)
+cluster_tagged = TAG_OBJ(cluster_obj, asa)
+
+CLUSTERS_INFO = {}
+def run_cluster():
+    mprint("running listen and discovery")
+    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+    threading.Thread(target=discover_cluster, args=[cluster_tagged]).start()
+
+def listen_cluster(_tagged):
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    while len(node_info["cluster_set"]) == 0:
+        pass
+    mprint("I'm in clusterhead listener")
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
+        if not err:
+            # mprint("incoming request")
+            # threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            mprint("ok")
+        else:
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+
+
+def discover_cluster(_tagged, _attempt=3):
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    while len(tmp_tagged['cluster_set']) == 0:
+        pass
+    mprint("I'm in clusterhead discovery")
+    attempt = _attempt
+    while attempt != 0:
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
+        for item in ll:
+            CLUSTERS_INFO[item] = 0
+            mprint("\033[1;32;1m locator of cluster found {} - on try {}\033[0m".format(item.locator, _attempt-attempt))
+        attempt-=1
+    # for item in ll:
+    #     CLUSTERS_INFO[item] = 0
+    #     mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))

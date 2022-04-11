@@ -535,8 +535,8 @@ def generate_topology():
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
 
-cluster_obj1, err = OBJ_REG("obj1", cbor.dumps(10), True, False, 10, asa2)
-cluster_tagged = TAG_OBJ(cluster_obj1, asa2)
+cluster_obj1, err = OBJ_REG("obj1", cbor.dumps(10), True, False, 10, asa)
+cluster_tagged = TAG_OBJ(cluster_obj1, asa)
 
 CLUSTERS_INFO = {}
 

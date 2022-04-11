@@ -143,8 +143,10 @@ tagged_sem = threading.Semaphore()
 ##########
 # @param _tagged, a tagged objective to listen for
 ##########
-def listen(_tagged):
+def listen(_tagged, _phase = 0):
     while True:
+        if CLUSTERING_DONE and _phase != 0:
+            return
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             mprint("incoming request")
@@ -203,25 +205,28 @@ def listener_handler(_tagged, _handle, _answer):
 # @param _tagged tagged objective trying to discover 
 # @param _attempt number of attempts before start negotiating
 ###########
-def discover(_tagged, _attempt=3, _phase=1):
-    if _phase == 1:
-        global NEIGHBOR_INFO
-        attempt = 3
-        while attempt != 0:
-            _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-            mprint(len(ll))
-            attempt-=1
-        if _tagged.objective.name == 'node':
-            for item in ll:
-                NEIGHBOR_INFO[item] = 0
-                NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
-            threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
-            mprint(NEIGHBOR_LOCATOR_STR)
-        else:
-            mprint("$$$$$$$\ndumping\n$$$$$$$$$")
-            graspi.dump_all()
-            for item in ll:
-                mprint("cluster heads found at {}".format(str(item.locator)))
+def discover(_tagged, _attempt=3, _phase=0):
+    # if _phase == 1:
+    
+    global NEIGHBOR_INFO
+    attempt = 3
+    while attempt != 0:
+        if CLUSTERING_DONE and _phase != 0:
+            return
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        mprint(len(ll))
+        attempt-=1
+    if _tagged.objective.name == 'node':
+        for item in ll:
+            NEIGHBOR_INFO[item] = 0
+            NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
+        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
+        mprint(NEIGHBOR_LOCATOR_STR)
+    else:
+        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
+        graspi.dump_all()
+        for item in ll:
+            mprint("cluster heads found at {}".format(str(item.locator)))
     #TODO for maintenance you have to do something!
 discovery_1 = threading.Thread(target=discover, args=[tagged, 1])
 discovery_1.start()
@@ -576,10 +581,10 @@ def run_cluster():
     mprint("running listen and discovery")
     # listen_1.join()
     global discovery_1, listen_1
-    threading.Thread(target=listen, args=[cluster_tagged]).start()
+    threading.Thread(target=listen, args=[cluster_tagged, 1]).start()
     sleep(30)
     # discovery_1.join()
-    threading.Thread(target=discover, args=[cluster_tagged, 3]).start()
+    threading.Thread(target=discover, args=[cluster_tagged, 3, 1]).start()
 
     # tmp_tagged = cbor.loads(tagged.objective.value)
     # while len(tmp_tagged['cluster_set']) == 0:

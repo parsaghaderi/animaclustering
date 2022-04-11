@@ -218,6 +218,8 @@ def discover(_tagged, _attempt=3, _phase=1):
             threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
             mprint(NEIGHBOR_LOCATOR_STR)
         else:
+            mprint("$$$$$$$\ndumping\n$$$$$$$$$")
+            graspi.dump_all()
             for item in ll:
                 mprint("cluster heads found at {}".format(str(item.locator)))
     #TODO for maintenance you have to do something!
@@ -560,8 +562,7 @@ def discover_cluster(_tagged_obj, _attempt=3):
     while attempt != 0:
         _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
                             100000, flush=True, minimum_TTL=500000)
-        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
-        graspi.dump_all()
+        
         for item in ll:
             mprint("item clusterhead locator {}".format(str(item.locator)))
             if str(item.locator) == MY_ULA:

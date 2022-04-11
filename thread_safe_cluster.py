@@ -560,12 +560,14 @@ def discover_cluster(_tagged_obj, _attempt=3):
     while attempt != 0:
         _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
                             100000, flush=True, minimum_TTL=500000)
+        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
+        graspi.dump_all()
         for item in ll:
             mprint("item clusterhead locator {}".format(str(item.locator)))
             if str(item.locator) == MY_ULA:
                 attempt+=1
-        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
-        graspi.dump_all()
+        
+        
 
         attempt-=1
 def run_cluster():

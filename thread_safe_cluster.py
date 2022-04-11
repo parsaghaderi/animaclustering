@@ -564,6 +564,7 @@ def discover_cluster(_tagged_obj, _attempt=3):
             mprint("item clusterhead locator {}".format(str(item.locator)))
             if str(item.locator) == MY_ULA:
                 attempt+=1
+        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
         graspi.dump_all()
 
         attempt-=1

@@ -81,7 +81,7 @@ asa2, err = ASA_REG('cluster_neg')
 def gremlin():
     while True:
         sleep(1)
-threading.Thread(target=gremlin, args=[]).start()
+# threading.Thread(target=gremlin, args=[]).start()
 
 ##########
 # MY_ULA str
@@ -120,8 +120,6 @@ HEAVIEST = None
 ########Flags#######
 CLUSTER_HEAD = False
 INITIAL_NEG = False
-CLUSTERING_DONE = False
-SYNCH = False
 CLUSTERING_DONE = False
 SYNCH = False
 TO_JOIN = None
@@ -164,7 +162,7 @@ listen_1.start()
 # @param _answer offered answer from neg peer
 ###########
 def listener_handler(_tagged, _handle, _answer):
-    global tag_lock
+    
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     #TODO get info from the answer
@@ -468,31 +466,7 @@ def on_update_rcv():
         else:
             mprint(HEAVIER)
             tmp_ch = find_next_heaviest(HEAVIEST)
-            if tmp_ch == None:
-                mprint("I'm clusterhead")
-                mprint("\033[1;35;1m I'm in on update rcv - I'm cluster head 2\033[0m")
-                # while not tag_lock:
-                #     pass
-                # tag_lock = False
-                tagged_sem.acquire()
-                tagged.objective.value = cbor.loads(tagged.objective.value)
-                tagged.objective.value['cluster_head'] = True
-                if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
-                    tagged.objective.value['cluster_set'].append(MY_ULA)
-                tagged.objective.value['status'] = 2
-                node_info = tagged.objective.value
-                tagged.objective.value = cbor.dumps(tagged.objective.value)
-                tagged_sem.release()
-                # tag_lock = True 
-                tagged_sem.acquire()
-                mprint(cbor.loads(tagged.objective.value))
-                tagged_sem.release()
-                mprint(NEIGHBOR_INFO)
-                CLUSTERING_DONE = True
-                CLUSTER_HEAD = True
-            else:
-                tmp_ch = find_next_heaviest(HEAVIEST)
-                while tmp_ch != None:
+            while tmp_ch != None:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(tmp_ch.locator)))
                         mprint("\033[1;35;1m I'm in on update rcv - joining 2\033[0m")
@@ -517,6 +491,32 @@ def on_update_rcv():
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
                         mprint("trying next heaviest node")
+            if tmp_ch == None:
+                mprint("I'm clusterhead")
+                mprint("\033[1;35;1m I'm in on update rcv - I'm cluster head 2\033[0m")
+                # while not tag_lock:
+                #     pass
+                # tag_lock = False
+                tagged_sem.acquire()
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                tagged.objective.value['cluster_head'] = True
+                if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+                    tagged.objective.value['cluster_set'].append(MY_ULA)
+                tagged.objective.value['status'] = 2
+                node_info = tagged.objective.value
+                tagged.objective.value = cbor.dumps(tagged.objective.value)
+                tagged_sem.release()
+                # tag_lock = True 
+                tagged_sem.acquire()
+                mprint(cbor.loads(tagged.objective.value))
+                tagged_sem.release()
+                mprint(NEIGHBOR_INFO)
+                CLUSTERING_DONE = True
+                CLUSTER_HEAD = True
+            # else:
+            #     # tmp_ch = find_next_heaviest(HEAVIEST)
+            #     pass
+                
     sleep(15)
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     SYNCH = True
@@ -546,18 +546,18 @@ cluster_tagged = TAG_OBJ(cluster_obj1, asa)
 CLUSTERS_INFO = {}
 
 
-# def listen_cluster(tagged_obj):
-#     tmp_tagged = cbor.loads(tagged.objective.value)
-#     if tmp_tagged['status']!=2:
-#         return
-#     mprint("I'm in clusterhead discovery")
-#     while True:
-#         err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
-#         if not err:
-#             mprint("incoming request")
-#             pass
-#         else:
-#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+def listen_cluster(tagged_obj):
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if tmp_tagged['status']!=2:
+        return
+    mprint("I'm in clusterhead discovery")
+    while True:
+        err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
+        if not err:
+            mprint("incoming request")
+            pass
+        else:
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
 def discover_cluster(_tagged_obj, _attempt=3):
     tmp_tagged = cbor.loads(tagged.objective.value)

@@ -571,8 +571,6 @@ def run_cluster():
     mprint("running listen and discovery")
     # listen_1.join()
     global discovery_1, listen_1
-    listen_1._stop()
-    discovery_1._stop()
     threading.Thread(target=listen, args=[cluster_tagged]).start()
     sleep(30)
     # discovery_1.join()
@@ -597,3 +595,5 @@ cluster_sem = threading.Semaphore()
 
 def neg_cluster(_tagged):
     pass
+
+

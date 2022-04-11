@@ -148,7 +148,10 @@ def listen(_tagged):
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             mprint("incoming request")
-            threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            if _tagged.objective.name == 'node':
+                threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            else:
+                pass
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 listen_1 = threading.Thread(target=listen, args=[tagged])
@@ -208,11 +211,15 @@ def discover(_tagged, _attempt=3, _phase=1):
             _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
             mprint(len(ll))
             attempt-=1
-        for item in ll:
-            NEIGHBOR_INFO[item] = 0
-            NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
-        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
-        mprint(NEIGHBOR_LOCATOR_STR)
+        if _tagged.objective.name == 'node':
+            for item in ll:
+                NEIGHBOR_INFO[item] = 0
+                NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
+            threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
+            mprint(NEIGHBOR_LOCATOR_STR)
+        else:
+            for item in ll:
+                mprint("cluster heads found at {}".format(str(item.locator)))
     #TODO for maintenance you have to do something!
 discovery_1 = threading.Thread(target=discover, args=[tagged, 1])
 discovery_1.start()
@@ -532,18 +539,18 @@ cluster_tagged = TAG_OBJ(cluster_obj1, asa2)
 CLUSTERS_INFO = {}
 
 
-def listen_cluster(tagged_obj):
-    tmp_tagged = cbor.loads(tagged.objective.value)
-    if tmp_tagged['status']!=2:
-        return
-    mprint("I'm in clusterhead discovery")
-    while True:
-        err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
-        if not err:
-            mprint("incoming request")
-            pass
-        else:
-            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+# def listen_cluster(tagged_obj):
+#     tmp_tagged = cbor.loads(tagged.objective.value)
+#     if tmp_tagged['status']!=2:
+#         return
+#     mprint("I'm in clusterhead discovery")
+#     while True:
+#         err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
+#         if not err:
+#             mprint("incoming request")
+#             pass
+#         else:
+#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
 def discover_cluster(_tagged_obj, _attempt=3):
     tmp_tagged = cbor.loads(tagged.objective.value)
@@ -560,12 +567,13 @@ def discover_cluster(_tagged_obj, _attempt=3):
         attempt-=1
     
 def run_cluster():
+    global listen_1, discovery_1
     mprint("running listen and discovery")
     listen_1.join()
-    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+    threading.Thread(target=listen, args=[cluster_tagged]).start()
     sleep(30)
     discovery_1.join()
-    threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
+    threading.Thread(target=discover, args=[cluster_tagged, 3]).start()
 
     # tmp_tagged = cbor.loads(tagged.objective.value)
     # while len(tmp_tagged['cluster_set']) == 0:

@@ -145,7 +145,7 @@ tagged_sem = threading.Semaphore()
 ##########
 def listen(_tagged, _phase = 0):
     while True:
-        if CLUSTERING_DONE and _phase != 0:
+        if CLUSTERING_DONE or _phase != 0:
             return
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
@@ -211,7 +211,7 @@ def discover(_tagged, _attempt=3, _phase=0):
     global NEIGHBOR_INFO
     attempt = 3
     while attempt != 0:
-        if CLUSTERING_DONE and _phase != 0:
+        if CLUSTERING_DONE or _phase != 0:
             return
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         mprint(len(ll))

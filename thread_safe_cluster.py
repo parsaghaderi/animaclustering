@@ -526,22 +526,16 @@ def generate_topology():
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
 
-cluster_obj, err = OBJ_REG("clusterhead", cbor.dumps(10), True, False, 10, asa2)
-cluster_tagged = TAG_OBJ(cluster_obj, asa2)
+cluster_obj1, err = OBJ_REG("obj1", cbor.dumps(10), True, False, 10, asa2)
+cluster_tagged = TAG_OBJ(cluster_obj1, asa2)
 
 CLUSTERS_INFO = {}
-def run_cluster():
-    mprint("running listen and discovery")
-    listen_1.join()
-    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
-    sleep(30)
-    discovery_1.join()
-    threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
+
 
 def listen_cluster(tagged_obj):
     tmp_tagged = cbor.loads(tagged.objective.value)
-    while len(tmp_tagged['cluster_set']) == 0:
-        pass
+    if tmp_tagged['status']!=2:
+        return
     mprint("I'm in clusterhead discovery")
     while True:
         err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
@@ -553,9 +547,8 @@ def listen_cluster(tagged_obj):
 
 def discover_cluster(_tagged_obj, _attempt=3):
     tmp_tagged = cbor.loads(tagged.objective.value)
-    while len(tmp_tagged['cluster_set']) == 0:
-        pass
-    
+    if tmp_tagged['status']!=2:
+        return
     attempt = _attempt
     while attempt != 0:
         _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
@@ -566,7 +559,13 @@ def discover_cluster(_tagged_obj, _attempt=3):
                 attempt+=1
         attempt-=1
     
-
+def run_cluster():
+    mprint("running listen and discovery")
+    listen_1.join()
+    threading.Thread(target=listen_cluster, args=[cluster_tagged]).start()
+    sleep(30)
+    discovery_1.join()
+    threading.Thread(target=discover_cluster, args=[cluster_tagged, 3]).start()
 
     # tmp_tagged = cbor.loads(tagged.objective.value)
     # while len(tmp_tagged['cluster_set']) == 0:

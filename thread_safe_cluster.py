@@ -569,10 +569,10 @@ def discover_cluster(_tagged_obj, _attempt=3):
 def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
-    listen_1.join()
+    # listen_1.join()
     threading.Thread(target=listen, args=[cluster_tagged]).start()
     sleep(30)
-    discovery_1.join()
+    # discovery_1.join()
     threading.Thread(target=discover, args=[cluster_tagged, 3]).start()
 
     # tmp_tagged = cbor.loads(tagged.objective.value)

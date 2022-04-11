@@ -564,8 +564,9 @@ def discover_cluster(_tagged_obj, _attempt=3):
             mprint("item clusterhead locator {}".format(str(item.locator)))
             if str(item.locator) == MY_ULA:
                 attempt+=1
+        graspi.dump_all()
+
         attempt-=1
-    graspi.dump_all()
 def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")

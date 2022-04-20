@@ -93,6 +93,7 @@ def listen(_tagged, _phase = 0):
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
 def discover(_tagged, _attempt=3, _phase=0):
+    global FLAG
     global NEIGHBOR_INFO
     attempt = _attempt
     while attempt != 0:

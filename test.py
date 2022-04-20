@@ -131,7 +131,7 @@ if sp.getoutput('hostname') == 'Tarjan':
     while not FLAG:
         mprint("here madar jende")
         sleep(0.5)
-
+    mprint("not here madar jende")
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
     threading.Thread(target=listen, args=[tagged_2]).start()      

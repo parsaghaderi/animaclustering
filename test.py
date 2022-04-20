@@ -95,7 +95,7 @@ def discover(_tagged, _attempt=5, _phase=0):
     global FLAG
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, None, flush=True, minimum_TTL=50000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, None, flush=True, minimum_TTL=-1)
         mprint(len(ll))
         sleep(1)
         attempt-=1

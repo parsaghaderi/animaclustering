@@ -78,7 +78,8 @@ obj1, err = OBJ_REG("test_obj", 10, True, False, 10, asa)
 tagged_1 = TAG_OBJ(obj1, asa)
 # obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
 # tagged_2 = TAG_OBJ(obj2, asa)
-
+FLAG = False
+FLAG2 = False
 def listen(_tagged, _phase = 0):
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
@@ -101,18 +102,23 @@ def discover(_tagged, _attempt=3, _phase=0):
         attempt-=1
     for items in ll:
         mprint("obj {}, locator {}".format(_tagged.objective.name, str(items.locator)))
+    if _tagged.objective.name == 'test_obj':
+        FLAG = True
 
-
-threading.Thread(target=listen, args=[tagged_1]).start()      
+listen_1 = threading.Thread(target=listen, args=[tagged_1])
+listen_1.start()
 
 if sp.getoutput('hostname') == 'Dijkstra':
-
+    disc_1 = threading.Thread(target=discover, args=[tagged_1])
+    disc_1.start()
+    while not FLAG:
+        sleep(0.5)
+    listen_1.join()
+    disc_1.join()
 
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
     threading.Thread(target=listen, args=[tagged_2]).start()      
-    threading.Thread(target=discover, args=[tagged_1]).start()
-    sleep(20)
     threading.Thread(target=discover, args=[tagged_2]).start()
 
 if sp.getoutput('hostname') == 'Gingko':
@@ -122,20 +128,30 @@ if sp.getoutput('hostname') == 'Ritchie':
     threading.Thread(target=discover, args=[tagged_1]).start()
 
 if sp.getoutput('hostname') == 'Tarjan':
+    disc_1 = threading.Thread(target=discover, args=[tagged_1])
+    disc_1.start()
+    while not FLAG:
+        sleep(0.5)
+    listen_1.join()
+    disc_1.join()
+
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2]).start()
-    threading.Thread(target=discover, args=[tagged_1]).start()
-    sleep(20)
+    threading.Thread(target=listen, args=[tagged_2]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()
 
 if sp.getoutput('hostname') == 'Iverson':
     threading.Thread(target=discover, args=[tagged_1]).start()
 
 if sp.getoutput('hostname') == 'Backus':
+    disc_1 = threading.Thread(target=discover, args=[tagged_1])
+    disc_1.start()
+    while not FLAG:
+        sleep(0.5)
+    listen_1.join()
+    disc_1.join()
+
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2]).start()
-    threading.Thread(target=discover, args=[tagged_1]).start()
-    sleep(20)
+    threading.Thread(target=listen, args=[tagged_2]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()

@@ -147,7 +147,7 @@ if sp.getoutput('hostname') == 'Tarjan':
     threading.Thread(target=listen, args=[tagged_2]).start()
     # threading.Thread(target=listen, args=[tagged_1]).start()
 
-    # threading.Thread(target=discover, args=[tagged_2]).start()
+    threading.Thread(target=discover, args=[tagged_2]).start()
 
     
 
@@ -167,7 +167,7 @@ if sp.getoutput('hostname') == 'Backus':
     tagged_2 = TAG_OBJ(obj2, asa2)
     threading.Thread(target=listen, args=[tagged_2]).start()
     # threading.Thread(target=listen, args=[tagged_1]).start()
-    # threading.Thread(target=discover, args=[tagged_2]).start()
+    threading.Thread(target=discover, args=[tagged_2]).start()
 
     
     

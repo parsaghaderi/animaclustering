@@ -104,8 +104,7 @@ def discover(_tagged, _attempt=3, _phase=0):
             attempt+=1
     for items in ll:
         mprint("obj {}, locator {}".format(_tagged.objective.name, str(items.locator)))
-    if _phase == 0:
-        FLAG = True
+
 
 
 

@@ -109,8 +109,9 @@ def discover(_tagged, _attempt=3, _phase=0):
 
 
 threading.Thread(target=listen, args=[tagged_1]).start()
-threading.Thread(target=listen, args=[tagged_2]).start()
 if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=listen, args=[tagged_2]).start()
+
     threading.Thread(target=discover, args=[tagged_2]).start()
     
 
@@ -123,6 +124,7 @@ if sp.getoutput('hostname') == 'Ritchie':
     
 
 if sp.getoutput('hostname') == 'Tarjan':
+    threading.Thread(target=listen, args=[tagged_2]).start()
     threading.Thread(target=discover, args=[tagged_2]).start()
 
     
@@ -132,6 +134,7 @@ if sp.getoutput('hostname') == 'Iverson':
 
 
 if sp.getoutput('hostname') == 'Backus':
+    threading.Thread(target=listen, args=[tagged_2]).start()
     threading.Thread(target=discover, args=[tagged_2]).start()
 
     

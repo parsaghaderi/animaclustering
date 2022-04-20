@@ -76,8 +76,8 @@ def TAG_OBJ(obj, ASA):
 asa, err = ASA_REG("test")
 obj1, err = OBJ_REG("test_obj", 10, True, False, 10, asa)
 tagged_1 = TAG_OBJ(obj1, asa)
-# obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
-# tagged_2 = TAG_OBJ(obj2, asa)
+obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
+tagged_2 = TAG_OBJ(obj2, asa)
 FLAG = False
 FLAG2 = False
 def listen(_tagged, _phase = 0):
@@ -107,49 +107,34 @@ def discover(_tagged, _attempt=3, _phase=0):
     if _phase == 0:
         FLAG = True
 
-listen_1 = threading.Thread(target=listen, args=[tagged_1])
-listen_1.start()
 
+
+threading.Thread(target=listen, args=[tagged_1]).start()
+threading.Thread(target=listen, args=[tagged_2]).start()
+threading.Thread(target=discover, args=[tagged_2]).start()
 if sp.getoutput('hostname') == 'Dijkstra':
-    disc_1 = threading.Thread(target=discover, args=[tagged_1])
-    disc_1.start()
-    while not FLAG:
-        mprint("here madar jende")
-        sleep(0.5)
-    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
-    tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2,1]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()
+    
 
 if sp.getoutput('hostname') == 'Gingko':
-    threading.Thread(target=discover, args=[tagged_1, 3, 0]).start()
-
+    pass
+    
+    
 if sp.getoutput('hostname') == 'Ritchie':
-    threading.Thread(target=discover, args=[tagged_1, 3, 0]).start()
+    pass
+    
 
 if sp.getoutput('hostname') == 'Tarjan':
-    disc_1 = threading.Thread(target=discover, args=[tagged_1, 3, 0])
-    disc_1.start()
-    while not FLAG:
-        mprint("here madar jende")
-        sleep(0.5)
-    mprint("not here madar jende")
-    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
-    tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2,1]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()
+
+    
 
 if sp.getoutput('hostname') == 'Iverson':
-    threading.Thread(target=discover, args=[tagged_1, 3, 0]).start()
+    pass
+
 
 if sp.getoutput('hostname') == 'Backus':
-    disc_1 = threading.Thread(target=discover, args=[tagged_1, 3, 0])
-    disc_1.start()
-    while not FLAG:
-        mprint("here madar jende")
-        sleep(0.5)
-
-    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
-    tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2,1]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()
+
+    
+    

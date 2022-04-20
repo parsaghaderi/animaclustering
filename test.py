@@ -81,7 +81,7 @@ tagged_1 = TAG_OBJ(obj1, asa)
 FLAG = False
 FLAG2 = False
 def listen(_tagged, _phase = 0):
-    while not FLAG:
+    while not FLAG or _phase:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             mprint("incoming request")
@@ -118,7 +118,7 @@ if sp.getoutput('hostname') == 'Dijkstra':
         sleep(0.5)
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2]).start()      
+    threading.Thread(target=listen, args=[tagged_2,1]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()
 
 if sp.getoutput('hostname') == 'Gingko':
@@ -136,7 +136,7 @@ if sp.getoutput('hostname') == 'Tarjan':
     mprint("not here madar jende")
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2]).start()      
+    threading.Thread(target=listen, args=[tagged_2,1]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()
 
 if sp.getoutput('hostname') == 'Iverson':
@@ -151,5 +151,5 @@ if sp.getoutput('hostname') == 'Backus':
 
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
     tagged_2 = TAG_OBJ(obj2, asa)
-    threading.Thread(target=listen, args=[tagged_2]).start()      
+    threading.Thread(target=listen, args=[tagged_2,1]).start()      
     threading.Thread(target=discover, args=[tagged_2]).start()

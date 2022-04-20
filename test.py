@@ -98,6 +98,7 @@ def discover(_tagged, _attempt=3, _phase=0):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         mprint(len(ll))
         sleep(2)
+        attempt-=1
     for items in ll:
         mprint("obj {}, locator {}".format(_tagged.objective.name, str(items.locator)))
 

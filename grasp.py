@@ -863,8 +863,8 @@ def _ini_crypt(key=None, iv=None):
         confirm = 1
         print("Please enter the keying password for the domain.")
         while password != confirm:
-            password = bytes('N', 'utf-8') #TODO changed
-            confirm = bytes('N', 'utf-8') #TODO changed     
+            password = bytes('', 'utf-8') #TODO changed
+            confirm = bytes('', 'utf-8') #TODO changed     
             if password != confirm:
                 print("Mismatch, try again.")
         if password == b'':
@@ -4548,7 +4548,7 @@ def _initialise_grasp():
 
         try:
             # _l = input("Insecure link-local mode (DULL)? Y/N:")
-            _l = 'Y'
+            _l = 'N'
             if _l:
                 if _l[0] == "Y" or _l[0] == "y":
                     DULL = True

@@ -103,7 +103,7 @@ def discover(_tagged, _attempt=3, _phase=0):
         attempt-=1
     for items in ll:
         mprint("obj {}, locator {}".format(_tagged.objective.name, str(items.locator)))
-    if _tagged.objective.name == 'test_obj':
+    if _phase == 0:
         FLAG = True
 
 listen_1 = threading.Thread(target=listen, args=[tagged_1])
@@ -113,6 +113,7 @@ if sp.getoutput('hostname') == 'Dijkstra':
     disc_1 = threading.Thread(target=discover, args=[tagged_1])
     disc_1.start()
     while not FLAG:
+        mprint("here madar jende")
         sleep(0.5)
     listen_1.join()
     disc_1.join()
@@ -132,6 +133,7 @@ if sp.getoutput('hostname') == 'Tarjan':
     disc_1 = threading.Thread(target=discover, args=[tagged_1])
     disc_1.start()
     while not FLAG:
+        mprint("here madar jende")
         sleep(0.5)
     listen_1.join()
     disc_1.join()
@@ -148,6 +150,7 @@ if sp.getoutput('hostname') == 'Backus':
     disc_1 = threading.Thread(target=discover, args=[tagged_1])
     disc_1.start()
     while not FLAG:
+        mprint("here madar jende")
         sleep(0.5)
     listen_1.join()
     disc_1.join()

@@ -91,11 +91,11 @@ def listen(_tagged, _phase = 0):
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
-def discover(_tagged, _attempt=3, _phase=0):
+def discover(_tagged, _attempt=5, _phase=0):
     global FLAG
     attempt = _attempt
     while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 50000, flush=True, minimum_TTL=50000)
         mprint(len(ll))
         sleep(1)
         attempt-=1
@@ -122,12 +122,12 @@ if sp.getoutput('hostname') == 'Gingko':
     
     
 if sp.getoutput('hostname') == 'Ritchie':
-    # while True:
-    #     pass
-    asa2, err = ASA_REG("test2")
-    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
-    tagged_2 = TAG_OBJ(obj2, asa2)
-    threading.Thread(target=listen, args=[tagged_2]).start()
+    while True:
+        pass
+    # asa2, err = ASA_REG("test2")
+    # obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+    # tagged_2 = TAG_OBJ(obj2, asa2)
+    # threading.Thread(target=listen, args=[tagged_2]).start()
     
 
 if sp.getoutput('hostname') == 'Tarjan':
@@ -145,13 +145,13 @@ if sp.getoutput('hostname') == 'Iverson':
 
 
 if sp.getoutput('hostname') == 'Backus':
-    while True:
-        pass
-    # asa2, err = ASA_REG("test2")
-    # obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
-    # tagged_2 = TAG_OBJ(obj2, asa2)
-    # threading.Thread(target=listen, args=[tagged_2]).start()
-    # threading.Thread(target=discover, args=[tagged_2]).start()
+    # while True:
+    #     pass
+    asa2, err = ASA_REG("test2")
+    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+    tagged_2 = TAG_OBJ(obj2, asa2)
+    threading.Thread(target=listen, args=[tagged_2]).start()
+    threading.Thread(target=discover, args=[tagged_2]).start()
 
     
     

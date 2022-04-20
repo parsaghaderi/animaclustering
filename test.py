@@ -74,11 +74,9 @@ def TAG_OBJ(obj, ASA):
 
 
 asa, err = ASA_REG("test")
-asa2, err = ASA_REG("test2")
 obj1, err = OBJ_REG("test_obj", 10, True, False, 10, asa)
 tagged_1 = TAG_OBJ(obj1, asa)
-obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
-tagged_2 = TAG_OBJ(obj2, asa2)
+
 FLAG = False
 FLAG2 = False
 def listen(_tagged, _phase = 0):
@@ -111,32 +109,43 @@ def discover(_tagged, _attempt=3, _phase=0):
 
 threading.Thread(target=listen, args=[tagged_1]).start()
 if sp.getoutput('hostname') == 'Dijkstra':
-    threading.Thread(target=listen, args=[tagged_2]).start()
-
+    asa2, err = ASA_REG("test2")
+    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+    tagged_2 = TAG_OBJ(obj2, asa2)
+    # threading.Thread(target=listen, args=[tagged_2]).start()
     threading.Thread(target=discover, args=[tagged_2]).start()
     
 
 if sp.getoutput('hostname') == 'Gingko':
-    pass
+    while True:
+        pass
     
     
 if sp.getoutput('hostname') == 'Ritchie':
-    pass
+    while True:
+        pass
     
 
 if sp.getoutput('hostname') == 'Tarjan':
+    asa2, err = ASA_REG("test2")
+    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+    tagged_2 = TAG_OBJ(obj2, asa2)
     threading.Thread(target=listen, args=[tagged_2]).start()
-    threading.Thread(target=discover, args=[tagged_2]).start()
+    # threading.Thread(target=discover, args=[tagged_2]).start()
 
     
 
 if sp.getoutput('hostname') == 'Iverson':
-    pass
+    while True:
+        pass
 
 
 if sp.getoutput('hostname') == 'Backus':
+    asa2, err = ASA_REG("test2")
+    obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+    tagged_2 = TAG_OBJ(obj2, asa2)
     threading.Thread(target=listen, args=[tagged_2]).start()
-    threading.Thread(target=discover, args=[tagged_2]).start()
+    # threading.Thread(target=discover, args=[tagged_2]).start()
 
     
     

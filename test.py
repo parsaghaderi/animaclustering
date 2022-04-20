@@ -74,10 +74,11 @@ def TAG_OBJ(obj, ASA):
 
 
 asa, err = ASA_REG("test")
+asa2, err = ASA_REG("test2")
 obj1, err = OBJ_REG("test_obj", 10, True, False, 10, asa)
 tagged_1 = TAG_OBJ(obj1, asa)
-obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa)
-tagged_2 = TAG_OBJ(obj2, asa)
+obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+tagged_2 = TAG_OBJ(obj2, asa2)
 FLAG = False
 FLAG2 = False
 def listen(_tagged, _phase = 0):

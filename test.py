@@ -109,6 +109,19 @@ def discover(_tagged, _attempt=5, _phase=0):
 
 threading.Thread(target=listen, args=[tagged_1]).start()
 if sp.getoutput('hostname') == 'Dijkstra':
+    threading.Thread(target=listen, args=[tagged_1]).start()
+
+    # asa2, err = ASA_REG("test2")
+    # obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
+    # tagged_2 = TAG_OBJ(obj2, asa2)
+    # # threading.Thread(target=listen, args=[tagged_2]).start()
+    # # threading.Thread(target=listen, args=[tagged_1]).start()
+    # threading.Thread(target=discover, args=[tagged_2]).start()
+    
+
+if sp.getoutput('hostname') == 'Gingko':
+    threading.Thread(target=listen, args=[tagged_1]).start()
+
     asa2, err = ASA_REG("test2")
     obj2, err = OBJ_REG("test_obj2", 20, True, False, 10, asa2)
     tagged_2 = TAG_OBJ(obj2, asa2)
@@ -116,9 +129,6 @@ if sp.getoutput('hostname') == 'Dijkstra':
     # threading.Thread(target=listen, args=[tagged_1]).start()
     threading.Thread(target=discover, args=[tagged_2]).start()
     
-
-if sp.getoutput('hostname') == 'Gingko':
-    threading.Thread(target=listen, args=[tagged_1]).start()
 
     
     

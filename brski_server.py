@@ -121,7 +121,7 @@ def discover_neighbor(_tagged, _attempts = 3):
                     NEIGHBOR_INFO[item.locator] = []
                     mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
         else:
-            mprint("\033[1;32;1m brski server found with locator address {}\033[0m".format(str(ll[0].locator)))
+            mprint("\033[1;32;1m brski server found with locator address {}\033[0m".format(str(ll.locator)))
 
 threading.Thread(target=discover_neighbor, args=[tagged]).start()
 if sys.argv[1] == "client":

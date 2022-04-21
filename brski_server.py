@@ -11,6 +11,7 @@ except:
     _old_API = True
 import acp
 import networkx as nx
+import sys
 #########################
 # utility function for setting the value of
 # each node randomly. 
@@ -81,13 +82,17 @@ node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':list(LOCATOR_STR.keys()), 
              'status': 1} 
 
-asa, err  = ASA_REG("brski")
+asa, err     = ASA_REG("brski")
 
-obj, err  = OBJ_REG("node", None, True,
+obj, err     = OBJ_REG("node", cbor.dumps(node_info), True,
                     False, 10, asa)
 
-tagged    = TAG_OBJ(obj, asa)
+tagged       = TAG_OBJ(obj, asa)
 
+brski, err   = OBJ_REG("brski", None, True,
+                    False, 10, asa)
+
+tagged_brski = TAG_OBJ(brski, asa)
 
 def listen(_tagged):
     while True:
@@ -99,6 +104,9 @@ def listen(_tagged):
                     .format(_tagged.objective.name,graspi.etext[err]))           
 
 threading.Thread(target=listen, args=[tagged]).start()
+if sys.argv[1] != "server":
+    threading.Thread(target=listen, args=[tagged_brski]).start()
+
 
 def discover_neighbor(_tagged, _attempts = 3):
     attempt = _attempts
@@ -106,12 +114,18 @@ def discover_neighbor(_tagged, _attempts = 3):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1)
         if len(ll) != 0:
             attempt -= 1
-        for item in ll:
-            if not LOCATOR_STR.__contains__(str(item.locator)):
-                LOCATOR_STR[str(item.locator)] = item.locator
-                NEIGHBOR_INFO[item.locator] = []
-                mprint("new neighbor found {}".format(str(item.locator)))
+        if _tagged.objective.name == "node":
+            for item in ll:
+                if not LOCATOR_STR.__contains__(str(item.locator)):
+                    LOCATOR_STR[str(item.locator)] = item.locator
+                    NEIGHBOR_INFO[item.locator] = []
+                    mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
+        else:
+            mprint("\033[1;32;1m brski server found with locator address {}\033[0m".format(str(ll[0].locator)))
+
 threading.Thread(target=discover_neighbor, args=[tagged]).start()
+if sys.argv[1] != "client":
+    threading.Thread(target=discover_neighbor, args=[tagged_brski]).start()
 
 
 def neg(_tagged):

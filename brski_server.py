@@ -104,7 +104,7 @@ def listen(_tagged):
                     .format(_tagged.objective.name,graspi.etext[err]))           
 
 threading.Thread(target=listen, args=[tagged]).start()
-if sys.argv[1] != "server":
+if sys.argv[1] == "server":
     threading.Thread(target=listen, args=[tagged_brski]).start()
 
 
@@ -124,7 +124,7 @@ def discover_neighbor(_tagged, _attempts = 3):
             mprint("\033[1;32;1m brski server found with locator address {}\033[0m".format(str(ll[0].locator)))
 
 threading.Thread(target=discover_neighbor, args=[tagged]).start()
-if sys.argv[1] != "client":
+if sys.argv[1] == "client":
     threading.Thread(target=discover_neighbor, args=[tagged_brski]).start()
 
 

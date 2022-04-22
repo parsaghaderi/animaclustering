@@ -1451,7 +1451,7 @@ def _drloop(ifi,ttl,options,rec_obj,obj,inDivert):
         if 'aloc' in locals():
             aloc.protocol = opti.protocol
             aloc.port = opti.port
-            aloc.expire = int(time.monotonic() + 1) #changed
+            aloc.expire = int(time.monotonic() + ttl/1000)
             _found = False
             _disc_lock.acquire()
             for x in _discovery_cache:

@@ -4372,7 +4372,7 @@ structures for interactive debugging. Not thread-safe.
         for x in _discovery_cache:
             print(x.objective.name,"locators:")
             for y in x.asa_locators:
-                print(str(y.locator), y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",y.expire) #changed this
+                print(str(y.locator), y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",type(y.expire)) #changed this
             if x.received:
                 print("Received",x.received.name,"rapid value",x.received.value)
     print("\nFlood cache contents:\n--------------------")            

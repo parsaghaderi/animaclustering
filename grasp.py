@@ -1281,35 +1281,35 @@ def discover(asa_handle, obj, timeout, flush=False, minimum_TTL=-1,
         #normal expiry deadline is NOW
         _exdl = int(time.monotonic())        
 
-    # _disc_lock.acquire()
-    # # Can't use a comprehension because we need the actual
-    # # list entry in order to delete it.
-    # for i in range(len(_discovery_cache)):
-    #     x = _discovery_cache[i]
-    #     if x.objective.name == obj.name:
-    #         del(_discovery_cache[i])
-    #         if flush or (minimum_TTL == 0):
-    #             ttprint("Discover flushing",obj.name)
-    #             break
-    #         else:
-    #             _discovery_cache.append(x)   #make it Most Recently Used
-    #             if not _test_divert:
-    #                 # delete any expired locators
-    #                 j = 0
-    #                 while len(x.asa_locators) > j:
-    #                     _ex = x.asa_locators[j].expire
-    #                     ttprint("Discovery expiry data:",obj.name,_ex, int(time.monotonic()))
-    #                     if _ex and (_ex < _exdl):
-    #                         ttprint("Deleting stale discovery",j)
-    #                         del x.asa_locators[j]
-    #                     else:
-    #                         j += 1
+    _disc_lock.acquire()
+    # Can't use a comprehension because we need the actual
+    # list entry in order to delete it.
+    for i in range(len(_discovery_cache)):
+        x = _discovery_cache[i]
+        if x.objective.name == obj.name:
+            del(_discovery_cache[i])
+            if flush or (minimum_TTL == 0):
+                ttprint("Discover flushing",obj.name)
+                break
+            else:
+                _discovery_cache.append(x)   #make it Most Recently Used
+                if not _test_divert:
+                    # delete any expired locators
+                    j = 0
+                    while len(x.asa_locators) > j:
+                        _ex = x.asa_locators[j].expire
+                        ttprint("Discovery expiry data:",obj.name,_ex, int(time.monotonic()))
+                        if _ex and (_ex < _exdl):
+                            ttprint("Deleting stale discovery",j)
+                            del x.asa_locators[j]
+                        else:
+                            j += 1
                             
-    #                 # is there anything to return?                
-    #                 if len(x.asa_locators) > 0:
-    #                     _disc_lock.release()
-    #                     return errors.ok, x.asa_locators                            
-    # _disc_lock.release()
+                    # is there anything to return?                
+                    if len(x.asa_locators) > 0:
+                        _disc_lock.release()
+                        return errors.ok, x.asa_locators                            
+    _disc_lock.release()
 
     # Not already discovered (or flushed), launch discovery session
 
@@ -1453,35 +1453,35 @@ def _drloop(ifi,ttl,options,rec_obj,obj,inDivert):
             aloc.port = opti.port
             aloc.expire = int(time.monotonic() + 1) #changed
             _found = False
-            # _disc_lock.acquire()
-            # for x in _discovery_cache:
-            #     if x.objective.name == obj.name:
-            #         ttprint("Adding locator to discovery cache for",obj.name)
-            #         #20220316 - add check for duplicate
-            #         _duplicate = False
-            #         for existing in x.asa_locators:
-            #             if aloc.locator == existing.locator:
-            #                 #same answer already in cache
-            #                 _duplicate = True
-            #                 ttprint("Found duplicate locator in discovery cache for",obj.name)
-            #                 if aloc.expire > existing.expire:
-            #                     #fresher reply, prefer it
-            #                     existing.expire = aloc.expire
-            #         if not _duplicate:
-            #             x.asa_locators.append(aloc)
-            #         x.received = rec_obj #always prefer latest value
-            #         _found = True
-            #         break
-            # if not _found:
-            #     ttprint("Adding objective to discovery cache")
-            #     #add entry to discovery cache
-            #     #but first, check length and garbage collect
-            #     if len(_discovery_cache) >= _discCacheLimit:
-            #         del(_discovery_cache[0]) #delete Least Recently Used
-            #     _new_do = _discovered_objective(obj,[aloc])
-            #     _new_do.received = rec_obj
-            #     _discovery_cache.append(_new_do)
-            # _disc_lock.release()
+            _disc_lock.acquire()
+            for x in _discovery_cache:
+                if x.objective.name == obj.name:
+                    ttprint("Adding locator to discovery cache for",obj.name)
+                    #20220316 - add check for duplicate
+                    _duplicate = False
+                    for existing in x.asa_locators:
+                        if aloc.locator == existing.locator:
+                            #same answer already in cache
+                            _duplicate = True
+                            ttprint("Found duplicate locator in discovery cache for",obj.name)
+                            if aloc.expire > existing.expire:
+                                #fresher reply, prefer it
+                                existing.expire = aloc.expire
+                    if not _duplicate:
+                        x.asa_locators.append(aloc)
+                    x.received = rec_obj #always prefer latest value
+                    _found = True
+                    break
+            if not _found:
+                ttprint("Adding objective to discovery cache")
+                #add entry to discovery cache
+                #but first, check length and garbage collect
+                if len(_discovery_cache) >= _discCacheLimit:
+                    del(_discovery_cache[0]) #delete Least Recently Used
+                _new_do = _discovered_objective(obj,[aloc])
+                _new_do.received = rec_obj
+                _discovery_cache.append(_new_do)
+            _disc_lock.release()
 
 
 ####################################
@@ -3964,22 +3964,22 @@ class _mchandler(threading.Thread):
 
                             #ttprint("Search discovery cache")
                             
-                            # _disc_lock.acquire()
+                            _disc_lock.acquire()
 
-                            # #ttprint("Acquired _disc_lock")
+                            #ttprint("Acquired _disc_lock")
                             
-                            # # Can't use a comprehension because we need the actual
-                            # # list entry in order to delete it.
-                            # ll = False
-                            # for i in range(len(_discovery_cache)):
-                            #     x = _discovery_cache[i]                        
-                            #     if x.objective.name == oname: #found the objective
-                            #         ll = x.asa_locators
-                            #         if ll:  #it has not expired
-                            #             del(_discovery_cache[i])
-                            #             _discovery_cache.append(x)   #make it Most Recently Used                                 
-                            #         break   #quit the search
-                            # _disc_lock.release()
+                            # Can't use a comprehension because we need the actual
+                            # list entry in order to delete it.
+                            ll = False
+                            for i in range(len(_discovery_cache)):
+                                x = _discovery_cache[i]                        
+                                if x.objective.name == oname: #found the objective
+                                    ll = x.asa_locators
+                                    if ll:  #it has not expired
+                                        del(_discovery_cache[i])
+                                        _discovery_cache.append(x)   #make it Most Recently Used                                 
+                                    break   #quit the search
+                            _disc_lock.release()
                             if ll:
                                 #Build Divert option
                                 ttprint("Build Divert option")

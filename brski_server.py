@@ -114,16 +114,16 @@ def discover_neighbor(_tagged, _attempts = 3):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1)
         if len(ll) != 0:
             attempt -= 1
-        if _tagged.objective.name == "node":
-            for item in ll:
-                if not LOCATOR_STR.__contains__(str(item.locator)):
-                    LOCATOR_STR[str(item.locator)] = item.locator
-                    NEIGHBOR_INFO[item.locator] = []
-                    mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
-        else:
-            for item in ll:
-                mprint("\033[1;32;1m brski server found with locator address {}\033[0m".format(str(item.locator)))
-                attempt = 0
+    if _tagged.objective.name == "node":
+        for item in ll:
+            if not LOCATOR_STR.__contains__(str(item.locator)):
+                LOCATOR_STR[str(item.locator)] = item.locator
+                NEIGHBOR_INFO[item.locator] = []
+                mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
+    else:
+        for item in ll:
+            mprint("\033[1;32;1m brski server found with locator address {}\033[0m".format(str(item.locator)))
+                
 threading.Thread(target=discover_neighbor, args=[tagged]).start()
 if sys.argv[1] == "client":
     threading.Thread(target=discover_neighbor, args=[tagged_brski]).start()

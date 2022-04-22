@@ -465,7 +465,7 @@ Booleans:
         #Defaults
         self.protocol = socket.IPPROTO_TCP
         self.port = GRASP_LISTEN_PORT
-        self.expire = 0
+        self.expire = 10000 #changed
         
         #One of the following must be set when the object is created
         #Addresses to be stored in Python ipaddress class

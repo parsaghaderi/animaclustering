@@ -1451,7 +1451,7 @@ def _drloop(ifi,ttl,options,rec_obj,obj,inDivert):
         if 'aloc' in locals():
             aloc.protocol = opti.protocol
             aloc.port = opti.port
-            aloc.expire = int(time.monotonic() + ttl) #changed
+            aloc.expire = int(time.monotonic() + ttl/1000)
             _found = False
             _disc_lock.acquire()
             for x in _discovery_cache:
@@ -4052,7 +4052,7 @@ class _mchandler(threading.Thread):
                             ttprint("No locator in flooded objective")
                             _loc = asa_locator(None, None, False)
                         if msg.ttl > 0:
-                            _loc.expire = int(time.monotonic() + msg.ttl)#changed
+                            _loc.expire = int(time.monotonic() + msg.ttl/1000)
                             ttprint("Setting expiry",_loc.expire)
                         else:
                             _loc.expire = 0
@@ -4372,7 +4372,7 @@ structures for interactive debugging. Not thread-safe.
         for x in _discovery_cache:
             print(x.objective.name,"locators:")
             for y in x.asa_locators:
-                print(str(y.locator), y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",y.expire, "Now:", time.monotonic()) #changed this
+                print(str(y.locator), y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",y.expire) #changed this
             if x.received:
                 print("Received",x.received.name,"rapid value",x.received.value)
     print("\nFlood cache contents:\n--------------------")            

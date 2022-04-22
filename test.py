@@ -103,9 +103,21 @@ def discover(_tagged, _attempt=5, _phase=0):
             attempt+=1
     for items in ll:
         mprint("obj {}, locator {}".format(_tagged.objective.name, str(items.locator)))
+    sleep(60)
+    attempt = 3
+    while attempt != 0:
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=500)
+        mprint(len(ll))
+        sleep(1)
+        attempt-=1
+        if len(ll) == 0:
+            attempt+=1
+    for items in ll:
+        mprint("obj {}, locator {}".format(_tagged.objective.name, str(items.locator)))
 
-
+log = open("log.txt", "w")
 def dump():
+    
     while True:
         graspi.dump_all()
         sleep(5)

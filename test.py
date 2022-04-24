@@ -96,7 +96,7 @@ tagged3 = TAG_OBJ(obj3, asa)
 
 def flooder(_tagged):
     while True:
-        err = graspi.flood(_tagged.source, 59000, _tagged.objective)
+        err = graspi.flood(asa, 59000, _tagged)
         if err:
             mprint("\033[1;31;1m in flood error {} \033[0m" .format(graspi.etext[err]))
 

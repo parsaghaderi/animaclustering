@@ -91,6 +91,16 @@ def listen(_tagged, _phase = 0):
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
+obj3, err = OBJ_REG("test_flood", 10, False, True, 10, asa)
+tagged3 = TAG_OBJ(obj3, asa)
+
+def flooder(_tagged):
+    while True:
+        err = graspi.flood(_tagged.source, 59000, _tagged.objective)
+        if err:
+            mprint("\033[1;31;1m in flood error {} \033[0m" .format(graspi.etext[err]))
+
+
 def discover(_tagged, _attempt=5, _phase=0):
     global FLAG
     attempt = _attempt
@@ -190,6 +200,7 @@ if sp.getoutput('hostname') == 'Backus':
     # threading.Thread(target=listen, args=[tagged_1]).start()
     sleep(10)
     threading.Thread(target=discover, args=[tagged_2]).start()
+    threading.Thread(target=flood, args=[tagged3]).start()
 
     
     

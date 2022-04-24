@@ -4378,7 +4378,7 @@ structures for interactive debugging. Not thread-safe.
     print("\nFlood cache contents:\n--------------------")            
     for x in _flood_cache:
         print(x.objective.name,"count:",x.objective.loop_count,"value:", x.objective.value,
-              "source:",x.source.locator, x.source.protocol, x.source.port, x.source.expire)
+              "source:",x.source.locator, x.source.protocol, x.source.port, time.ctime(x.source.expire))
     if not partial:
         print("\nSession ID cache contents:\n-------------------------")         
         for x in _session_id_cache:

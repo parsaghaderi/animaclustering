@@ -215,7 +215,7 @@ if sp.getoutput('hostname') == 'Backus':
     # threading.Thread(target=listen, args=[tagged_1]).start()
     sleep(10)
     threading.Thread(target=discover, args=[tagged_2]).start()
-    flooder.start()
+    flooder().start()
 
     
     

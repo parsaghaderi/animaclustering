@@ -94,11 +94,26 @@ def listen(_tagged, _phase = 0):
 obj3, err = OBJ_REG("test_flood", 10, False, True, 10, asa)
 tagged3 = TAG_OBJ(obj3, asa)
 
-def flooder(_tagged):
-    while True:
-        err = graspi.flood(asa, 59000, _tagged)
-        if err:
-            mprint("\033[1;31;1m in flood error {} \033[0m" .format(graspi.etext[err]))
+class flooder(threading.Thread):
+    """Thread to flood EX1 repeatedly"""
+    def __init__(self):
+        threading.Thread.__init__(self, daemon=True)
+
+    def run(self):
+        while True:
+            sleep(15)
+            # obj1.value = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC from Briggs")
+            err = graspi.flood(asa, 59000, [graspi.tagged_objective(obj3,None)])
+            if err:
+                graspi.tprint("Flood failure:",graspi.etext[err])
+            sleep(5)
+            if _old_API:
+                if graspi.test_mode:
+                    pass
+            else:
+                if graspi.grasp.test_mode:
+                    pass
+        
 
 
 def discover(_tagged, _attempt=5, _phase=0):
@@ -200,7 +215,7 @@ if sp.getoutput('hostname') == 'Backus':
     # threading.Thread(target=listen, args=[tagged_1]).start()
     sleep(10)
     threading.Thread(target=discover, args=[tagged_2]).start()
-    threading.Thread(target=flooder, args=[tagged3]).start()
+    flooder.start()
 
     
     

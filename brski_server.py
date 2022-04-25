@@ -4,7 +4,6 @@ import cbor
 import subprocess as sp
 from time import sleep
 
-from thread_safe_cluster import CLUSTER_HEAD
 try:
     import graspi
     _old_API = False    
@@ -93,8 +92,8 @@ tagged       = TAG_OBJ(node, asa)
 
 
 
-server, err = OBJ_REG("server", None, True, False, 10, asa)
-tagged_server = TAG_OBJ(server, asa)
+# server, err = OBJ_REG("server", None, True, False, 10, asa)
+# tagged_server = TAG_OBJ(server, asa)
 
 # brski, err   = OBJ_REG("brski", None, True,
 #                     False, 10, asa)

@@ -655,7 +655,7 @@ F_NEG_DRY = 3 # negotiation is dry-run
 ALL_GRASP_NEIGHBORS_6 = ipaddress.IPv6Address('ff02::13')   # LL multicast
 ALL_GRASP_NEIGHBORS_4 = ipaddress.IPv4Address('224.0.0.119') # LL multicast
 GRASP_LISTEN_PORT = 7017 # IANA port number
-GRASP_DEF_TIMEOUT = 0 # milliseconds
+GRASP_DEF_TIMEOUT = 6000 # milliseconds
 GRASP_DEF_LOOPCT = 6
 GRASP_DEF_MAX_SIZE = 2048 # max message size
 

@@ -4351,22 +4351,23 @@ Utility function dump_all() prints various GRASP data
 structures for interactive debugging. Not thread-safe.                             
 """
     if not partial:
-        print("\nThread count:",threading.active_count(),"\n------------")
-        print("\nMy address:", str(_my_address),"\n----------")
-        print("\nSession locator:", str(_session_locator),"\n---------------")
-        print("\nLink local zone index(es):\n-------------------------")
-        for x in _ll_zone_ids:
-            print(x)
-        print("\nASA registry contents:\n---------------------")       
-        for x in _asa_registry:
-            print(x.name,"handle:",x.handle)
-    print("\nObjective registry contents:\n---------------------------")         
-    for x in _obj_registry:
-        o= x.objective
-        print(o.name,"ASA:",x.asa_id,"Listen:",x.listening,"Port", x.port,"Neg:",o.neg,
-               "Synch:",o.synch,"Count:",o.loop_count,"Value:",o.value)
-        if x.locators:
-            print("Predefined locators:", x.locators)
+        pass
+        # print("\nThread count:",threading.active_count(),"\n------------")
+        # print("\nMy address:", str(_my_address),"\n----------")
+        # print("\nSession locator:", str(_session_locator),"\n---------------")
+        # print("\nLink local zone index(es):\n-------------------------")
+        # for x in _ll_zone_ids:
+        #     print(x)
+        # print("\nASA registry contents:\n---------------------")       
+        # for x in _asa_registry:
+        #     print(x.name,"handle:",x.handle)
+    # print("\nObjective registry contents:\n---------------------------")         
+    # for x in _obj_registry:
+    #     o= x.objective
+    #     print(o.name,"ASA:",x.asa_id,"Listen:",x.listening,"Port", x.port,"Neg:",o.neg,
+    #            "Synch:",o.synch,"Count:",o.loop_count,"Value:",o.value)
+    #     if x.locators:
+    #         print("Predefined locators:", x.locators)
     if not partial:
         print("\nDiscovery cache contents:\n------------------------")
         for x in _discovery_cache:
@@ -4375,15 +4376,15 @@ structures for interactive debugging. Not thread-safe.
                 print(str(y.locator), y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",y.expire) #changed this
             if x.received:
                 print("Received",x.received.name,"rapid value",x.received.value)
-    print("\nFlood cache contents:\n--------------------")            
-    for x in _flood_cache:
-        print(x.objective.name,"count:",x.objective.loop_count,"value:", x.objective.value,
-              "source:",x.source.locator, x.source.protocol, x.source.port, time.ctime(x.source.expire))
-    if not partial:
-        print("\nSession ID cache contents:\n-------------------------")         
-        for x in _session_id_cache:
-            print("Handle:",'{:8}'.format(x.id_value),"Source:",x.id_source,"Active:",x.id_active,
-                  "Relayed:",x.id_relayed)
+    # print("\nFlood cache contents:\n--------------------")            
+    # for x in _flood_cache:
+    #     print(x.objective.name,"count:",x.objective.loop_count,"value:", x.objective.value,
+    #           "source:",x.source.locator, x.source.protocol, x.source.port, time.ctime(x.source.expire))
+    # if not partial:
+    #     print("\nSession ID cache contents:\n-------------------------")         
+    #     for x in _session_id_cache:
+    #         print("Handle:",'{:8}'.format(x.id_value),"Source:",x.id_source,"Active:",x.id_active,
+    #               "Relayed:",x.id_relayed)
 
 def _security_check():
     """Internal use only """

@@ -89,6 +89,9 @@ node, err     = OBJ_REG("node", cbor.dumps(node_info), True,
 tagged_sem = threading.Semaphore()
 tagged       = TAG_OBJ(node, asa)
 
+server, err = OBJ_REG("server", None, True, False, 10, asa)
+tagged_server = TAG_OBJ(server, asa)
+
 #on all nodes
 def listen(_tagged):
     while True:
@@ -115,5 +118,19 @@ def discover_neighbor(_tagged, _attempts = 3):
                 NEIGHBOR_INFO[item.locator] = []
                 mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
 
+
+
+def discovery_brski(_tagged, _attempts = 3):
+    global BRSKI_locator
+    attempt = _attempts
+    while attempt!=0:
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1)
+        if len(ll) != 0:
+            attempt -= 1
+    for item in ll:
+        BRSKI_locator = item.locator
+    mprint("\033[1;32;1m brski server found {}\033[0m".format(str(BRSKI_locator)))
+
 threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover_neighbor, args=[tagged]).start()
+threading.Thread(target=discovery_brski, args=[tagged_server]).start()

@@ -80,7 +80,7 @@
 ########################################################
 ########################################################"""
 
-_version = "RFC8990-BC-20220316"
+_version = "RFC8990-BC-20220429"
 
 ##########################################################
 # The following change log records significant changes,
@@ -240,6 +240,8 @@ _version = "RFC8990-BC-20220316"
 #
 # 20220316 - fixed grievous bug in O_DIVERT format and other related bugs
 #          - added duplicate detection when storing locator in discovery cache
+#
+# 20220429 - ignore cache entries discovered on same interface 
 #
 ##########################################################
 
@@ -655,7 +657,7 @@ F_NEG_DRY = 3 # negotiation is dry-run
 ALL_GRASP_NEIGHBORS_6 = ipaddress.IPv6Address('ff02::13')   # LL multicast
 ALL_GRASP_NEIGHBORS_4 = ipaddress.IPv4Address('224.0.0.119') # LL multicast
 GRASP_LISTEN_PORT = 7017 # IANA port number
-GRASP_DEF_TIMEOUT = 6000 # milliseconds
+GRASP_DEF_TIMEOUT = 60000 # milliseconds
 GRASP_DEF_LOOPCT = 6
 GRASP_DEF_MAX_SIZE = 2048 # max message size
 
@@ -863,8 +865,8 @@ def _ini_crypt(key=None, iv=None):
         confirm = 1
         print("Please enter the keying password for the domain.")
         while password != confirm:
-            password = bytes('', 'utf-8') #TODO changed
-            confirm = bytes('', 'utf-8') #TODO changed     
+            password = bytes(getpass.getpass(), 'utf-8')
+            confirm = bytes(getpass.getpass("Confirm:" ), 'utf-8')      
             if password != confirm:
                 print("Mismatch, try again.")
         if password == b'':
@@ -1304,12 +1306,31 @@ def discover(asa_handle, obj, timeout, flush=False, minimum_TTL=-1,
                             del x.asa_locators[j]
                         else:
                             j += 1
-                            
+                       
                     # is there anything to return?                
                     if len(x.asa_locators) > 0:
+                        _found = copy.deepcopy(x.asa_locators)
                         _disc_lock.release()
-                        return errors.ok, x.asa_locators                            
-    _disc_lock.release()
+                        
+                        # 20220429 - ignore cache entries discovered on same interface 
+                        # (RFC8990 section 2.5.4.3 2nd paragraph, last sentence)
+                        
+                        if relay_ifi:
+                            j = 0
+                            while len(_found) > j:
+                                if _found[j].ifi == relay_ifi:
+                                    # Remove the entry
+                                    ttprint("Ignoring LL discovery result", _found[j].locator)
+                                    del _found[j]
+                                else:
+                                    j += 1
+                        
+                        if len(_found) > 0:
+                            return errors.ok, _found                            
+    try:
+        _disc_lock.release()
+    except:
+        pass
 
     # Not already discovered (or flushed), launch discovery session
 
@@ -2637,7 +2658,7 @@ def expire_flood(asa_handle, tagged_obj):
 # return errorcode if failure
 ##############################################################
 """
-    print("$$$$$$$$\n$$$$$$$$\nin expire\n$$$$$$$$$\n$$$$$$$$")
+
     if _no_handle(asa_handle):
         return errors.noASA
     
@@ -3671,7 +3692,7 @@ def _relay(payload, msg, ifi):
 #                                                  #
 # NOTE WELL: uses raw payload, as well as parsed   #
 # message, since we send the payload out again in  #
-# the Flood case.                                            #
+# the Flood case.                                  #
 #                                                  #
 # Lazy code: only controls loops using loop count  #
 # and doesn't throttle rate. Note that we must not #
@@ -4351,40 +4372,39 @@ Utility function dump_all() prints various GRASP data
 structures for interactive debugging. Not thread-safe.                             
 """
     if not partial:
-        pass
-        # print("\nThread count:",threading.active_count(),"\n------------")
-        # print("\nMy address:", str(_my_address),"\n----------")
-        # print("\nSession locator:", str(_session_locator),"\n---------------")
-        # print("\nLink local zone index(es):\n-------------------------")
-        # for x in _ll_zone_ids:
-        #     print(x)
-        # print("\nASA registry contents:\n---------------------")       
-        # for x in _asa_registry:
-        #     print(x.name,"handle:",x.handle)
-    # print("\nObjective registry contents:\n---------------------------")         
-    # for x in _obj_registry:
-    #     o= x.objective
-    #     print(o.name,"ASA:",x.asa_id,"Listen:",x.listening,"Port", x.port,"Neg:",o.neg,
-    #            "Synch:",o.synch,"Count:",o.loop_count,"Value:",o.value)
-    #     if x.locators:
-    #         print("Predefined locators:", x.locators)
+        print("\nThread count:",threading.active_count(),"\n------------")
+        print("\nMy address:", str(_my_address),"\n----------")
+        print("\nSession locator:", str(_session_locator),"\n---------------")
+        print("\nLink local zone index(es):\n-------------------------")
+        for x in _ll_zone_ids:
+            print(x)
+        print("\nASA registry contents:\n---------------------")       
+        for x in _asa_registry:
+            print(x.name,"handle:",x.handle)
+    print("\nObjective registry contents:\n---------------------------")         
+    for x in _obj_registry:
+        o= x.objective
+        print(o.name,"ASA:",x.asa_id,"Listen:",x.listening,"Port", x.port,"Neg:",o.neg,
+               "Synch:",o.synch,"Count:",o.loop_count,"Value:",o.value)
+        if x.locators:
+            print("Predefined locators:", x.locators)
     if not partial:
         print("\nDiscovery cache contents:\n------------------------")
         for x in _discovery_cache:
             print(x.objective.name,"locators:")
             for y in x.asa_locators:
-                print(str(y.locator), y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",y.expire, "Now:", time.ctime()) #changed this
+                print(y.locator, y.protocol, y.port, "Diverted:",y.diverted,"Expiry:",y.expire)
             if x.received:
                 print("Received",x.received.name,"rapid value",x.received.value)
-    # print("\nFlood cache contents:\n--------------------")            
-    # for x in _flood_cache:
-    #     print(x.objective.name,"count:",x.objective.loop_count,"value:", x.objective.value,
-    #           "source:",x.source.locator, x.source.protocol, x.source.port, time.ctime(x.source.expire))
-    # if not partial:
-    #     print("\nSession ID cache contents:\n-------------------------")         
-    #     for x in _session_id_cache:
-    #         print("Handle:",'{:8}'.format(x.id_value),"Source:",x.id_source,"Active:",x.id_active,
-    #               "Relayed:",x.id_relayed)
+    print("\nFlood cache contents:\n--------------------")            
+    for x in _flood_cache:
+        print(x.objective.name,"count:",x.objective.loop_count,"value:", x.objective.value,
+              "source:",x.source.locator, x.source.protocol, x.source.port, x.source.expire)
+    if not partial:
+        print("\nSession ID cache contents:\n-------------------------")         
+        for x in _session_id_cache:
+            print("Handle:",'{:8}'.format(x.id_value),"Source:",x.id_source,"Active:",x.id_active,
+                  "Relayed:",x.id_relayed)
 
 def _security_check():
     """Internal use only """

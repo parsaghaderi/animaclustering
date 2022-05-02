@@ -158,7 +158,7 @@ def listen(_tagged, _phase = 0):
             if _tagged.objective.name == 'node':
                 threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
             elif _tagged.objective.name == 'cluster_head':
-                threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+                threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
             else:
                 pass
         else:

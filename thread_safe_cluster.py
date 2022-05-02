@@ -124,6 +124,9 @@ CLUSTERING_DONE = False
 SYNCH = False
 TO_JOIN = None
 
+##########CLUSTER INFO#######
+CLUSTERS_INFO = {}
+
 
 ##########
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
@@ -220,6 +223,11 @@ def discover(_tagged, _attempt=3, _phase=0):
             NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
         threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
         mprint(NEIGHBOR_LOCATOR_STR)
+    elif _tagged.objective.name == 'cluster_head':
+        for item in ll:
+            if str(item.locator) != acp._get_my_address():
+                CLUSTERS_INFO[item.locator] = 0
+        mprint(CLUSTERS_INFO)
     else:
         mprint("$$$$$$$\ndumping\n$$$$$$$$$")
         graspi.dump_all()
@@ -540,10 +548,10 @@ def generate_topology():
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
 
-cluster_obj1, err = OBJ_REG("obj1", cbor.dumps(10), True, False, 10, asa)
+cluster_obj1, err = OBJ_REG("cluster_head", cbor.dumps(10), True, False, 10, asa)
 cluster_tagged = TAG_OBJ(cluster_obj1, asa)
 
-CLUSTERS_INFO = {}
+
 
 
 def listen_cluster(tagged_obj):
@@ -582,10 +590,10 @@ def run_cluster():
     # listen_1.join()
     global discovery_1, listen_1
     threading.Thread(target=listen, args=[cluster_tagged, 1]).start()
-    sleep(30)
+    sleep(15)
     # discovery_1.join()
-    threading.Thread(target=discover, args=[cluster_tagged, 3, 1]).start()
-
+    discovery_cl = threading.Thread(target=discover, args=[cluster_tagged, 3, 1])
+    discovery_cl.start()
     # tmp_tagged = cbor.loads(tagged.objective.value)
     # while len(tmp_tagged['cluster_set']) == 0:
     #     pass

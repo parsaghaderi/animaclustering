@@ -225,7 +225,7 @@ def discover(_tagged, _attempt=3, _phase=0):
         mprint(NEIGHBOR_LOCATOR_STR)
     elif _tagged.objective.name == 'cluster_head':
         for item in ll:
-            if str(item.locator) != acp._get_my_address():
+            if str(item.locator) != MY_ULA:
                 CLUSTERS_INFO[item.locator] = 0
         mprint(CLUSTERS_INFO)
     else:

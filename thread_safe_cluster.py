@@ -126,7 +126,7 @@ TO_JOIN = None
 
 ##########CLUSTER INFO#######
 CLUSTERS_INFO = {}
-
+CLUSTER_INFO_KEYS = []
 #######topology of the network#######
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
@@ -233,9 +233,8 @@ def discover(_tagged, _attempt=3, _phase=0):
         for item in ll:
             if str(item.locator) != MY_ULA:
                 CLUSTERS_INFO[str(item.locator)] = 0
-                threading.Thread(target=neg_cluster, args=[_tagged, item, 3]).start()
-                #run neg on item only ont .locator
-        mprint(CLUSTERS_INFO)
+                CLUSTER_INFO_KEYS.append(item)
+        threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
     else:
         mprint("$$$$$$$\ndumping\n$$$$$$$$$")
         graspi.dump_all()
@@ -259,6 +258,12 @@ def run_neg(_tagged, _locators, _attempts = 1):
     sleep(15)
     show()
     INITIAL_NEG = True
+
+def run_clustering_neg(_tagged, _locators, _attempts = 1):
+    for item in _locators:
+        threading.Thread(target=neg_cluster, args=[_tagged, item, _attempts]).start()
+    sleep(15)
+    mprint(CLUSTERS_INFO)
 
 ############
 # @param _tagged tagged objective for negotiating over

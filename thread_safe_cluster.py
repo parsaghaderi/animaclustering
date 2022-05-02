@@ -127,6 +127,10 @@ TO_JOIN = None
 ##########CLUSTER INFO#######
 CLUSTERS_INFO = {}
 
+#######topology of the network#######
+TP_MAP = {}
+MAP_SEM = threading.Semaphore()
+
 
 ##########
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
@@ -152,6 +156,8 @@ def listen(_tagged, _phase = 0):
         if not err:
             mprint("incoming request")
             if _tagged.objective.name == 'node':
+                threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
+            elif _tagged.objective.name == 'cluster_head':
                 threading.Thread(target=listener_handler, args=[_tagged, handle, answer]).start()
             else:
                 pass
@@ -226,7 +232,9 @@ def discover(_tagged, _attempt=3, _phase=0):
     elif _tagged.objective.name == 'cluster_head':
         for item in ll:
             if str(item.locator) != MY_ULA:
-                CLUSTERS_INFO[item.locator] = 0
+                CLUSTERS_INFO[str(item.locator)] = 0
+                threading.Thread(target=neg_cluster, args=[_tagged, item, 3]).start()
+                #run neg on item only ont .locator
         mprint(CLUSTERS_INFO)
     else:
         mprint("$$$$$$$\ndumping\n$$$$$$$$$")
@@ -534,6 +542,7 @@ def on_update_rcv():
 
 def generate_topology():
     # global    #,SYNCH, NEIGHBOR_INFO,MY_ULA,CLUSTER_HEAD
+    global TP_MAP
     while not SYNCH:
         pass
     tmp_map = {}
@@ -545,11 +554,16 @@ def generate_topology():
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({node_info['ula']:node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
+        TP_MAP = {MY_ULA:tmp_map}
+        cluster_tagged_sem.acquire()
+        cluster_tagged.objective.value = cbor.dumps(TP_MAP)
+        cluster_tagged_sem.release()
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
 
-cluster_obj1, err = OBJ_REG("cluster_head", cbor.dumps(10), True, False, 10, asa)
+cluster_obj1, err = OBJ_REG("cluster_head", {}, True, False, 10, asa)
 cluster_tagged = TAG_OBJ(cluster_obj1, asa)
+cluster_tagged_sem = threading.Semaphore()
 
 
 
@@ -609,9 +623,59 @@ def run_cluster():
     #     CLUSTERS_INFO[item] = 0
     #     mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
 
-cluster_sem = threading.Semaphore()
 
-def neg_cluster(_tagged):
-    pass
+def cluster_listen_handler(_tagged, _handle, _answer):
+    tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
+    cluster_tagged_sem.acquire()
+    CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer[list(tmp_answer.keys())[0]]
+    _tagged.objective.value = cbor.dumps(TP_MAP)
+    cluster_tagged_sem.release()
+    _answer = _tagged.objective.value
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            pass
+        else:
+            mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+            pass
+    except Exception as err:
+        mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
 
+def neg_cluster(_tagged, ll, _attempt):
+    _try = 1
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start cluster negotiation with {} for {}th time - try {}".format(str(ll.locator), attempt, _try))
+        if _old_API:
+            cluster_tagged_sem.acquire()
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+            cluster_tagged_sem.release()
+        else:
+            cluster_tagged_sem.acquire()
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            cluster_tagged_sem.release()
+            if not err:
+                cluster_tagged_sem.acquire()
+                mprint("\033[1;32;1m got cluster answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
+                CLUSTERS_INFO[ll.locator] = cbor.loads(answer.value)
+                mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√ 
+                cluster_tagged_sem.release()
+                try:
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                    if not _err:
+                        mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+                    else:
+                        mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+                except Exception as e:
+                    mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            else:
+                    mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+                    attempt+=1

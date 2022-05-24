@@ -144,7 +144,7 @@ def listen(_tagged):
         if not err:
             mprint("\033[1;32;1m incoming request \033[0m")
             if _tagged.objective.name == "node": #intended for neighbor disc/neg
-                threading.Thread(target=listen_hander, args=[_tagged,handle,answer]).start()
+                threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
             elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
                 threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
             else:
@@ -166,7 +166,7 @@ def discover(_tagged, _attempts = 3):
         for item in ll:
             NEIGHBOR_INFO[item] = 0
             NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
-        #threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
+        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
         mprint(NEIGHBOR_LOCATOR_STR)
     elif _tagged.objective.name == 'cluster_head':
         for item in ll:
@@ -174,7 +174,6 @@ def discover(_tagged, _attempts = 3):
                 CLUSTERS_INFO[str(item.locator)] = 0
                 CLUSTER_INFO_KEYS.append(item)
                 mprint("cluster head found at {}".format(str(item.locator)))
-        #threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
     else:
         mprint("$$$$$$$\ndumping\n$$$$$$$$$")
         graspi.dump_all()
@@ -183,3 +182,76 @@ def discover(_tagged, _attempts = 3):
 
 discovery_1 = threading.Thread(target=discover, args=[tagged, 2])
 discovery_1.start()
+
+def listen_handler(_tagged, _handle, _answer):
+    tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
+    for item in NEIGHBOR_INFO:#TODO just deleted
+        if str(item.locator) == tmp_answer['ula']:
+            NEIGHBOR_INFO[item] = tmp_answer
+    tagged_sem.acquire()
+    _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer) - just deleted
+    tagged_sem.release()
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            pass
+        else:
+            mprint("\033[1;31;1m in listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+            pass
+    except Exception as err:
+        mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
+
+def run_neg(_tagged, _locators, _attempts = 1):
+    global INITIAL_NEG
+    for item in _locators:
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    while list(NEIGHBOR_INFO.values()).__contains__(0):
+        pass
+    sleep(15)
+    INITIAL_NEG = True
+
+def neg(_tagged, ll, _attempt):
+    global NEIGHBOR_INFO, MY_ULA, node_info
+    _try = 1
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _try))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            if not err:
+                mprint("\033[1;32;1m got answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
+                NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+                mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+                
+                if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
+                    tagged_sem.acquire()
+                    tagged.objective.value = cbor.loads(tagged.objective.value)
+                    if not tagged.objective.value['cluster_set'].__contains__(str(ll.locator)):
+                        tagged.objective.value['cluster_set'].append(str(ll.locator))
+                    node_info = tagged.objective.value
+                    tagged.objective.value = cbor.dumps(tagged.objective.value)
+                    tagged_sem.release()
+                    NEIGHBOR_UPDATE[ll.locator] = True
+                try:
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                    if not _err:
+                        mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+                    else:
+                        mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+                except Exception as e:
+                    mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            else:
+                mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+                attempt+=1
+        attempt-=1
+        _try += 1
+        sleep(3)

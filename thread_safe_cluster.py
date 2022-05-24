@@ -235,7 +235,7 @@ def discover(_tagged, _attempt=3, _phase=0):
                 CLUSTERS_INFO[str(item.locator)] = 0
                 CLUSTER_INFO_KEYS.append(item)
                 mprint("cluster head found at {}".format(str(item.locator)))
-        # threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
+        threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
 
     else:
         mprint("$$$$$$$\ndumping\n$$$$$$$$$")

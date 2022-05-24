@@ -166,7 +166,7 @@ def discover(_tagged, _attempts = 3):
         for item in ll:
             NEIGHBOR_INFO[item] = 0
             NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
-        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempt]).start()
+        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempts]).start()
         mprint(NEIGHBOR_LOCATOR_STR)
     elif _tagged.objective.name == 'cluster_head':
         for item in ll:

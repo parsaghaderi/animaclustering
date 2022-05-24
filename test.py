@@ -181,5 +181,5 @@ def discover(_tagged, _attempts = 3):
         for item in ll:
             mprint("cluster heads found at {}".format(str(item.locator)))
 
-discovery_1 = threading.Thread(target=discover, args=[tagged, 1])
+discovery_1 = threading.Thread(target=discover, args=[tagged, 2])
 discovery_1.start()

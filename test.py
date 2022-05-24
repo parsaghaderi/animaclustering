@@ -384,6 +384,7 @@ def init():
 threading.Thread(target=init, args=[]).start() #initial init
 
 def on_update_rcv():
+    mprint("\033[1;35;1m in update rcv \033[0m")
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD #NEIGHBOR_INFO,HEAVIER,HEAVIER,TO_JOIN,tag_lock,
     if TO_JOIN == None:
         mprint("I'm clusterhead")

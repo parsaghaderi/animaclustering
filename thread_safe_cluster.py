@@ -573,114 +573,114 @@ cluster_tagged_sem = threading.Semaphore()
 
 
 
-# def listen_cluster(tagged_obj):
-#     tmp_tagged = cbor.loads(tagged.objective.value)
-#     if tmp_tagged['status']!=2:
-#         return
-#     mprint("I'm in clusterhead discovery")
-#     while True:
-#         err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
-#         if not err:
-#             mprint("incoming request")
-#             pass
-#         else:
-#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+def listen_cluster(tagged_obj):
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if tmp_tagged['status']!=2:
+        return
+    mprint("I'm in clusterhead discovery")
+    while True:
+        err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
+        if not err:
+            mprint("incoming request")
+            pass
+        else:
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
-# def discover_cluster(_tagged_obj, _attempt=3):
-#     tmp_tagged = cbor.loads(tagged.objective.value)
-#     if tmp_tagged['status']!=2:
-#         return
-#     attempt = _attempt
-#     while attempt != 0:
-#         _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
-#                             100000, flush=True, minimum_TTL=500000)
+def discover_cluster(_tagged_obj, _attempt=3):
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if tmp_tagged['status']!=2:
+        return
+    attempt = _attempt
+    while attempt != 0:
+        _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
+                            100000, flush=True, minimum_TTL=500000)
         
-#         for item in ll:
-#             mprint("item clusterhead locator {}".format(str(item.locator)))
-#             if str(item.locator) == MY_ULA:
-#                 attempt+=1
+        for item in ll:
+            mprint("item clusterhead locator {}".format(str(item.locator)))
+            if str(item.locator) == MY_ULA:
+                attempt+=1
         
         
 
-#         attempt-=1
-# def run_cluster():
-#     global listen_1, discovery_1
-#     mprint("running listen and discovery")
-#     # listen_1.join()
-#     global discovery_1, listen_1
-#     threading.Thread(target=listen, args=[cluster_tagged, 1]).start()
-#     sleep(15)
-#     # discovery_1.join()
-#     discovery_cl = threading.Thread(target=discover, args=[cluster_tagged, 3, 1])
-#     discovery_cl.start()
-#     # tmp_tagged = cbor.loads(tagged.objective.value)
-#     # while len(tmp_tagged['cluster_set']) == 0:
-#     #     pass
-#     # mprint("I'm in clusterhead discovery")
-#     # attempt = _attempt
-#     # while attempt != 0:
-#     #     _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
-#     #     for item in ll:
-#     #         CLUSTERS_INFO[item] = 0
-#     #         mprint("\033[1;32;1m locator of cluster found {} - on try {}\033[0m".format(item.locator, _attempt-attempt))
-#     #     attempt-=1
-#     # for item in ll:
-#     #     CLUSTERS_INFO[item] = 0
-#     #     mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
+        attempt-=1
+def run_cluster():
+    global listen_1, discovery_1
+    mprint("running listen and discovery")
+    # listen_1.join()
+    global discovery_1, listen_1
+    threading.Thread(target=listen, args=[cluster_tagged, 1]).start()
+    sleep(15)
+    # discovery_1.join()
+    discovery_cl = threading.Thread(target=discover, args=[cluster_tagged, 3, 1])
+    discovery_cl.start()
+    # tmp_tagged = cbor.loads(tagged.objective.value)
+    # while len(tmp_tagged['cluster_set']) == 0:
+    #     pass
+    # mprint("I'm in clusterhead discovery")
+    # attempt = _attempt
+    # while attempt != 0:
+    #     _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=1000000)
+    #     for item in ll:
+    #         CLUSTERS_INFO[item] = 0
+    #         mprint("\033[1;32;1m locator of cluster found {} - on try {}\033[0m".format(item.locator, _attempt-attempt))
+    #     attempt-=1
+    # for item in ll:
+    #     CLUSTERS_INFO[item] = 0
+    #     mprint("\033[1;32;1m locator of cluster found {} \033[0m".format(item.locator))
 
 
-# def cluster_listen_handler(_tagged, _handle, _answer):
-#     tmp_answer = cbor.loads(_answer.value)
-#     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
-#     cluster_tagged_sem.acquire()
-#     CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer[list(tmp_answer.keys())[0]]
-#     _tagged.objective.value = cbor.dumps(TP_MAP)
-#     cluster_tagged_sem.release()
-#     _answer = _tagged.objective.value
-#     try:
-#         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
-#         if _old_API:
-#             err, temp, answer = _r
-#             reason = answer
-#         else:
-#             err, temp, answer, reason = _r
-#         if (not err) and (temp == None):
-#             pass
-#         else:
-#             mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
-#             pass
-#     except Exception as err:
-#         mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
+def cluster_listen_handler(_tagged, _handle, _answer):
+    tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
+    cluster_tagged_sem.acquire()
+    CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer[list(tmp_answer.keys())[0]]
+    _tagged.objective.value = cbor.dumps(TP_MAP)
+    cluster_tagged_sem.release()
+    _answer = _tagged.objective.value
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            pass
+        else:
+            mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+            pass
+    except Exception as err:
+        mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
 
-# def neg_cluster(_tagged, ll, _attempt):
-#     _try = 1
-#     attempt = _attempt
-#     while attempt!=0:
-#         mprint("start cluster negotiation with {} for {}th time - try {}".format(str(ll.locator), attempt, _try))
-#         if _old_API:
-#             cluster_tagged_sem.acquire()
-#             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
-#             reason = answer
-#             cluster_tagged_sem.release()
-#         else:
-#             cluster_tagged_sem.acquire()
-#             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-#             cluster_tagged_sem.release()
-#             if not err:
-#                 cluster_tagged_sem.acquire()
-#                 mprint("\033[1;32;1m got cluster answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
-#                 CLUSTERS_INFO[ll.locator] = cbor.loads(answer.value)
-#                 mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√ 
-#                 cluster_tagged_sem.release()
-#                 try:
-#                     _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-#                     if not _err:
-#                         mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
-#                     else:
-#                         mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
-#                 except Exception as e:
-#                     mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
-#             else:
-#                     mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-#                     attempt+=1
+def neg_cluster(_tagged, ll, _attempt):
+    _try = 1
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start cluster negotiation with {} for {}th time - try {}".format(str(ll.locator), attempt, _try))
+        if _old_API:
+            cluster_tagged_sem.acquire()
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+            cluster_tagged_sem.release()
+        else:
+            cluster_tagged_sem.acquire()
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            cluster_tagged_sem.release()
+            if not err:
+                cluster_tagged_sem.acquire()
+                mprint("\033[1;32;1m got cluster answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
+                CLUSTERS_INFO[ll.locator] = cbor.loads(answer.value)
+                mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√ 
+                cluster_tagged_sem.release()
+                try:
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                    if not _err:
+                        mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+                    else:
+                        mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+                except Exception as e:
+                    mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            else:
+                    mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+                    attempt+=1

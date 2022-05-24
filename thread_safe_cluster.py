@@ -234,7 +234,9 @@ def discover(_tagged, _attempt=3, _phase=0):
             if str(item.locator) != MY_ULA:
                 CLUSTERS_INFO[str(item.locator)] = 0
                 CLUSTER_INFO_KEYS.append(item)
-        threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
+                mprint("cluster head found at {}".format(str(item.locator)))
+        # threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
+
     else:
         mprint("$$$$$$$\ndumping\n$$$$$$$$$")
         graspi.dump_all()
@@ -573,18 +575,18 @@ cluster_tagged_sem = threading.Semaphore()
 
 
 
-def listen_cluster(tagged_obj):
-    tmp_tagged = cbor.loads(tagged.objective.value)
-    if tmp_tagged['status']!=2:
-        return
-    mprint("I'm in clusterhead discovery")
-    while True:
-        err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
-        if not err:
-            mprint("incoming request")
-            pass
-        else:
-            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+# def listen_cluster(tagged_obj):
+#     tmp_tagged = cbor.loads(tagged.objective.value)
+#     if tmp_tagged['status']!=2:
+#         return
+#     mprint("I'm in clusterhead discovery")
+#     while True:
+#         err, handle, answer = graspi.listen_negotiate(tagged_obj.source, tagged_obj.objective)
+#         if not err:
+#             mprint("incoming request")
+#             pass
+#         else:
+#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
 def discover_cluster(_tagged_obj, _attempt=3):
     tmp_tagged = cbor.loads(tagged.objective.value)
@@ -594,7 +596,7 @@ def discover_cluster(_tagged_obj, _attempt=3):
     while attempt != 0:
         _, ll = graspi.discover(_tagged_obj.source, _tagged_obj.objective,
                             100000, flush=True, minimum_TTL=500000)
-        
+
         for item in ll:
             mprint("item clusterhead locator {}".format(str(item.locator)))
             if str(item.locator) == MY_ULA:

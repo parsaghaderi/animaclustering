@@ -378,6 +378,7 @@ def init():
     INITIAL_NEG = False
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     while not INITIAL_NEG:
+        mprint("stuck here!")
         pass
     sleep(15)
     threading.Thread(target=on_update_rcv, args=[]).start()
@@ -434,9 +435,6 @@ def on_update_rcv():
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(tmp_ch.locator)))
                         mprint("\033[1;35;1m I'm in on update rcv - joining 2\033[0m")
-                        # while not tag_lock:
-                        #     pass
-                        # tag_lock = False
                         tagged_sem.acquire()
                         tagged.objective.value = cbor.loads(tagged.objective.value)
                         tagged.objective.value['cluster_head'] = str(tmp_ch.locator)

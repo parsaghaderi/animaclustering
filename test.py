@@ -450,3 +450,18 @@ def generate_topology():
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
         TP_MAP = {MY_ULA:tmp_map}
 
+
+cluster_obj1, err = OBJ_REG("cluster_head", {}, True, False, 10, asa)
+cluster_tagged = TAG_OBJ(cluster_obj1, asa)
+cluster_tagged_sem = threading.Semaphore()
+
+
+
+def run_cluster():
+    global listen_1, discovery_1
+    mprint("running listen and discovery")
+    global discovery_1, listen_1
+    threading.Thread(target=listen, args=[cluster_tagged, 1]).start()
+    sleep(15)
+    discovery_cl = threading.Thread(target=discover, args=[cluster_tagged, 3, 1])
+    discovery_cl.start()

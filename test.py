@@ -138,6 +138,7 @@ tagged_sem = threading.Semaphore()
 ####step 1 - neighbor discovery####
 
 def listen(_tagged):
+    mprint("start listening for objective {}".format(_tagged.objective.name))
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
                                                       _tagged.objective)       
@@ -146,7 +147,8 @@ def listen(_tagged):
             if _tagged.objective.name == "node": #intended for neighbor disc/neg
                 threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
             elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
-                threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
+                pass
+                # threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
             else:
                 pass
         else:
@@ -156,7 +158,8 @@ listen_1 = threading.Thread(target=listen, args=[tagged]) #TODO change the name
 listen_1.start()
 
 def discover(_tagged, _attempts = 3):
-    global NEIGHBOR_INFO #x
+    mprint("entering discovery for {}".format(_tagged.objective.name))
+    global NEIGHBOR_INFO 
     attempt = _attempts
     while attempt != 0:
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
@@ -461,7 +464,6 @@ def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
     global discovery_1, listen_1
-    threading.Thread(target=listen, args=[cluster_tagged, 1]).start()
+    threading.Thread(target=listen, args=[cluster_tagged]).start()
     sleep(15)
-    discovery_cl = threading.Thread(target=discover, args=[cluster_tagged, 3, 1])
-    discovery_cl.start()
+    threading.Thread(target=discover, args=[cluster_tagged, 3]).start()

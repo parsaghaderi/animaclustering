@@ -380,7 +380,7 @@ def init():
     while not INITIAL_NEG:
         pass
     sleep(15)
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    threading.Thread(target=on_update_rcv, args=[]).start()
 threading.Thread(target=init, args=[]).start() #initial init
 
 def on_update_rcv():

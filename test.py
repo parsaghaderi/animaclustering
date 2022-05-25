@@ -148,7 +148,7 @@ def listen(_tagged):
                 threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
             elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
                 pass
-                # threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
+                threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
             else:
                 pass
         else:
@@ -211,6 +211,30 @@ def listen_handler(_tagged, _handle, _answer):
             pass
     except Exception as err:
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
+
+def cluster_listen_handler(_tagged, _handle, _answer):
+    tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
+    cluster_tagged_sem.acquire()
+    CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer[list(tmp_answer.keys())[0]]
+    _tagged.objective.value = cbor.dumps(TP_MAP)
+    cluster_tagged_sem.release()
+    _answer = _tagged.objective.value
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            pass
+        else:
+            mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+            pass
+    except Exception as err:
+        mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
+
 
 def run_neg(_tagged, _locators, _attempts = 1):
     global INITIAL_NEG

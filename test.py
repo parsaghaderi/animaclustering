@@ -213,10 +213,11 @@ def listen_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
 
 def cluster_listen_handler(_tagged, _handle, _answer):
+    global CLUSTERS_INFO
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     cluster_tagged_sem.acquire()
-    CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer[list(tmp_answer.keys())[0]]
+    CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer #changed
     _tagged.objective.value = cbor.dumps(TP_MAP)
     cluster_tagged_sem.release()
     _answer = _tagged.objective.value

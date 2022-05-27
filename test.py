@@ -6,58 +6,50 @@ except:
     import grasp as graspi
     _old_API = True
 
-##########
+'''
 # MY_ULA str
 # NEIGHBOR_ULA list[str]
-##########
+# NEIGHBOR_INFO = {} - NEIGHBOR_INFO dict locator:json
+# NEIGHBOR_LOCATOR_STR = {} - dict to map str(locator) -> locator; then can be used to access neighbor_info
+# NEIGHBOR_UPDATE = {}  - ?
+# HEAVIER = {} - locator of heavier nodes
+# LIGHTER = {} - locator of lighter nodes
+# HEAVIEST = None - locator of heaviest node
+#CLUSTER_HEAD = False - Flag
+#INITIAL_NEG = False - Flag
+#CLUSTERING_DONE = False - Flag
+#SYNCH = False - Flag
+#TO_JOIN = None - Flag
+#CLUSTERS_INFO = {} - cluster info
+#CLUSTER_INFO_KEYS = [] - cluster info
+#TP_MAP = {} - topology of the network
+#MAP_SEM = threading.Semaphore() - topology semaphore
+'''
+
+
 MY_ULA, NEIGHBOR_ULA = get_neighbors() 
-
-
-##########
-# NEIGHBOR_INFO dict locator:json
-##########
 NEIGHBOR_INFO = {}
-
-##########
-# dict to map str(locator) -> locator; then can be used to access neighbor_info
-##########
 NEIGHBOR_LOCATOR_STR = {}
-
-##########
-# ?
-##########
 NEIGHBOR_UPDATE = {} 
-
-##########
-# locator of heavier nodes
-##########
 HEAVIER = {}
-##########
-# locator of lighter nodes
-##########
 LIGHTER = {}
-##########
-# locator of heaviest node
-##########
 HEAVIEST = None
-########Flags#######
 CLUSTER_HEAD = False
 INITIAL_NEG = False
 CLUSTERING_DONE = False
 SYNCH = False
 TO_JOIN = None
-
-##########CLUSTER INFO#######
 CLUSTERS_INFO = {}
 CLUSTER_INFO_KEYS = []
-#######topology of the network#######
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
 
-##########
+
+'''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
 # status 1:not decided, 2:cluster-head, 3:want to join, 4:joined 5:changed (!)
-##########
+'''
+
 node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 
              'status': 1} 
@@ -78,7 +70,6 @@ def listen(_tagged):
             if _tagged.objective.name == "node": #intended for neighbor disc/neg
                 threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
             elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
-                pass
                 threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
             else:
                 pass

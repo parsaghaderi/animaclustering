@@ -3,12 +3,9 @@ import threading
 import cbor
 import subprocess as sp
 from time import sleep
-try:
-    import graspi
-    _old_API = False    
-except:
-    import grasp as graspi
-    _old_API = True
+
+from matplotlib.style import available
+import multiping
 import acp
 
 
@@ -75,3 +72,9 @@ def TAG_OBJ(obj, ASA):
 
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
+
+def check_alive(_neighbors):
+    req = multiping.MultiPing(_neighbors)
+    req.send()
+    _available, _not_available = req.receive(5)
+    return _available, _not_available

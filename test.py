@@ -60,29 +60,25 @@ tagged_sem = threading.Semaphore()
 
 ####step 1 - neighbor discovery####
 
-# def listen(_tagged, _handler = None):
-#     mprint("start listening for objective {}".format(_tagged.objective.name))
-#     while True:
-#         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
-#                                                       _tagged.objective)       
-#         if not err:
-#             mprint("\033[1;32;1m incoming request \033[0m")
-#             # if _tagged.objective.name == "node": #intended for neighbor disc/neg
-#             #     threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
-#             # elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
-#             #     threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
-#             threading.Thread(target=_handler, args=[_tagged,handle,answer]).start()
-#         else:
-#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
-def run_neg(_tagged, _locators, _attempts = 1):
-    global INITIAL_NEG
-    for item in _locators:
-        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
-    while list(NEIGHBOR_INFO.values()).__contains__(0):
-        pass
-    sleep(15)
-    INITIAL_NEG = True
+def listen(_tagged):
+    mprint("start listening for objective {}".format(_tagged.objective.name))
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, 
+                                                      _tagged.objective)       
+        if not err:
+            mprint("\033[1;32;1m incoming request \033[0m")
+            if _tagged.objective.name == "node": #intended for neighbor disc/neg
+                threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
+            elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
+                threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
+            
+            else:
+                pass
+        else:
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
+listen_1 = threading.Thread(target=listen, args=[tagged]) #TODO change the name
+listen_1.start()
 
 def discover(_tagged, _attempts = 3):
     mprint("entering discovery for {}".format(_tagged.objective.name))
@@ -138,8 +134,7 @@ def listen_handler(_tagged, _handle, _answer):
             pass
     except Exception as err:
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
-listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
-listen_1.start()
+
 def cluster_listen_handler(_tagged, _handle, _answer):
     global CLUSTERS_INFO
     tmp_answer = cbor.loads(_answer.value)
@@ -165,7 +160,14 @@ def cluster_listen_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
 
-
+def run_neg(_tagged, _locators, _attempts = 1):
+    global INITIAL_NEG
+    for item in _locators:
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    while list(NEIGHBOR_INFO.values()).__contains__(0):
+        pass
+    sleep(15)
+    INITIAL_NEG = True
 
 def run_clustering_neg(_tagged, _locators, _attempts = 1):
     for item in _locators:
@@ -423,7 +425,7 @@ def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
     global discovery_1, listen_1
-    threading.Thread(target=listen, args=[cluster_tagged, cluster_listen_handler]).start()
+    threading.Thread(target=listen, args=[cluster_tagged]).start()
     sleep(15)
     threading.Thread(target=discover, args=[cluster_tagged, 3]).start()
 

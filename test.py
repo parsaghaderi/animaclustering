@@ -74,7 +74,14 @@ tagged_sem = threading.Semaphore()
 #             threading.Thread(target=_handler, args=[_tagged,handle,answer]).start()
 #         else:
 #             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
-
+def run_neg(_tagged, _locators, _attempts = 1):
+    global INITIAL_NEG
+    for item in _locators:
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    while list(NEIGHBOR_INFO.values()).__contains__(0):
+        pass
+    sleep(15)
+    INITIAL_NEG = True
 
 
 def discover(_tagged, _attempts = 3):
@@ -158,14 +165,7 @@ def cluster_listen_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
 
-def run_neg(_tagged, _locators, _attempts = 1):
-    global INITIAL_NEG
-    for item in _locators:
-        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
-    while list(NEIGHBOR_INFO.values()).__contains__(0):
-        pass
-    sleep(15)
-    INITIAL_NEG = True
+
 
 def run_clustering_neg(_tagged, _locators, _attempts = 1):
     for item in _locators:

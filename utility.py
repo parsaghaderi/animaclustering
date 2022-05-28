@@ -4,7 +4,12 @@ import cbor
 import subprocess as sp
 from time import sleep
 import acp
-    
+try:
+    import graspi
+    _old_API = False    
+except:
+    import grasp as graspi
+    _old_API = True
 
 #########################
 # utility function for setting the value of

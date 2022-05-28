@@ -1,10 +1,6 @@
 from utility import *
-try:
-    import graspi
-    _old_API = False    
-except:
-    import grasp as graspi
-    _old_API = True
+from utility import _old_API as _old_API
+
 
 '''
 # MY_ULA str

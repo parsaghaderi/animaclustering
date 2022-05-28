@@ -203,24 +203,24 @@ def neg(_tagged, ll, _attempt):
 #############
 # sort nodes based on their weights
 #############
-def sort_weight():
-    global NEIGHBOR_INFO, HEAVIER, LIGHTER, HEAVIEST
-    my_weight = node_info['weight']
-    max_weight = my_weight
-    for item in NEIGHBOR_INFO:
-        if NEIGHBOR_INFO[item]['weight']> my_weight:
-            HEAVIER[item] = NEIGHBOR_INFO[item]['weight']
-            if NEIGHBOR_INFO[item]['weight']> max_weight:
-                HEAVIEST = item #locator #TODO subject to change if it joins another cluster
-                max_weight = NEIGHBOR_INFO[item]['weight']
-        else:
-            LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
+# def sort_weight():
+#     global NEIGHBOR_INFO, HEAVIER, LIGHTER, HEAVIEST
+#     my_weight = node_info['weight']
+#     max_weight = my_weight
+#     for item in NEIGHBOR_INFO:
+#         if NEIGHBOR_INFO[item]['weight']> my_weight:
+#             HEAVIER[item] = NEIGHBOR_INFO[item]['weight']
+#             if NEIGHBOR_INFO[item]['weight']> max_weight:
+#                 HEAVIEST = item #locator #TODO subject to change if it joins another cluster
+#                 max_weight = NEIGHBOR_INFO[item]['weight']
+#         else:
+#             LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
 
-    HEAVIER = dict(sorted(HEAVIER.items(), key=lambda item: item[1], reverse = True))
-    mprint("heavier:{}".format(HEAVIER))
-    mprint("lighter:{}".format(LIGHTER))
-    mprint("heaviest:{}".format(HEAVIEST))
-
+#     HEAVIER = dict(sorted(HEAVIER.items(), key=lambda item: item[1], reverse = True))
+#     mprint("heavier:{}".format(HEAVIER))
+#     mprint("lighter:{}".format(LIGHTER))
+#     mprint("heaviest:{}".format(HEAVIEST))
+HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 #########
 # @param _heaviest takes the current heaviest(locator), return next one in line
 # @return locator of the 2nd heaviest node

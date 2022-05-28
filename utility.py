@@ -90,3 +90,21 @@ def listen(_tagged, _handler):
             threading.Thread(target=_handler, args=[_tagged,handle,answer]).start()
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+
+
+def sort_weight(_my_weight, _neighbor_info, _heavier, _heaviest, _lighter):
+    max_weight = _my_weight
+    for item in _neighbor_info:
+        if _neighbor_info[item]['weight']> _my_weight:
+            _heavier[item] = _neighbor_info[item]['weight']
+            if _neighbor_info[item]['weight']> max_weight:
+                _heaviest = item #locator #TODO subject to change if it joins another cluster
+                max_weight = _neighbor_info[item]['weight']
+        else:
+            _lighter[item] = _neighbor_info[item]['weight']
+
+    _heavier = dict(sorted(_heavier.items(), key=lambda item: item[1], reverse = True))
+    mprint("heavier:{}".format(_heavier))
+    mprint("lighter:{}".format(_lighter))
+    mprint("heaviest:{}".format(_heaviest))
+    return _heavier, _heaviest, _lighter

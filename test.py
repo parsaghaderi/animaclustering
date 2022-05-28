@@ -128,7 +128,7 @@ def cluster_listen_handler(_tagged, _handle, _answer):
 #         else:
 #             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
-listen_1 = threading.Thread(target=listen, args=[tagged]) #TODO change the name
+listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_1.start()
 
 def discover(_tagged, _attempts = 3):
@@ -427,7 +427,7 @@ def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
     global discovery_1, listen_1
-    threading.Thread(target=listen, args=[cluster_tagged]).start()
+    threading.Thread(target=listen, args=[cluster_tagged, cluster_listen_handler]).start()
     sleep(15)
     threading.Thread(target=discover, args=[cluster_tagged, 3]).start()
 

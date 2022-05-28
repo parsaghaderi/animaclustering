@@ -240,11 +240,11 @@ def init():
         tagged_sem.release()
         mprint(list(NEIGHBOR_INFO.values()))
     INITIAL_NEG = False
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
+    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     while not INITIAL_NEG:
         pass
     sleep(15)
-    threading.Thread(target=on_update_rcv, args=[]).start()
+    # threading.Thread(target=on_update_rcv, args=[]).start()
 
 def on_update_rcv():
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD 

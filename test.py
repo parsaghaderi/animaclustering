@@ -60,57 +60,6 @@ tagged_sem = threading.Semaphore()
 
 ####step 1 - neighbor discovery####
 
-def listen(_tagged):
-    mprint("start listening for objective {}".format(_tagged.objective.name))
-    while True:
-        err, handle, answer = graspi.listen_negotiate(_tagged.source, 
-                                                      _tagged.objective)       
-        if not err:
-            mprint("\033[1;32;1m incoming request \033[0m")
-            if _tagged.objective.name == "node": #intended for neighbor disc/neg
-                threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
-            elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
-                threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
-            
-            else:
-                pass
-        else:
-            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
-
-listen_1 = threading.Thread(target=listen, args=[tagged]) #TODO change the name
-listen_1.start()
-
-def discover(_tagged, _attempts = 3):
-    mprint("entering discovery for {}".format(_tagged.objective.name))
-    global NEIGHBOR_INFO 
-    attempt = _attempts
-    while attempt != 0:
-        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-        mprint(len(ll))
-        attempt-=1
-    if _tagged.objective.name == 'node':
-        for item in ll:
-            NEIGHBOR_INFO[item] = 0
-            NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
-        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempts]).start()
-        mprint(NEIGHBOR_LOCATOR_STR)
-    elif _tagged.objective.name == 'cluster_head':
-        for item in ll:
-            if str(item.locator) != MY_ULA:
-                CLUSTERS_INFO[str(item.locator)] = 0
-                CLUSTER_INFO_KEYS.append(item)
-                mprint("cluster head found at {}".format(str(item.locator)))
-        threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
-
-    else:
-        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
-        graspi.dump_all()
-        for item in ll:
-            mprint("cluster heads found at {}".format(str(item.locator)))
-
-discovery_1 = threading.Thread(target=discover, args=[tagged, 2])
-discovery_1.start()
-
 def listen_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
@@ -159,6 +108,56 @@ def cluster_listen_handler(_tagged, _handle, _answer):
     except Exception as err:
         mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
+# def listen(_tagged):
+#     mprint("start listening for objective {}".format(_tagged.objective.name))
+#     while True:
+#         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
+#                                                       _tagged.objective)       
+#         if not err:
+#             mprint("\033[1;32;1m incoming request \033[0m")
+#             if _tagged.objective.name == "node": #intended for neighbor disc/neg
+#                 threading.Thread(target=listen_handler, args=[_tagged,handle,answer]).start()
+#             elif _tagged.objective.name == "cluster_head": #intended for clusterhead disc/neg
+#                 threading.Thread(target=cluster_listen_handler, args=[_tagged, handle, answer]).start()
+            
+#             else:
+#                 pass
+#         else:
+#             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+
+listen_1 = threading.Thread(target=listen, args=[tagged]) #TODO change the name
+listen_1.start()
+
+def discover(_tagged, _attempts = 3):
+    mprint("entering discovery for {}".format(_tagged.objective.name))
+    global NEIGHBOR_INFO 
+    attempt = _attempts
+    while attempt != 0:
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        mprint(len(ll))
+        attempt-=1
+    if _tagged.objective.name == 'node':
+        for item in ll:
+            NEIGHBOR_INFO[item] = 0
+            NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
+        threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempts]).start()
+        mprint(NEIGHBOR_LOCATOR_STR)
+    elif _tagged.objective.name == 'cluster_head':
+        for item in ll:
+            if str(item.locator) != MY_ULA:
+                CLUSTERS_INFO[str(item.locator)] = 0
+                CLUSTER_INFO_KEYS.append(item)
+                mprint("cluster head found at {}".format(str(item.locator)))
+        threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
+
+    else:
+        mprint("$$$$$$$\ndumping\n$$$$$$$$$")
+        graspi.dump_all()
+        for item in ll:
+            mprint("cluster heads found at {}".format(str(item.locator)))
+
+discovery_1 = threading.Thread(target=discover, args=[tagged, 2])
+discovery_1.start()
 
 def run_neg(_tagged, _locators, _attempts = 1):
     global INITIAL_NEG

@@ -78,3 +78,15 @@ def check_alive(_neighbors):
     req.send()
     _available, _not_available = req.receive(5)
     return _available, _not_available
+
+
+def listen(_tagged, _handler):
+    mprint("start listening for objective {}".format(_tagged.objective.name))
+    while True:
+        err, handle, answer = graspi.listen_negotiate(_tagged.source, 
+                                                      _tagged.objective)       
+        if not err:
+            mprint("\033[1;32;1m incoming request \033[0m")
+            threading.Thread(target=_handler, args=[_tagged,handle,answer]).start()
+        else:
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))

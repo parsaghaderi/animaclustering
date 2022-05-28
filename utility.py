@@ -3,8 +3,6 @@ import threading
 import cbor
 import subprocess as sp
 from time import sleep
-
-from matplotlib.style import available
 import acp
 import grasp as graspi
 _old_API = True

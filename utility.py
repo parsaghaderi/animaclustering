@@ -7,7 +7,8 @@ from time import sleep
 from matplotlib.style import available
 import multiping
 import acp
-
+import grasp as graspi
+_old_API = True
 
 #########################
 # utility function for setting the value of

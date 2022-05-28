@@ -108,3 +108,17 @@ def sort_weight(_my_weight, _neighbor_info, _heavier, _heaviest, _lighter):
     mprint("lighter:{}".format(_lighter))
     mprint("heaviest:{}".format(_heaviest))
     return _heavier, _heaviest, _lighter
+
+#########
+# @param _heaviest takes the current heaviest(locator), return next one in line
+# @return locator of the 2nd heaviest node
+#########
+def find_next_heaviest(_heaviest, _heavier):
+    heavier_lst = list(_heavier.keys())
+    if len(heavier_lst) == 0:
+        return None
+    if heavier_lst.index(_heaviest) == len(heavier_lst)-1:
+        return None
+    else:
+        index = heavier_lst.index(_heaviest)
+        return heavier_lst[index+1]

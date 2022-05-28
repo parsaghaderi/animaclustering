@@ -158,7 +158,6 @@ def run_clustering_neg(_tagged, _locators, _attempts = 1):
     sleep(15)
     mprint(CLUSTERS_INFO)
 
-
 def neg(_tagged, ll, _attempt):
     global NEIGHBOR_INFO, MY_ULA, node_info
     _try = 1
@@ -200,40 +199,20 @@ def neg(_tagged, ll, _attempt):
         sleep(3)
 
 
-#############
-# sort nodes based on their weights
-#############
-# def sort_weight():
-#     global NEIGHBOR_INFO, HEAVIER, LIGHTER, HEAVIEST
-#     my_weight = node_info['weight']
-#     max_weight = my_weight
-#     for item in NEIGHBOR_INFO:
-#         if NEIGHBOR_INFO[item]['weight']> my_weight:
-#             HEAVIER[item] = NEIGHBOR_INFO[item]['weight']
-#             if NEIGHBOR_INFO[item]['weight']> max_weight:
-#                 HEAVIEST = item #locator #TODO subject to change if it joins another cluster
-#                 max_weight = NEIGHBOR_INFO[item]['weight']
-#         else:
-#             LIGHTER[item] = NEIGHBOR_INFO[item]['weight']
-
-#     HEAVIER = dict(sorted(HEAVIER.items(), key=lambda item: item[1], reverse = True))
-#     mprint("heavier:{}".format(HEAVIER))
-#     mprint("lighter:{}".format(LIGHTER))
-#     mprint("heaviest:{}".format(HEAVIEST))
 #########
 # @param _heaviest takes the current heaviest(locator), return next one in line
 # @return locator of the 2nd heaviest node
 #########
-def find_next_heaviest(_heaviest):
-    global HEAVIER, HEAVIEST
-    heavier_lst = list(HEAVIER.keys())
-    if len(heavier_lst) == 0:
-        return None
-    if heavier_lst.index(_heaviest) == len(heavier_lst)-1:
-        return None
-    else:
-        index = heavier_lst.index(_heaviest)
-        return heavier_lst[index+1]
+# def find_next_heaviest(_heaviest):
+#     global HEAVIER, HEAVIEST
+#     heavier_lst = list(HEAVIER.keys())
+#     if len(heavier_lst) == 0:
+#         return None
+#     if heavier_lst.index(_heaviest) == len(heavier_lst)-1:
+#         return None
+#     else:
+#         index = heavier_lst.index(_heaviest)
+#         return heavier_lst[index+1]
 
 def init():
     global tagged
@@ -243,13 +222,13 @@ def init():
     mprint("deciding the role")
     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 
-    tmp_ch = find_next_heaviest(HEAVIEST)
+    tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
     if tmp_ch == None:
         mprint("tmp_ch == None")
     else:
         while tmp_ch != None:
             mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
-            tmp_ch = find_next_heaviest(tmp_ch)
+            tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
 
     if HEAVIEST == None:
         mprint("I'm clusterhead")
@@ -330,7 +309,7 @@ def on_update_rcv():
         
         else:
             mprint(HEAVIER)
-            tmp_ch = find_next_heaviest(HEAVIEST)
+            tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
             while tmp_ch != None:
                     if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
                         mprint("Joining {}".format(str(tmp_ch.locator)))
@@ -350,7 +329,7 @@ def on_update_rcv():
                         CLUSTERING_DONE = True
                         break
                     else:
-                        tmp_ch = find_next_heaviest(tmp_ch) #TODO check how we can stick in the loop
+                        tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
                         mprint("trying next heaviest node")
             if tmp_ch == None:
                 mprint("I'm clusterhead")

@@ -220,7 +220,6 @@ def neg(_tagged, ll, _attempt):
 #     mprint("heavier:{}".format(HEAVIER))
 #     mprint("lighter:{}".format(LIGHTER))
 #     mprint("heaviest:{}".format(HEAVIEST))
-HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 #########
 # @param _heaviest takes the current heaviest(locator), return next one in line
 # @return locator of the 2nd heaviest node
@@ -238,11 +237,12 @@ def find_next_heaviest(_heaviest):
 
 def init():
     global tagged
-    global INITIAL_NEG, TO_JOIN, CLUSTER_HEAD
+    global INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, HEAVIER, LIGHTER, HEAVIEST, node_info
     while not INITIAL_NEG:
         pass
     mprint("deciding the role")
-    sort_weight()
+    HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
+
     tmp_ch = find_next_heaviest(HEAVIEST)
     if tmp_ch == None:
         mprint("tmp_ch == None")

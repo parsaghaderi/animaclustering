@@ -145,13 +145,13 @@ def run_neg(_tagged, _locators, _attempts = 1):
         threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
-    sleep(15)
+    sleep(5)
     INITIAL_NEG = True
 
 def run_clustering_neg(_tagged, _locators, _attempts = 1):
     for item in _locators:
         threading.Thread(target=neg_cluster, args=[_tagged, item, _attempts]).start()
-    sleep(15)
+    sleep(5)
     mprint(CLUSTERS_INFO)
 
 def neg(_tagged, ll, _attempt):
@@ -165,31 +165,31 @@ def neg(_tagged, ll, _attempt):
             reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-            if not err:
-                mprint("\033[1;32;1m got answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
-                NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-                mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
-                
-                if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
-                    tagged_sem.acquire()
-                    tagged.objective.value = cbor.loads(tagged.objective.value)
-                    if not tagged.objective.value['cluster_set'].__contains__(str(ll.locator)):
-                        tagged.objective.value['cluster_set'].append(str(ll.locator))
-                    node_info = tagged.objective.value
-                    tagged.objective.value = cbor.dumps(tagged.objective.value)
-                    tagged_sem.release()
-                    NEIGHBOR_UPDATE[ll.locator] = True
-                try:
-                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                    if not _err:
-                        mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
-                    else:
-                        mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
-                except Exception as e:
-                    mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
-            else:
-                mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-                attempt+=1
+        if not err:
+            mprint("\033[1;32;1m got answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
+            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+            
+            if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
+                tagged_sem.acquire()
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                if not tagged.objective.value['cluster_set'].__contains__(str(ll.locator)):
+                    tagged.objective.value['cluster_set'].append(str(ll.locator))
+                node_info = tagged.objective.value
+                tagged.objective.value = cbor.dumps(tagged.objective.value)
+                tagged_sem.release()
+                NEIGHBOR_UPDATE[ll.locator] = True
+            try:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+                else:
+                    mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+            except Exception as e:
+                mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+        else:
+            mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+            attempt+=1
         attempt-=1
         _try += 1
         sleep(3)
@@ -240,11 +240,11 @@ def init():
         tagged_sem.release()
         mprint(list(NEIGHBOR_INFO.values()))
     INITIAL_NEG = False
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     while not INITIAL_NEG:
         pass
-    sleep(15)
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    sleep(5)
+    threading.Thread(target=on_update_rcv, args=[]).start()
 
 def on_update_rcv():
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD 

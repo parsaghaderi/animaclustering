@@ -50,6 +50,10 @@ MAP_SEM = threading.Semaphore()
 # status 1:not decided, 2:cluster-head, 3:want to join, 4:joined 5:changed (!)
 '''
 
+asa, err = ASA_REG('node_neg')
+asa2, err = ASA_REG('cluster_neg')
+
+
 node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 
              'status': 1} 

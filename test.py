@@ -23,7 +23,7 @@ from utility import _old_API as _old_API
 '''
 
 
-MY_ULA, NEIGHBOR_ULA = get_neighbors() 
+MY_ULA, NEIGHBOR_ULA = get_neighbors()  #ACP job to give the list of neighbors! ACP not available hence hardcoded
 NEIGHBOR_INFO = {}
 NEIGHBOR_LOCATOR_STR = {}
 NEIGHBOR_UPDATE = {} 
@@ -53,12 +53,15 @@ asa2, err = ASA_REG('cluster_neg')
 node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 
              'status': 1} 
+
 obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
-# tag_lock = True
 tagged   = TAG_OBJ(obj, asa)
 tagged_sem = threading.Semaphore()
 
-####step 1 - neighbor discovery####
+cluster_obj1, err = OBJ_REG("cluster_head", {}, True, False, 10, asa)
+cluster_tagged = TAG_OBJ(cluster_obj1, asa)
+cluster_tagged_sem = threading.Semaphore()
+
 
 def listen_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)
@@ -108,10 +111,6 @@ def cluster_listen_handler(_tagged, _handle, _answer):
     except Exception as err:
         mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
-
-listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
-listen_1.start()
-
 def discover(_tagged, _attempts = 3):
     mprint("entering discovery for {}".format(_tagged.objective.name))
     global NEIGHBOR_INFO 
@@ -139,9 +138,6 @@ def discover(_tagged, _attempts = 3):
         graspi.dump_all()
         for item in ll:
             mprint("cluster heads found at {}".format(str(item.locator)))
-
-discovery_1 = threading.Thread(target=discover, args=[tagged, 2])
-discovery_1.start()
 
 def run_neg(_tagged, _locators, _attempts = 1):
     global INITIAL_NEG
@@ -198,22 +194,6 @@ def neg(_tagged, ll, _attempt):
         _try += 1
         sleep(3)
 
-
-#########
-# @param _heaviest takes the current heaviest(locator), return next one in line
-# @return locator of the 2nd heaviest node
-#########
-# def find_next_heaviest(_heaviest):
-#     global HEAVIER, HEAVIEST
-#     heavier_lst = list(HEAVIER.keys())
-#     if len(heavier_lst) == 0:
-#         return None
-#     if heavier_lst.index(_heaviest) == len(heavier_lst)-1:
-#         return None
-#     else:
-#         index = heavier_lst.index(_heaviest)
-#         return heavier_lst[index+1]
-
 def init():
     global tagged
     global INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, HEAVIER, LIGHTER, HEAVIEST, node_info
@@ -265,8 +245,6 @@ def init():
         pass
     sleep(15)
     threading.Thread(target=on_update_rcv, args=[]).start()
-threading.Thread(target=init, args=[]).start() #initial init
-
 
 def on_update_rcv():
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD 
@@ -377,12 +355,6 @@ def generate_topology():
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
 
-cluster_obj1, err = OBJ_REG("cluster_head", {}, True, False, 10, asa)
-cluster_tagged = TAG_OBJ(cluster_obj1, asa)
-cluster_tagged_sem = threading.Semaphore()
-
-
-
 def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
@@ -422,3 +394,12 @@ def neg_cluster(_tagged, ll, _attempt):
             else:
                     mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
                     attempt+=1
+
+listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
+listen_1.start()
+
+discovery_1 = threading.Thread(target=discover, args=[tagged, 2])
+discovery_1.start()
+
+init_1 = threading.Thread(target=init, args=[]) #initial init
+init_1.start()

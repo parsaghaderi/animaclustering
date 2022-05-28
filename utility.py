@@ -91,7 +91,7 @@ def listen(_tagged, _handler):
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
-
+#shouldn't be here, but whatever !!!!
 def sort_weight(_my_weight, _neighbor_info, _heavier, _heaviest, _lighter):
     max_weight = _my_weight
     for item in _neighbor_info:

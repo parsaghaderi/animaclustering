@@ -244,7 +244,7 @@ def init():
     while not INITIAL_NEG:
         pass
     sleep(5)
-    # threading.Thread(target=on_update_rcv, args=[]).start()
+    threading.Thread(target=on_update_rcv, args=[]).start()
 
 def on_update_rcv():
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD 

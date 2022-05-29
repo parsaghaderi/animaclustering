@@ -306,6 +306,10 @@ def on_update_rcv():
                         mprint(NEIGHBOR_INFO)
                         CLUSTERING_DONE = True
                         break
+                    elif NEIGHBOR_INFO[tmp_ch]['status'] == 3:
+                        mprint("\033[1;31;1m fucked up situation {} \033[0m")
+                        tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
+                        mprint("trying next heaviest node")
                     else:
                         tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
                         mprint("trying next heaviest node")

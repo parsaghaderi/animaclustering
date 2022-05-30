@@ -91,9 +91,9 @@ def listen_handler(_tagged, _handle, _answer):
 def cluster_listen_handler(_tagged, _handle, _answer):
     global CLUSTERS_INFO
     tmp_answer = cbor.loads(_answer.value)
-    mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
+    mprint("req_neg initial value : peer offered {}_____{}".format(tmp_answer, (list(tmp_answer.keys())[0])))#√
     cluster_tagged_sem.acquire()
-    CLUSTERS_INFO[str((list(tmp_answer.keys())[0]).locator)] = tmp_answer #changed
+    CLUSTERS_INFO[(list(tmp_answer.keys())[0])] = tmp_answer #changed
     _tagged.objective.value = cbor.dumps(TP_MAP)
     cluster_tagged_sem.release()
     _answer.value = _tagged.objective.value
@@ -160,6 +160,8 @@ def neg(_tagged, ll, _attempt):
     _try = 1
     attempt = _attempt
     while attempt!=0:
+        if _try == 10:
+            break
         mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _try))
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO

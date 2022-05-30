@@ -387,7 +387,7 @@ def neg_cluster(_tagged, ll, _attempt):
         if not err:
             cluster_tagged_sem.acquire()
             mprint("\033[1;32;1m got cluster answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
-            CLUSTERS_INFO[ll.locator] = cbor.loads(answer.value)
+            CLUSTERS_INFO[str(ll.locator)] = cbor.loads(answer.value)
             mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), cbor.loads(answer.value)))#√ 
             cluster_tagged_sem.release()
             # try:

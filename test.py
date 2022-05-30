@@ -385,7 +385,7 @@ def neg_cluster(_tagged, ll, _attempt):
             cluster_tagged_sem.acquire()
             mprint("\033[1;32;1m got cluster answer form {} on {}th try\033[0m".format(str(ll.locator), _try))
             CLUSTERS_INFO[ll.locator] = cbor.loads(answer.value)
-            mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√ 
+            mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTERS_INFO[ll]))#√ 
             cluster_tagged_sem.release()
             # try:
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")

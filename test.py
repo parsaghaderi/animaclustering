@@ -368,7 +368,7 @@ def generate_topology():
     else:
         mprint("sleeping for 100s")
         sleep(100)
-        threading.Thread(target=neg_with_my_ch, args=[tagged, TO_JOIN, 1])
+        threading.Thread(target=neg_with_my_ch, args=[tagged, TO_JOIN, 1]).start()
 def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
@@ -411,6 +411,7 @@ def neg_cluster(_tagged, ll, _attempt):
                 mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
                 attempt+=1
         attempt-=1
+        _try+=1
         mprint(CLUSTERS_INFO)
         sleep(0.75)
 
@@ -440,7 +441,7 @@ def neg_with_my_ch(_tagged, _ll, _attempt):
                 mprint("\033[1;31;1m in neg w/ cluster head exception happened {} \033[0m".format(e))
                 attempt+=1
         _try+=1
-        
+
 listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_1.start()
 

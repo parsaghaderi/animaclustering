@@ -96,20 +96,20 @@ def cluster_listen_handler(_tagged, _handle, _answer):
     _tagged.objective.value = cbor.dumps(TP_MAP)
     cluster_tagged_sem.release()
     _answer = _tagged.objective.value
-    try:
-        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
-        if _old_API:
-            err, temp, answer = _r
-            reason = answer
-        else:
-            err, temp, answer, reason = _r
-        if (not err) and (temp == None):
-            pass
-        else:
-            mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
-            pass
-    except Exception as err:
-        mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
+    # try:
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        pass
+    else:
+        mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+        pass
+    # except Exception as err:
+    #     mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
 def discover(_tagged, _attempts = 3):
     mprint("entering discovery for {}".format(_tagged.objective.name))
@@ -387,14 +387,14 @@ def neg_cluster(_tagged, ll, _attempt):
             CLUSTERS_INFO[ll.locator] = cbor.loads(answer.value)
             mprint("cluster neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√ 
             cluster_tagged_sem.release()
-            try:
-                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                if not _err:
-                    mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
-                else:
-                    mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
-            except Exception as e:
-                mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            # try:
+            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+            if not _err:
+                mprint("\033[1;32;1m neg with {} ended \033[0m".format(str(ll.locator)))
+            else:
+                mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+            # except Exception as e:
+            #     mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
         else:
                 mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
                 attempt+=1

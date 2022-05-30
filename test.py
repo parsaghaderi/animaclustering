@@ -1,4 +1,6 @@
+from ast import Break
 import atexit
+from concurrent.futures import thread
 from utility import *
 from utility import _old_API as _old_API
 
@@ -40,7 +42,7 @@ CLUSTERS_INFO = {}
 CLUSTER_INFO_KEYS = []
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
-
+CLUSTER_NODES = {}
 
 '''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
@@ -49,7 +51,6 @@ MAP_SEM = threading.Semaphore()
 
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
-
 
 node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 
@@ -70,6 +71,8 @@ def listen_handler(_tagged, _handle, _answer):
     for item in NEIGHBOR_INFO:#TODO just deleted
         if str(item.locator) == tmp_answer['ula']:
             NEIGHBOR_INFO[item] = tmp_answer
+            if node_info['cluster_set'].__contains__(tmp_answer['ula']):
+                mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     tagged_sem.acquire()
     _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer) - just deleted
     tagged_sem.release()
@@ -182,6 +185,7 @@ def neg(_tagged, ll, _attempt):
                 tagged.objective.value = cbor.dumps(tagged.objective.value)
                 tagged_sem.release()
                 NEIGHBOR_UPDATE[ll.locator] = True
+                
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
@@ -361,7 +365,10 @@ def generate_topology():
         cluster_tagged_sem.release()
         sleep(15)
         threading.Thread(target=run_cluster, args=[]).start()
-
+    else:
+        mprint("sleeping for 100s")
+        sleep(100)
+        threading.Thread(target=neg_with_my_ch, args=[tagged, TO_JOIN, 1])
 def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
@@ -374,6 +381,8 @@ def neg_cluster(_tagged, ll, _attempt):
     _try = 1
     attempt = _attempt
     while attempt!=0:
+        if _try == 5:
+            break
         mprint("start cluster negotiation with {} for {}th time - try {}".format(str(ll.locator), attempt, _try))
         if _old_API:
             cluster_tagged_sem.acquire()
@@ -405,6 +414,33 @@ def neg_cluster(_tagged, ll, _attempt):
         mprint(CLUSTERS_INFO)
         sleep(0.75)
 
+def neg_with_my_ch(_tagged, _ll, _attempt):
+    _try = 1
+    attempt = _attempt
+    while attempt!=0:
+        if _try == 3:
+            mprint("not working")
+            break
+        mprint("start negotiating with cluster head {} for {}th time - try {}".format(str(_ll.locator), attempt, _try))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, _ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, _ll, None)
+        if not err:
+            try:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m neg with cluster head {} ended \033[0m".format(str(_ll.locator)))
+                    attempt-=1
+                else:
+                    mprint("\033[1;31;1m in neg_end with cluster head error happened {} \033[0m".format(graspi.etext[_err]))
+                    attempt+=1
+            except Exception as e:
+                mprint("\033[1;31;1m in neg w/ cluster head exception happened {} \033[0m".format(e))
+                attempt+=1
+        _try+=1
+        
 listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_1.start()
 

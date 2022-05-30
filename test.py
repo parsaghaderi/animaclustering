@@ -93,7 +93,7 @@ def cluster_listen_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}_____{}".format(tmp_answer, (list(tmp_answer.keys())[0])))#√
     cluster_tagged_sem.acquire()
-    CLUSTERS_INFO[(list(tmp_answer.keys())[0])] = tmp_answer #changed
+    CLUSTERS_INFO[(list(tmp_answer.keys())[0])] = tmp_answer[(list(tmp_answer.keys())[0])] #changed
     _tagged.objective.value = cbor.dumps(TP_MAP)
     cluster_tagged_sem.release()
     _answer.value = _tagged.objective.value

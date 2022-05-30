@@ -1,3 +1,4 @@
+import atexit
 from utility import *
 from utility import _old_API as _old_API
 
@@ -398,6 +399,7 @@ def neg_cluster(_tagged, ll, _attempt):
         else:
                 mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
                 attempt+=1
+        attempt-=1
         mprint(CLUSTERS_INFO)
         sleep(0.75)
 

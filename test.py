@@ -58,7 +58,7 @@ obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa)
 tagged   = TAG_OBJ(obj, asa)
 tagged_sem = threading.Semaphore()
 
-cluster_obj1, err = OBJ_REG("cluster_head", {}, True, False, 10, asa)
+cluster_obj1, err = OBJ_REG("cluster_head", cbor.dumps(TP_MAP), True, False, 10, asa)
 cluster_tagged = TAG_OBJ(cluster_obj1, asa)
 cluster_tagged_sem = threading.Semaphore()
 
@@ -95,7 +95,7 @@ def cluster_listen_handler(_tagged, _handle, _answer):
     CLUSTERS_INFO[list(tmp_answer.keys())[0]] = tmp_answer #changed
     _tagged.objective.value = cbor.dumps(TP_MAP)
     cluster_tagged_sem.release()
-    _answer = _tagged.objective.value
+    _answer.value = _tagged.objective.value
     # try:
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:

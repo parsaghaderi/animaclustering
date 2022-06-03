@@ -34,6 +34,7 @@ def get_neighbors():
     l = f.readlines()
     l = [item.rstrip('\n') for item in l]
     return l[0], l[1:]
+MY_ULA, NEIGHBOR_ULA = get_neighbors()  #ACP job to give the list of neighbors! ACP not available hence hardcoded
 
 #########################
 #Registering ASA 
@@ -122,3 +123,7 @@ def find_next_heaviest(_heaviest, _heavier):
     else:
         index = heavier_lst.index(_heaviest)
         return heavier_lst[index+1]
+
+
+
+def check_neighbors_active

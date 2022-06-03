@@ -1,6 +1,3 @@
-from ast import Break
-import atexit
-from concurrent.futures import thread
 from utility import *
 from utility import _old_API as _old_API
 
@@ -26,7 +23,6 @@ from utility import _old_API as _old_API
 '''
 
 
-MY_ULA, NEIGHBOR_ULA = get_neighbors()  #ACP job to give the list of neighbors! ACP not available hence hardcoded
 NEIGHBOR_INFO = {}
 NEIGHBOR_LOCATOR_STR = {}
 NEIGHBOR_UPDATE = {} 

@@ -126,4 +126,3 @@ def find_next_heaviest(_heaviest, _heavier):
 
 
 
-def check_neighbors_active

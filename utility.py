@@ -138,4 +138,4 @@ def run_ping():
         mprint("*(*(*(*(*(*(*((*\n{}(*(*(*(*(*(*(*(*".format(result[1]))
         sleep(10)
 
-threading.Thread(target=ping_neighbor(), args=[]).start()
+threading.Thread(target=run_ping, args=[]).start()

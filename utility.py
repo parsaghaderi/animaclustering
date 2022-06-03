@@ -126,3 +126,16 @@ def find_next_heaviest(_heaviest, _heavier):
 
 
 
+def ping_neighbor():    
+    ping=multiping.MultiPing(NEIGHBOR_ULA)
+    ping.send()
+    result = ping.receive(2)
+    return result
+
+def run_ping():
+    while True:
+        result = ping_neighbor()
+        mprint("*(*(*(*(*(*(*((*\n{}(*(*(*(*(*(*(*(*".format(result[1]))
+        sleep(10)
+
+threading.Thread(target=ping_neighbor(), args=[]).start()

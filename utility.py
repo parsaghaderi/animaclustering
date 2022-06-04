@@ -132,10 +132,3 @@ def ping_neighbor():
     result = ping.receive(2)
     return result
 
-def run_ping():
-    while True:
-        result = ping_neighbor()
-        mprint("*(*(*(*(*(*(*((*\n{}(*(*(*(*(*(*(*(*".format(result[1]))
-        sleep(10)
-
-threading.Thread(target=run_ping, args=[]).start()

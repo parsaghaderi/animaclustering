@@ -111,6 +111,25 @@ def cluster_listen_handler(_tagged, _handle, _answer):
     # except Exception as err:
     #     mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
+def listen_neighbor_alive():
+    while True:
+        result = ping_neighbor()
+        down_neighbors = result[1]
+        if len(down_neighbors) != 0:
+            for item in down_neighbors:
+                tagged_sem.acquire()
+                node_info["neighbors"].remove(item)
+                tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
+                for neighbor in NEIGHBOR_INFO:
+                    if str(neighbor.locator) == item:
+                        NEIGHBOR_INFO.pop(neighbor)
+                generate_topology()
+            mprint("the new topology is \n {}".format(TP_MAP))
+        sleep(10)
+
+threading.Thread(target=listen_neighbor_alive, args=[]).start()
+
 def discover(_tagged, _attempts = 3):
     mprint("entering discovery for {}".format(_tagged.objective.name))
     global NEIGHBOR_INFO 
@@ -121,6 +140,12 @@ def discover(_tagged, _attempts = 3):
         attempt-=1
     if _tagged.objective.name == 'node':
         for item in ll:
+            if str(item.locator) not in NEIGHBOR_ULA:
+                NEIGHBOR_ULA.append(str(item.locator))
+                tagged_sem.acquire()
+                _tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
+
             NEIGHBOR_INFO[item] = 0
             NEIGHBOR_LOCATOR_STR[str(item.locator)] = item
         threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), _attempts]).start()

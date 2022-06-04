@@ -39,6 +39,8 @@ CLUSTER_INFO_KEYS = []
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
 CLUSTER_NODES = {}
+listen_sub = None
+
 
 '''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
@@ -58,6 +60,10 @@ tagged_sem = threading.Semaphore()
 
 cluster_obj1, err = OBJ_REG("cluster_head", cbor.dumps(TP_MAP), True, False, 10, asa)
 cluster_tagged = TAG_OBJ(cluster_obj1, asa)
+cluster_tagged_sem = threading.Semaphore()
+
+sub_cluster_obj, err = OBJ_REG("sub_cluster", cbor.dumps(TP_MAP), True, False, 10, asa)
+sub_cluster_tagged = TAG_OBJ(sub_cluster_obj, asa)
 cluster_tagged_sem = threading.Semaphore()
 
 
@@ -129,6 +135,24 @@ def listen_neighbor_alive():
         sleep(10)
 
 threading.Thread(target=listen_neighbor_alive, args=[]).start()
+
+
+
+def listen_sub_cluster_handler(_tagged, _handle, _answer):
+    tmp_answer = cbor.loads(_answer)
+    #TODO update the cluster local map - if any change, broadcast to others
+    _answer = cbor.dumps(TP_MAP)
+    _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+    if _old_API:
+        err, temp, answer = _r
+        reason = answer
+    else:
+        err, temp, answer, reason = _r
+    if (not err) and (temp == None):
+        pass
+    else:
+        mprint("\033[1;31;1m in cluster listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+        pass
 
 def discover(_tagged, _attempts = 3):
     mprint("entering discovery for {}".format(_tagged.objective.name))
@@ -253,6 +277,7 @@ def init():
         mprint(list(NEIGHBOR_INFO.values()))
         TO_JOIN = None
         CLUSTER_HEAD = True
+        listen_sub.start() #TODO how to stop
     else:
         mprint("I want to join {}".format(HEAVIEST.locator))
         TO_JOIN = HEAVIEST
@@ -389,7 +414,8 @@ def generate_topology():
     else:
         mprint("sleeping for 100s")
         sleep(100)
-        threading.Thread(target=neg_with_my_ch, args=[tagged, TO_JOIN, 1]).start()
+        threading.Thread(target=neg_with_my_ch, args=[cluster_tagged, TO_JOIN, 1]).start()
+
 def run_cluster():
     global listen_1, discovery_1
     mprint("running listen and discovery")
@@ -451,6 +477,8 @@ def neg_with_my_ch(_tagged, _ll, _attempt):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, _ll, None)
         if not err:
             try:
+                TP_MAP = cbor.loads(answer)
+                mprint("new map from CH \n {}".format(TP_MAP))
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
                     mprint("\033[1;32;1m neg with cluster head {} ended \033[0m".format(str(_ll.locator)))
@@ -471,3 +499,5 @@ discovery_1.start()
 
 init_1 = threading.Thread(target=init, args=[]) #initial init
 init_1.start()
+
+listen_sub = threading.Thread(target=listen, args=[sub_cluster_tagged, listen_sub_cluster_handler])

@@ -167,7 +167,7 @@ def init():
 
 
     
-    if find_next_heaviest() == None:
+    if find_next_heaviest(HEAVIEST, HEAVIER) == None:
         mprint("tmp_ch == None")
     else:
         while tmp_ch != None:

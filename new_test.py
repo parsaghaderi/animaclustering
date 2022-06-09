@@ -151,7 +151,7 @@ def neg(_tagged, ll, _attempt):
             attempt+=1
         attempt-=1
         sleep(3)
-        threading.Thread(target=init, args = []).start()
+    threading.Thread(target=init, args = []).start()
 
 def init():
     global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD

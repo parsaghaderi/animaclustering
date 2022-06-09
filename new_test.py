@@ -216,7 +216,7 @@ def on_update_rcv(_next):
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE, HEAVIEST, HEAVIER, TO_JOIN
     if CLUSTERING_DONE:
         #already sent the updates
-        PHASE = 0
+        PHASE = _next
         return
     if HEAVIEST != None:
         if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True:

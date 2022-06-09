@@ -118,8 +118,10 @@ def run_neg(_tagged, _locators, _attempts = 1):
     INITIAL_NEG = True
 
 
-def neg(_tagged, ll, _attempt):
-    global NEIGHBOR_INFO, MY_ULA, node_info
+def neg(_tagged, ll, _attempt, phase = 1):
+    if NEIGHBOR_INFO[ll]!=0 and phase == 1:
+        mprint("already exchanged node_info")
+        
 
     attempt = _attempt
     while attempt!=0:

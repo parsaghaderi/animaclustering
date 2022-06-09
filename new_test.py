@@ -108,9 +108,12 @@ def discovery_cluster_handler(_tagged, _locators):
     threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
 
 
-def run_neg(_tagged, _locators, _attempts = 1):
+def run_neg(_tagged, _locators, _attempts = 1, phase = 1):
     global INITIAL_NEG
     for item in _locators:
+        if phase == 1 and NEIGHBOR_INFO[item]!=0:
+            mprint("already negotiated with {}".format(str(item.locator)))
+            continue
         threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
     while list(NEIGHBOR_INFO.values()).__contains__(0):
         pass
@@ -119,11 +122,6 @@ def run_neg(_tagged, _locators, _attempts = 1):
 
 
 def neg(_tagged, ll, _attempt, phase = 1):
-    if NEIGHBOR_INFO[ll]!=0 and phase == 1:
-        mprint("already exchanged node_info")
-        return
-        
-
     attempt = _attempt
     while attempt!=0:
         mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _attempt-attempt+1))

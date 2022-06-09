@@ -166,8 +166,8 @@ def init():
     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 
 
-    
-    if find_next_heaviest(HEAVIEST, HEAVIER) == None:
+    tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
+    if  tmp_ch == None:
         mprint("tmp_ch == None")
     else:
         while tmp_ch != None:

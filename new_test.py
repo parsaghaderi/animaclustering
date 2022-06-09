@@ -12,7 +12,7 @@ LIGHTER to store lighter neighbors ()
 '''
 
 NEIGHBORS_STR = []
-NEIGHBORS_LOCATOR_TO_STR = {}
+NEIGHBOR_STR_TO_LOCATOR = {}
 NEIGHBOR_INFO = {} #TODO change
 
 HEAVIER = {}
@@ -41,7 +41,7 @@ listen_sub = None
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
 
-node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
+node_info = {'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBORS_STR, 
              'status': 1} 
 
@@ -68,7 +68,7 @@ def listen_handler(_tagged, _handle, _answer):
             if node_info['cluster_set'].__contains__(tmp_answer['ula']):
                 mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     tagged_sem.acquire()
-    _answer.value = _tagged.objective.value #TODO can be optimized by using the info in request (answer) - just deleted
+    _answer.value = _tagged.objective.value
     tagged_sem.release()
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
@@ -78,7 +78,7 @@ def listen_handler(_tagged, _handle, _answer):
         else:
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
-            pass
+            mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula))  
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
             pass
@@ -86,10 +86,11 @@ def listen_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
 
 
+
 def discovery_node_handler(_tagged, _locators):
     for item in _locators:
-        if item not in NEIGHBORS_LOCATOR_TO_STR:
-            NEIGHBORS_LOCATOR_TO_STR[item] = str(item.locator)
+        if str(item.locator) not in NEIGHBOR_STR_TO_LOCATOR:
+            NEIGHBOR_STR_TO_LOCATOR[str(item.locator) ] = item
             NEIGHBORS_STR.append(str(item.locator))
             NEIGHBOR_INFO[item] = 0
             tagged_sem.acquire()
@@ -105,6 +106,54 @@ def discovery_cluster_handler(_tagged, _locators):
             CLUSTER_INFO_KEYS.append(item)
             mprint("cluster head found at {}".format(str(item.locator)))
     threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
+
+
+def run_neg(_tagged, _locators, _attempts = 1):
+    global INITIAL_NEG
+    for item in _locators:
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    while list(NEIGHBOR_INFO.values()).__contains__(0):
+        pass
+    sleep(5)
+    INITIAL_NEG = True
+
+
+def neg(_tagged, ll, _attempt):
+    global NEIGHBOR_INFO, MY_ULA, node_info
+
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _attempt-attempt+1))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        if not err:
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
+            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+            
+            if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
+                tagged_sem.acquire()
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                if not node_info['cluster_set'].__contains__(str(ll.locator)):
+                    node_info['cluster_set'].append(str(ll.locator))
+                tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
+            try:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                else:
+                    mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+            except Exception as e:
+                mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+        else:
+            mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+            attempt+=1
+        attempt-=1
+        sleep(3)
 
 
 

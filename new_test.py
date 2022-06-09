@@ -79,13 +79,12 @@ def listen_handler(_tagged, _handle, _answer):
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula))  
+            mprint(NEIGHBOR_INFO)
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
             pass
     except Exception as err:
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
-
-
 
 def discovery_node_handler(_tagged, _locators):
     for item in _locators:
@@ -155,7 +154,6 @@ def neg(_tagged, ll, _attempt, phase = 1):
             attempt+=1
         attempt-=1
         sleep(3)
-
 
 
 listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name

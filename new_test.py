@@ -219,7 +219,6 @@ def on_update_rcv():
     if HEAVIEST != None:
         if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True:
             mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
-            mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
             tagged_sem.acquire()
             CLUSTERING_DONE = True
             node_info['cluster_head'] = str(HEAVIEST.locator)
@@ -229,13 +228,15 @@ def on_update_rcv():
             mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
             tagged_sem.release()
             mprint(NEIGHBOR_INFO)
+            CLUSTERING_DONE = True
             PHASE = 0
         elif NEIGHBOR_INFO[HEAVIEST]['cluster_head'] != True and NEIGHBOR_INFO[HEAVIEST]['status'] == 4:
             tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER) #TODO check
+            mprint("\033[1;35;1m finding next heaviest 1\033[0m")
+
             while tmp_ch!=None:
                 if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True and NEIGHBOR_INFO[tmp_ch]['status'] == 2:
-                    mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
-                    mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
+                    mprint("\033[1;35;1m Joining next heaviest{} 1\033[0m".format(HEAVIEST.locator))
                     tagged_sem.acquire()
                     CLUSTERING_DONE = True
                     node_info['cluster_head'] = str(tmp_ch.locator)
@@ -248,11 +249,11 @@ def on_update_rcv():
                     PHASE = 0
                     break
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and NEIGHBOR_INFO[tmp_ch]['status'] == 4:
-                    mprint("\033[1;35;1m trying next 1\033[0m")
+                    mprint("\033[1;35;1m next heaviest 1\033[0m")
                     tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and ( NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] == 3):
                     #wait for an update message
-                    mprint("\033[1;35;1m waiting for update 1\033[0m")
+                    mprint("\033[1;35;1m waiting for update from tmp_heaviest node1\033[0m")
                     PHASE = 0
                     break
 

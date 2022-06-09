@@ -155,7 +155,7 @@ def neg(_tagged, ll, _attempt):
         sleep(3)
     
 
-def init():
+def init(_next):
     global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
     
     while not INITIAL_NEG:
@@ -203,14 +203,14 @@ def init():
     #     tagged_sem.release()
     #     mprint(list(NEIGHBOR_INFO.values()))
     # sleep(10) #TODO check if can be reduced
-    PHASE = 2
+    PHASE = _next
 
     # INITIAL_NEG = False
     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     # while not INITIAL_NEG:
     #     pass
 
-def on_update_rcv():
+def on_update_rcv(_next):
     mprint("\033[1;35;1m *********************** 1\033[0m")
 
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE, HEAVIEST, HEAVIER, TO_JOIN
@@ -232,7 +232,7 @@ def on_update_rcv():
             tagged_sem.release()
             mprint(NEIGHBOR_INFO)
             CLUSTERING_DONE = True
-            PHASE = 0
+            PHASE = _next
         elif NEIGHBOR_INFO[HEAVIEST]['cluster_head'] != True and NEIGHBOR_INFO[HEAVIEST]['status'] == 4:
             mprint("\033[1;35;1m &&&&&&&&&&&&&&&&&&&&&& 1\033[0m")
             tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER) #TODO check
@@ -250,7 +250,7 @@ def on_update_rcv():
                     mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
                     tagged_sem.release()
                     mprint(NEIGHBOR_INFO)
-                    PHASE = 0
+                    PHASE = _next
                     break
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and NEIGHBOR_INFO[tmp_ch]['status'] == 4:
                     mprint("\033[1;35;1m next heaviest 1\033[0m")
@@ -258,7 +258,7 @@ def on_update_rcv():
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and ( NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] == 3):
                     #wait for an update message
                     mprint("\033[1;35;1m waiting for update from tmp_heaviest node1\033[0m")
-                    PHASE = 0
+                    PHASE = _next
                     break
 
             if tmp_ch == None:
@@ -276,7 +276,7 @@ def on_update_rcv():
                 mprint(NEIGHBOR_INFO)
                 TO_JOIN = None
                 CLUSTER_HEAD = True
-                PHASE = 0
+                PHASE = _next
             
             
 
@@ -377,7 +377,7 @@ def control():
     while True:
         if PHASE == 1:
             mprint("starting phase 0 - init")
-            init_thread = threading.Thread(target=init, args = [])
+            init_thread = threading.Thread(target=init, args = [2])
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
@@ -385,8 +385,15 @@ def control():
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 3:
-            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[])
+            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[4])
             work_on_update_thread.start()
             work_on_update_thread.join()
-
+        elif PHASE == 4:
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 1])
+            run_neg_thread.start()
+            run_neg_thread.join()
+        elif PHASE == 5:
+            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[0])
+            work_on_update_thread.start()
+            work_on_update_thread.join()
 threading.Thread(target=control, args = []).start()

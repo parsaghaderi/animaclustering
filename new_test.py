@@ -151,7 +151,7 @@ def neg(_tagged, ll, _attempt):
             attempt+=1
         attempt-=1
         sleep(3)
-    threading.Thread(target=init, args = []).start()
+    
 
 def init():
     global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD
@@ -213,3 +213,6 @@ listen_1.start()
 
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()
+
+init_1 = threading.Thread(target=init, args = [])
+init_1.start()

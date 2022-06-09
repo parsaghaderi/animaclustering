@@ -164,14 +164,14 @@ def init():
     mprint("entering init phase - deciding role")
     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 
-
-    tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
-    if  tmp_ch == None:
-        mprint("tmp_ch == None")
-    else:
-        while tmp_ch != None:
-            mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
-            tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
+    # if HEAVIEST != None:
+    # tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
+    # if  tmp_ch == None:
+    #     mprint("tmp_ch == None")
+    # else:
+    #     while tmp_ch != None:
+    #         mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
+    #         tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
     
     if HEAVIEST == None:
         mprint("I'm clusterhead")

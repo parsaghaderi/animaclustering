@@ -67,6 +67,7 @@ cluster_tagged_sem = threading.Semaphore()
 
 
 def listen_handler(_tagged, _handle, _answer):
+    mprint("*_*_*_*_*_*_*_*_*_*_*\n{}\n*_*_*_*_*_*_*_*_*_*".format(type(_handle)))
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     for item in NEIGHBOR_INFO:#TODO just deleted
@@ -141,7 +142,7 @@ def listen_sub_cluster_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer)
     #TODO update the cluster local map - if any change, broadcast to others
     _answer = cbor.dumps(TP_MAP)
-    mprint("*_*_*_*_*_*_*_*_*_*_*\n{}\n*_*_*_*_*_*_*_*_*_*".format(type(_handle)))
+    
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
         err, temp, answer = _r

@@ -1,3 +1,4 @@
+from ast import Pass
 from utility import *
 from utility import _old_API as _old_API
 
@@ -30,6 +31,8 @@ CLUSTER_NODES = {}
 
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
+
+PHASE = 0
 
 listen_sub = None
 
@@ -95,7 +98,7 @@ def discovery_node_handler(_tagged, _locators):
             _tagged.objective.value = cbor.dumps(node_info)
             tagged_sem.release()
     mprint(NEIGHBORS_STR)
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 
 
 def discovery_cluster_handler(_tagged, _locators):
@@ -107,15 +110,13 @@ def discovery_cluster_handler(_tagged, _locators):
     threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
 
 
-def run_neg(_tagged, _locators, _attempts = 1):
-    global INITIAL_NEG
+def run_neg(_tagged, _locators, _next, _attempts = 1):
+    global INITIAL_NEG, PHASE
     for item in _locators:
         threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
-    while list(NEIGHBOR_INFO.values()).__contains__(0):
-        pass
-    sleep(5)
+    sleep(10) #TODO check if can be reduced
     INITIAL_NEG = True
-
+    PHASE = _next
 
 def neg(_tagged, ll, _attempt):
     attempt = _attempt
@@ -154,7 +155,7 @@ def neg(_tagged, ll, _attempt):
     
 
 def init():
-    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD
+    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE
     
     while not INITIAL_NEG:
         pass
@@ -201,6 +202,8 @@ def init():
         mprint(cbor.loads(tagged.objective.value))
         tagged_sem.release()
         mprint(list(NEIGHBOR_INFO.values()))
+    sleep(10) #TODO check if can be reduced
+    PHASE = 2
     # INITIAL_NEG = False
     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     # while not INITIAL_NEG:
@@ -217,3 +220,16 @@ discovery_1.start()
 # init_1 = threading.Thread(target=init, args = [])
 # init_1.start()
 
+def control():
+    while True:
+        if PHASE == 1:
+            mprint("starting phase 0 - init")
+            init_thread = threading.Thread(target=init, args = [])
+            init_thread.start()
+            init_thread.join()
+        elif PHASE == 2:
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),0, 1])
+            run_neg_thread.start()
+            run_neg_thread.join()
+
+threading.Thread(target=control, args = []).start()

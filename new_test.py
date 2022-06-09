@@ -211,6 +211,24 @@ def init():
     # while not INITIAL_NEG:
     #     pass
 
+def on_update_rcv():
+    global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE
+    if HEAVIEST != None:
+        if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True:
+            mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
+            mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
+            tagged_sem.acquire()
+            CLUSTERING_DONE = True
+            node_info['cluster_head'] = str(HEAVIEST.locator)
+            node_info['cluster_set'] = []
+            node_info['status'] = 4
+            tagged.objective.value = cbor.dumps(node_info)
+            mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+            tagged_sem.release()
+            mprint(NEIGHBOR_INFO)
+    PHASE = 0
+
+
 # def on_update_rcv():
     # global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE
     # if TO_JOIN == None:
@@ -311,12 +329,12 @@ def control():
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),0, 1])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
             run_neg_thread.start()
             run_neg_thread.join()
-        # elif PHASE == 3:
-        #     work_on_update_thread = threading.Thread(target = on_update_rcv, args=...)
-        #     work_on_update_thread.start()
-        #     work_on_update_thread.join()
+        elif PHASE == 3:
+            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[])
+            work_on_update_thread.start()
+            work_on_update_thread.join()
 
 threading.Thread(target=control, args = []).start()

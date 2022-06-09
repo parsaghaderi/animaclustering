@@ -156,7 +156,7 @@ def neg(_tagged, ll, _attempt):
     
 
 def init():
-    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE
+    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
     
     while not INITIAL_NEG:
         pass
@@ -176,18 +176,17 @@ def init():
     if HEAVIEST == None:
         mprint("I'm clusterhead")
         tagged_sem.acquire()
-        tagged.objective.value = cbor.loads(tagged.objective.value)
-        tagged.objective.value['cluster_head'] = True
-        tagged.objective.value['status'] = 2
-        if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
-            tagged.objective.value['cluster_set'].append(MY_ULA)
-        node_info = tagged.objective.value
-        tagged.objective.value = cbor.dumps(tagged.objective.value)
+        node_info['cluster_head'] = True
+        node_info['status'] = 2
+        if not node_info['cluster_set'].__contains__(MY_ULA):
+            node_info['cluster_set'].append(MY_ULA)
+        tagged.objective.value = cbor.dumps(node_info)
         tagged_sem.release()
         mprint(node_info['weight'])
-        mprint(list(NEIGHBOR_INFO.values()))
+        mprint(NEIGHBOR_INFO)
         TO_JOIN = None
         CLUSTER_HEAD = True
+        CLUSTERING_DONE = True
         # listen_sub.start() #TODO how to stop
     # else:
     #     mprint("I want to join {}".format(HEAVIEST.locator))
@@ -212,7 +211,11 @@ def init():
     #     pass
 
 def on_update_rcv():
-    global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE
+    global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE, HEAVIEST, HEAVIER, TO_JOIN
+    if CLUSTERING_DONE:
+        #already sent the updates
+        PHASE = 0
+        return
     if HEAVIEST != None:
         if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True:
             mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
@@ -226,7 +229,47 @@ def on_update_rcv():
             mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
             tagged_sem.release()
             mprint(NEIGHBOR_INFO)
-    PHASE = 0
+            PHASE = 0
+        elif NEIGHBOR_INFO[HEAVIEST]['cluster_head'] != True and NEIGHBOR_INFO[HEAVIEST]['status'] == 4:
+            tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER) #TODO check
+            while tmp_ch!=None:
+                if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True and NEIGHBOR_INFO[tmp_ch]['status'] == 2:
+                    mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
+                    mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
+                    tagged_sem.acquire()
+                    CLUSTERING_DONE = True
+                    node_info['cluster_head'] = str(tmp_ch.locator)
+                    node_info['cluster_set'] = []
+                    node_info['status'] = 4
+                    tagged.objective.value = cbor.dumps(node_info)
+                    mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+                    tagged_sem.release()
+                    mprint(NEIGHBOR_INFO)
+                    PHASE = 0
+                    break
+                elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and NEIGHBOR_INFO[tmp_ch]['status'] == 4:
+                    tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
+                elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and ( NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] == 3):
+                    #wait for an update message
+                    PHASE = 0
+                    break
+
+            if tmp_ch == None:
+                mprint("I'm clusterhead")
+                tagged_sem.acquire()
+                node_info['cluster_head'] = True
+                node_info['status'] = 2
+                if not node_info['cluster_set'].__contains__(MY_ULA):
+                    node_info['cluster_set'].append(MY_ULA)
+                tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
+                mprint(node_info['weight'])
+                mprint(NEIGHBOR_INFO)
+                TO_JOIN = None
+                CLUSTER_HEAD = True
+                PHASE = 0
+            
+            
 
 
 # def on_update_rcv():

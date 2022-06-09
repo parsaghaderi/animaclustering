@@ -201,10 +201,10 @@ def init():
         mprint(cbor.loads(tagged.objective.value))
         tagged_sem.release()
         mprint(list(NEIGHBOR_INFO.values()))
-    INITIAL_NEG = False
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
-    while not INITIAL_NEG:
-        pass
+    # INITIAL_NEG = False
+    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
+    # while not INITIAL_NEG:
+    #     pass
 
 
 
@@ -214,5 +214,6 @@ listen_1.start()
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()
 
-init_1 = threading.Thread(target=init, args = [])
-init_1.start()
+# init_1 = threading.Thread(target=init, args = [])
+# init_1.start()
+

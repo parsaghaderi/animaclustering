@@ -65,7 +65,7 @@ def listen_handler(_tagged, _handle, _answer):
     for item in NEIGHBOR_INFO:#TODO just deleted
         if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
             NEIGHBOR_INFO[item] = tmp_answer
-            if node_info['cluster_set'].__contains__(tmp_answer['ula']):
+            if node_info['cluster_set'].__contains__(initiator_ula):
                 mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     tagged_sem.acquire()
     _answer.value = _tagged.objective.value

@@ -2042,6 +2042,7 @@ def listen_negotiate(asa_handle, obj):
     #build the session instance and handle
     s_id = rq[2].id_value
     s_source = rq[1]
+    print("*_*_*_*_*_*_*_*_*_*_\n{}\n*_*_*_*_*_*_*_*_*_*_".format(s_source))
     s_handle = _session_handle(s_id,s_source.packed)
     #cache remote session along with socket
     news = _session_instance(s_id,True,s_source.packed)

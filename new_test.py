@@ -157,7 +157,7 @@ def neg(_tagged, ll, _attempt, phase = 1):
         threading.Thread(target=init, args = []).start()
 
 def init():
-    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG
+    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD
     
     while not INITIAL_NEG:
         pass
@@ -189,7 +189,7 @@ def init():
         mprint(list(NEIGHBOR_INFO.values()))
         TO_JOIN = None
         CLUSTER_HEAD = True
-        listen_sub.start() #TODO how to stop
+        # listen_sub.start() #TODO how to stop
     else:
         mprint("I want to join {}".format(HEAVIEST.locator))
         TO_JOIN = HEAVIEST

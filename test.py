@@ -22,7 +22,6 @@ from utility import _old_API as _old_API
 #MAP_SEM = threading.Semaphore() - topology semaphore
 '''
 
-
 NEIGHBOR_INFO = {}
 NEIGHBOR_LOCATOR_STR = {}
 NEIGHBOR_UPDATE = {} 
@@ -142,6 +141,7 @@ def listen_sub_cluster_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer)
     #TODO update the cluster local map - if any change, broadcast to others
     _answer = cbor.dumps(TP_MAP)
+    mprint("*_*_*_*_*_*_*_*_*_*_*\n{}\n*_*_*_*_*_*_*_*_*_*".format(type(_handle)))
     _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
     if _old_API:
         err, temp, answer = _r

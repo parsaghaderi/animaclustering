@@ -248,9 +248,11 @@ def on_update_rcv():
                     PHASE = 0
                     break
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and NEIGHBOR_INFO[tmp_ch]['status'] == 4:
+                    mprint("\033[1;35;1m trying next 1\033[0m")
                     tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and ( NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] == 3):
                     #wait for an update message
+                    mprint("\033[1;35;1m waiting for update 1\033[0m")
                     PHASE = 0
                     break
 

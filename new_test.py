@@ -154,10 +154,10 @@ def neg(_tagged, ll, _attempt, phase = 1):
             attempt+=1
         attempt-=1
         sleep(3)
-
+        threading.Thread(target=init, args = []).start()
 
 def init():
-    global HEAVIER, HEAVIEST, LIGHTER
+    global HEAVIER, HEAVIEST, LIGHTER, node_info
     
     while not INITIAL_NEG:
         pass

@@ -1,6 +1,3 @@
-from clusters import INITIAL_NEG, TO_JOIN
-from test import TP_MAP
-from thread_safe_cluster import MAP_SEM
 from utility import *
 from utility import _old_API as _old_API
 

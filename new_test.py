@@ -79,7 +79,6 @@ def listen_handler(_tagged, _handle, _answer):
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula))  
-            mprint(NEIGHBOR_INFO)
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
             pass
@@ -97,6 +96,7 @@ def discovery_node_handler(_tagged, _locators):
             tagged_sem.release()
     mprint(NEIGHBORS_STR)
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
+
 
 def discovery_cluster_handler(_tagged, _locators):
     for item in _locators:
@@ -154,6 +154,61 @@ def neg(_tagged, ll, _attempt, phase = 1):
             attempt+=1
         attempt-=1
         sleep(3)
+
+
+def init():
+    global HEAVIER, HEAVIEST, LIGHTER
+    
+    while not INITIAL_NEG:
+        pass
+    
+    mprint("entering init phase - deciding role")
+    HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
+
+
+    
+    if find_next_heaviest() == None:
+        mprint("tmp_ch == None")
+    else:
+        while tmp_ch != None:
+            mprint("new tmp_locator is {}".format(str(tmp_ch.locator)))
+            tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
+    
+    if HEAVIEST == None:
+        mprint("I'm clusterhead")
+        tagged_sem.acquire()
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = True
+        tagged.objective.value['status'] = 2
+        if not tagged.objective.value['cluster_set'].__contains__(MY_ULA):
+            tagged.objective.value['cluster_set'].append(MY_ULA)
+        node_info = tagged.objective.value
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
+        tagged_sem.release()
+        mprint(node_info['weight'])
+        mprint(list(NEIGHBOR_INFO.values()))
+        TO_JOIN = None
+        CLUSTER_HEAD = True
+        listen_sub.start() #TODO how to stop
+    else:
+        mprint("I want to join {}".format(HEAVIEST.locator))
+        TO_JOIN = HEAVIEST
+        tagged_sem.acquire()
+        tagged.objective.value = cbor.loads(tagged.objective.value)
+        tagged.objective.value['cluster_head'] = False #to let lighter nodes know I'm not ch
+        tagged.objective.value['status'] = 3
+        tagged.objective.value['cluster_set']  = []
+        tagged.objective.value = cbor.dumps(tagged.objective.value)
+        tagged_sem.release()
+        tagged_sem.acquire()
+        mprint(cbor.loads(tagged.objective.value))
+        tagged_sem.release()
+        mprint(list(NEIGHBOR_INFO.values()))
+    INITIAL_NEG = False
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
+    while not INITIAL_NEG:
+        pass
+
 
 
 listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name

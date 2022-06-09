@@ -1,4 +1,5 @@
 from ast import Pass
+from os import stat
 from utility import *
 from utility import _old_API as _old_API
 
@@ -64,7 +65,7 @@ cluster_tagged_sem = threading.Semaphore()
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
+    mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))#√
     for item in NEIGHBOR_INFO:#TODO just deleted
         if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
             NEIGHBOR_INFO[item] = tmp_answer
@@ -83,7 +84,7 @@ def listen_handler(_tagged, _handle, _answer):
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula))  
         else:
-            mprint("\033[1;31;1m in listen handler - neg with peer interrupted with error code {} \033[0m".format(graspi.etext[err]))
+            mprint("\033[1;31;1m in listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]))
             pass
     except Exception as err:
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
@@ -188,28 +189,110 @@ def init():
         TO_JOIN = None
         CLUSTER_HEAD = True
         # listen_sub.start() #TODO how to stop
-    else:
-        mprint("I want to join {}".format(HEAVIEST.locator))
-        TO_JOIN = HEAVIEST
-        tagged_sem.acquire()
-        tagged.objective.value = cbor.loads(tagged.objective.value)
-        tagged.objective.value['cluster_head'] = False #to let lighter nodes know I'm not ch
-        tagged.objective.value['status'] = 3
-        tagged.objective.value['cluster_set']  = []
-        tagged.objective.value = cbor.dumps(tagged.objective.value)
-        tagged_sem.release()
-        tagged_sem.acquire()
-        mprint(cbor.loads(tagged.objective.value))
-        tagged_sem.release()
-        mprint(list(NEIGHBOR_INFO.values()))
-    sleep(10) #TODO check if can be reduced
+    # else:
+    #     mprint("I want to join {}".format(HEAVIEST.locator))
+    #     TO_JOIN = HEAVIEST
+    #     tagged_sem.acquire()
+    #     tagged.objective.value = cbor.loads(tagged.objective.value)
+    #     tagged.objective.value['cluster_head'] = False #to let lighter nodes know I'm not ch
+    #     tagged.objective.value['status'] = 3
+    #     tagged.objective.value['cluster_set']  = []
+    #     tagged.objective.value = cbor.dumps(tagged.objective.value)
+    #     tagged_sem.release()
+    #     tagged_sem.acquire()
+    #     mprint(cbor.loads(tagged.objective.value))
+    #     tagged_sem.release()
+    #     mprint(list(NEIGHBOR_INFO.values()))
+    # sleep(10) #TODO check if can be reduced
     PHASE = 2
+
     # INITIAL_NEG = False
     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
     # while not INITIAL_NEG:
     #     pass
 
+# def on_update_rcv():
+    # global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE
+    # if TO_JOIN == None:
+    #     mprint("I'm clusterhead")
+    #     tagged_sem.acquire()
+    #     CLUSTERING_DONE = True 
+    #     CLUSTER_HEAD = True   
+    #     mprint("\033[1;35;1m I'm in update rcv - I'm cluster head 1\033[0m")
+    #     node_info['cluster_head'] = True
+    #     if not node_info['cluster_set'].__contains__(MY_ULA):
+    #         node_info['cluster_set'].append(MY_ULA)
+    #     node_info['status'] = 2
+    #     # node_info = tagged.objective.value
+    #     tagged.objective.value = cbor.dumps(node_info)
+    #     mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+    #     tagged_sem.release()
+    #     mprint(NEIGHBOR_INFO)
+    #     PHASE = 2
+    # else:
+    #     if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2: #TODO check if it works with only one of the conditions
+    #         mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
+    #         mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
+    #         tagged_sem.acquire()
+    #         CLUSTERING_DONE = True
+    #         node_info['cluster_head'] = str(TO_JOIN.locator)
+    #         node_info['cluster_set'] = []
+    #         node_info['status'] = 4
+    #         tagged.objective.value = cbor.dumps(node_info)
+    #         mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+    #         tagged_sem.release()
+    #         mprint(NEIGHBOR_INFO)
+    #         PHASE = 2
+    #     else:
+    #         mprint("\033[1;35;1m HEAVIER  = {} 1\033[0m".format(HEAVIER))
+    #         tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
+    #         while tmp_ch != None:
+    #             if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
+    #                 mprint("Joining {}".format(str(tmp_ch.locator)))
+    #                 mprint("\033[1;35;1m I'm in on update rcv - joining 2\033[0m")
+    #                 tagged_sem.acquire()
+    #                 node_info["cluster_head"] = str(tmp_ch.locator)
+    #                 node_info["cluster_set"] = []
+    #                 node_info['status'] = 4
+    #                 tagged.objective.value = cbor.dumps(node_info)
+    #                 mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+    #                 tagged_sem.release()
+    #                 mprint(NEIGHBOR_INFO)
+    #                 CLUSTERING_DONE = True
+    #                 PHASE = 2
+    #                 break
+    #             elif NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] != 3:
+    #                 mprint("can't decide now!")
+    #                 PHASE = 3
+    #                 break
+                    
+                
+    #             #     mprint("\033[1;31;1m fucked up situation {} \033[0m")
+    #             #     tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
+    #             #     mprint("trying next heaviest node")
+    #             else:
+    #                 tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
+    #                 mprint("trying next heaviest node")
+    #         if tmp_ch == None:    
+    #             mprint("I'm clusterhead")
+    #             tagged_sem.acquire()
+    #             CLUSTERING_DONE = True 
+    #             CLUSTER_HEAD = True   
+    #             mprint("\033[1;35;1m I'm in update rcv - I'm cluster head 1\033[0m")
+    #             node_info['cluster_head'] = True
+    #             if not node_info['cluster_set'].__contains__(MY_ULA):
+    #                 node_info['cluster_set'].append(MY_ULA)
+    #             node_info['status'] = 2
+    #             # node_info = tagged.objective.value
+    #             tagged.objective.value = cbor.dumps(node_info)
+    #             mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+    #             tagged_sem.release()
+    #             mprint(NEIGHBOR_INFO)
+    #             PHASE = 2
 
+
+# def update_3_step():
+#     pass
 
 listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_1.start()
@@ -228,8 +311,12 @@ def control():
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),0, 1])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),2, 1])
             run_neg_thread.start()
             run_neg_thread.join()
+        # elif PHASE == 3:
+        #     work_on_update_thread = threading.Thread(target = on_update_rcv, args=...)
+        #     work_on_update_thread.start()
+        #     work_on_update_thread.join()
 
 threading.Thread(target=control, args = []).start()

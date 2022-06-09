@@ -67,7 +67,7 @@ cluster_tagged_sem = threading.Semaphore()
 
 
 def listen_handler(_tagged, _handle, _answer):
-    mprint("*_*_*_*_*_*_*_*_*_*_*\n{}\n*_*_*_*_*_*_*_*_*_*".format(str(_handle.id_source)))
+    mprint("*_*_*_*_*_*_*_*_*_*_*\n{}\n*_*_*_*_*_*_*_*_*_*".format(type(_handle.id_source)))
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer offered {}".format(tmp_answer))#√
     for item in NEIGHBOR_INFO:#TODO just deleted

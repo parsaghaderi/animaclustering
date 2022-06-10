@@ -387,7 +387,7 @@ def generate_topology():
         cluster_tagged_sem.release()
         sleep(15)
     else:
-        
+       pass 
 
 
 

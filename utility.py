@@ -138,6 +138,6 @@ def discovery(_tagged, _discovery_handler, _attempts=3):
     while attempt != 0:
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         for item in ll:
-            mprint(str(item.locator))
+            mprint(type(item))
         attempt-=1
     _discovery_handler(_tagged, ll)

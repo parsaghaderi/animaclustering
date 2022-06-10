@@ -83,14 +83,14 @@ def check_alive(_neighbors):
     return _available, _not_available
 
 
-def listen(_tagged, _handler):
+def listen(_tagged, _listen_handler):
     mprint("start listening for objective {}".format(_tagged.objective.name))
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
                                                       _tagged.objective)       
         if not err:
             mprint("\033[1;32;1m incoming request \033[0m")
-            threading.Thread(target=_handler, args=[_tagged,handle,answer]).start()
+            threading.Thread(target=_listen_handler, args=[_tagged,handle,answer]).start()
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
 
@@ -125,8 +125,6 @@ def find_next_heaviest(_heaviest, _heavier):
     else:
         index = heavier_lst.index(_heaviest)
         return heavier_lst[index+1]
-
-
 
 def ping_neighbor():    
     ping=multiping.MultiPing(NEIGHBOR_ULA)

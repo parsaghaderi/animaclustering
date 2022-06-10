@@ -26,9 +26,10 @@ INITIAL_NEG = False
 CLUSTERING_DONE = False
 SYNCH = False
 TO_JOIN = None
-CLUSTER_INFO = {}
-CLUSTER_INFO_KEYS = []
+
+CLUSTER_STR_TO_ULA = []
 CLUSTER_NODES = {}
+CLUSTER_INFO  = {}
 
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
@@ -108,9 +109,9 @@ def discovery_cluster_handler(_tagged, _locators):
     for item in _locators:
         if str(item.locator) != MY_ULA:
             CLUSTER_INFO[str(item.locator)] = 0
-            CLUSTER_INFO_KEYS.append(item)
+            CLUSTER_STR_TO_ULA[str(item.locator)] = item
             mprint("cluster head found at {}".format(str(item.locator)))
-    threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
+    # threading.Thread(target=run_clustering_neg, args=[_tagged, CLUSTER_INFO_KEYS, 1]).start()
 
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
@@ -189,6 +190,7 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
+
         # listen_sub.start() #TODO how to stop
     # else:
     #     mprint("I want to join {}".format(HEAVIEST.locator))
@@ -206,6 +208,7 @@ def init(_next):
     #     mprint(list(NEIGHBOR_INFO.values()))
     # sleep(10) #TODO check if can be reduced
     PHASE = _next
+    cluster_listen_1.start()
 
 
 def on_update_rcv(_next):
@@ -275,7 +278,7 @@ def on_update_rcv(_next):
                 TO_JOIN = None
                 CLUSTER_HEAD = True
                 PHASE = _next
-            
+                cluster_listen_1.start()
             
 
 
@@ -297,18 +300,23 @@ def generate_topology():
         cluster_tagged_sem.release()
         mprint(TP_MAP)
         sleep(15)
+        cluster_discovery_1.start()
     else:
        pass 
 
+def cluster_listener_handler(_tagged, _answer, _handle):
+    initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    tmp_answer = cbor.loads(_answer.value)
+    mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
 
-
-
-listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
-listen_1.start()
+listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
+listen_node_1.start()
 
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()
 
+cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster_listener_handler])
+cluster_discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_cluster_handler, 2])
 
 def control():
     while True:
@@ -337,7 +345,7 @@ def control():
             if CLUSTER_HEAD == True:
                 mprint("\033[1;35;1m I'm cluster head \033[0m")
                 threading.Thread(target=generate_topology, args=[]).start()
-
+                threading.Thread(target=discovery, args=[cluster_tagged, ])
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:

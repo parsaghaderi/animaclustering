@@ -111,7 +111,7 @@ def discovery_cluster_handler(_tagged, _locators):
             CLUSTER_UPDATE[str(item.locator)] = False
             CLUSTER_STR_TO_ULA[str(item.locator)] = item
             mprint("cluster head found at {}".format(str(item.locator)))
-    threading.Thread(target=run_cluster_neg, args=[_tagged, list(CLUSTER_INFO.keys()),0, 1]).start()
+    threading.Thread(target=run_cluster_neg, args=[_tagged, list(CLUSTER_INFO.values()),0, 1]).start()
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE

@@ -426,5 +426,5 @@ def control():
             work_on_update_thread.join()
             mprint("\033[1;35;1m DONE 1\033[0m")
         elif PHASE == 6:
-            
+            pass
 threading.Thread(target=control, args = []).start()

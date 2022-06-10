@@ -428,11 +428,11 @@ def control():
             work_on_update_thread = threading.Thread(target = on_update_rcv, args=[6])
             work_on_update_thread.start()
             work_on_update_thread.join()
-            mprint("\033[1;35;1m DONE 1\033[0m")
+            mprint("\033[1;35;1m DONE \033[0m")
             if CLUSTER_HEAD == True:
-                mprint("\033[1;35;1m I'm cluster head 1\033[0m")
+                mprint("\033[1;35;1m I'm cluster head \033[0m")
             else:
-                mprint("\033[1;35;1m I joined {} 1\033[0m".format(node_info['cluster_head']))
+                mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:
             pass
 threading.Thread(target=control, args = []).start()

@@ -298,6 +298,7 @@ def generate_topology():
         cluster_tagged_sem.acquire()
         cluster_tagged.objective.value = cbor.dumps(TP_MAP)
         cluster_tagged_sem.release()
+        mprint(TP_MAP)
         sleep(15)
     else:
        pass 

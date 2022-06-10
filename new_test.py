@@ -66,11 +66,14 @@ def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))#√
-    for item in NEIGHBOR_INFO:#TODO just deleted
-        if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
-            NEIGHBOR_INFO[item] = tmp_answer
-            if node_info['cluster_set'].__contains__(initiator_ula):
-                mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
+    # for item in NEIGHBOR_INFO:#TODO just deleted
+    #     if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
+    #         NEIGHBOR_INFO[item] = tmp_answer
+    #         if node_info['cluster_set'].__contains__(initiator_ula):
+    #             mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
+    NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer
+    if node_info['cluster_set'].__contains__(initiator_ula):
+        mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     tagged_sem.acquire()
     if tmp_answer['cluster_head'] == str(MY_ULA):
         node_info['cluster_set'].append(initiator_ula)

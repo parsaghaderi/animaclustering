@@ -177,7 +177,6 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
-        sleep(5)
         cluster_listen_1.start()
     PHASE = _next      
 
@@ -248,7 +247,6 @@ def on_update_rcv(_next):
                 TO_JOIN = None
                 CLUSTER_HEAD = True
                 PHASE = _next
-                sleep(5)
                 cluster_listen_1.start()
 
 def generate_topology():
@@ -372,6 +370,7 @@ def control():
             if CLUSTER_HEAD == True:
                 mprint("\033[1;35;1m I'm cluster head \033[0m")
                 threading.Thread(target=generate_topology, args=[]).start()
+                sleep(15)
                 cluster_discovery_1.start()
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))

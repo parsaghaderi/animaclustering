@@ -338,7 +338,7 @@ def neg_cluster(_tagged, ll, _attempt):
         sleep(3)
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
-listen_node_1.start()
+# listen_node_1.start()
 
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()

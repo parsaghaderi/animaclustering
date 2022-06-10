@@ -181,7 +181,7 @@ def init(_next):
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
     PHASE = _next
-    cluster_listen_1.start()
+    # cluster_listen_1.start()
 
 def on_update_rcv(_next):
     mprint("\033[1;35;1m *********************** 1\033[0m")
@@ -250,7 +250,7 @@ def on_update_rcv(_next):
                 TO_JOIN = None
                 CLUSTER_HEAD = True
                 PHASE = _next
-                cluster_listen_1.start()
+                # cluster_listen_1.start()
 
 def generate_topology():
     global TP_MAP
@@ -268,7 +268,7 @@ def generate_topology():
         cluster_tagged.objective.value = cbor.dumps(TP_MAP)
         cluster_tagged_sem.release()
         sleep(15)
-        cluster_discovery_1.start()
+        #cluster_discovery_1.start()
     else:
        pass 
 
@@ -298,11 +298,12 @@ def cluster_listener_handler(_tagged, _answer, _handle):
         mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(err))
 
 def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
+    global PHASE
     for item in _locators:
         threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
     sleep(15)
     mprint("topology after 1 round of neg \n{}".format(TP_MAP))
-    PHASE = 0
+    PHASE = _next
 
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
@@ -371,8 +372,8 @@ def control():
             mprint("\033[1;35;1m DONE \033[0m")
             if CLUSTER_HEAD == True:
                 mprint("\033[1;35;1m I'm cluster head \033[0m")
-                threading.Thread(target=generate_topology, args=[]).start()
-                threading.Thread(target=discovery, args=[cluster_tagged, ])
+                cluster_listen_1.start()
+                cluster_discovery_1.start()
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:

@@ -66,12 +66,15 @@ def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))#√
-    for item in NEIGHBOR_INFO:#TODO just deleted
-        if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
-            NEIGHBOR_INFO[item] = tmp_answer
-            if node_info['cluster_set'].__contains__(initiator_ula):
-                mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
+    # for item in NEIGHBOR_INFO:#TODO just deleted
+    #     if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
+    #         NEIGHBOR_INFO[item] = tmp_answer
+    #         if node_info['cluster_set'].__contains__(initiator_ula):
+    #             mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     tagged_sem.acquire()
+    if tmp_answer['cluster_head'] == str(MY_ULA):
+        node_info['cluster_set'].append(initiator_ula)
+        _tagged.objective.value = cbor.dumps(node_info)
     _answer.value = _tagged.objective.value
     tagged_sem.release()
     try:
@@ -364,6 +367,31 @@ def on_update_rcv(_next):
 # def update_3_step():
 #     pass
 
+def generate_topology():
+    global TP_MAP
+    tmp_map = {}
+    while not SYNCH:
+        pass
+    tmp_map = {}
+    tmp_tagged = cbor.loads(tagged.objective.value)
+    if len(tmp_tagged['cluster_set']) != 0:
+        for item in tmp_tagged['cluster_set']:
+            for locators in NEIGHBOR_INFO:
+                if item == str(locators.locator) and item != MY_ULA:
+                    tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
+        tmp_map.update({node_info['ula']:node_info['neighbors']})
+        mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
+        TP_MAP = {MY_ULA:tmp_map}
+        cluster_tagged_sem.acquire()
+        cluster_tagged.objective.value = cbor.dumps(TP_MAP)
+        cluster_tagged_sem.release()
+        sleep(15)
+    else:
+        
+
+
+
+
 listen_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_1.start()
 
@@ -393,8 +421,10 @@ def control():
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 5:
-            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[0])
+            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[6])
             work_on_update_thread.start()
             work_on_update_thread.join()
             mprint("\033[1;35;1m DONE 1\033[0m")
+        elif PHASE == 6:
+            
 threading.Thread(target=control, args = []).start()

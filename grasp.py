@@ -288,12 +288,12 @@ import binascii
 import copy
 import traceback
 ### for bubbles
-try:
-    import tkinter as tk
-    from tkinter import font
-except:
-    print("Could not import tkinter. No pretty printing.")
-    time.sleep(10)
+# try:
+#     import tkinter as tk
+#     from tkinter import font
+# except:
+#     print("Could not import tkinter. No pretty printing.")
+#     time.sleep(10)
 ###
 try:
     import cbor2 as cbor

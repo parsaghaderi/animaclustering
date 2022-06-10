@@ -273,7 +273,7 @@ def generate_topology():
     else:
        pass 
 
-def cluster_listener_handler(_tagged, _answer, _handle):
+def cluster_listener_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))

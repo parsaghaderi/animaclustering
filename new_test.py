@@ -65,12 +65,7 @@ cluster_tagged_sem = threading.Semaphore()
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))#√
-    # for item in NEIGHBOR_INFO:#TODO just deleted
-    #     if str(item.locator) == str(ipaddress.IPv6Address(_handle.id_source)):
-    #         NEIGHBOR_INFO[item] = tmp_answer
-    #         if node_info['cluster_set'].__contains__(initiator_ula):
-    #             mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
+    mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer
     if node_info['cluster_set'].__contains__(initiator_ula):
         mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
@@ -212,10 +207,6 @@ def init(_next):
     # sleep(10) #TODO check if can be reduced
     PHASE = _next
 
-    # INITIAL_NEG = False
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1]).start()
-    # while not INITIAL_NEG:
-    #     pass
 
 def on_update_rcv(_next):
     mprint("\033[1;35;1m *********************** 1\033[0m")
@@ -288,88 +279,6 @@ def on_update_rcv(_next):
             
 
 
-# def on_update_rcv():
-    # global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE
-    # if TO_JOIN == None:
-    #     mprint("I'm clusterhead")
-    #     tagged_sem.acquire()
-    #     CLUSTERING_DONE = True 
-    #     CLUSTER_HEAD = True   
-    #     mprint("\033[1;35;1m I'm in update rcv - I'm cluster head 1\033[0m")
-    #     node_info['cluster_head'] = True
-    #     if not node_info['cluster_set'].__contains__(MY_ULA):
-    #         node_info['cluster_set'].append(MY_ULA)
-    #     node_info['status'] = 2
-    #     # node_info = tagged.objective.value
-    #     tagged.objective.value = cbor.dumps(node_info)
-    #     mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
-    #     tagged_sem.release()
-    #     mprint(NEIGHBOR_INFO)
-    #     PHASE = 2
-    # else:
-    #     if NEIGHBOR_INFO[TO_JOIN]['cluster_head'] == True and NEIGHBOR_INFO[TO_JOIN]['status']==2: #TODO check if it works with only one of the conditions
-    #         mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
-    #         mprint("\033[1;35;1m I'm in on update rcv - joining 1\033[0m")
-    #         tagged_sem.acquire()
-    #         CLUSTERING_DONE = True
-    #         node_info['cluster_head'] = str(TO_JOIN.locator)
-    #         node_info['cluster_set'] = []
-    #         node_info['status'] = 4
-    #         tagged.objective.value = cbor.dumps(node_info)
-    #         mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
-    #         tagged_sem.release()
-    #         mprint(NEIGHBOR_INFO)
-    #         PHASE = 2
-    #     else:
-    #         mprint("\033[1;35;1m HEAVIER  = {} 1\033[0m".format(HEAVIER))
-    #         tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER)
-    #         while tmp_ch != None:
-    #             if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True:
-    #                 mprint("Joining {}".format(str(tmp_ch.locator)))
-    #                 mprint("\033[1;35;1m I'm in on update rcv - joining 2\033[0m")
-    #                 tagged_sem.acquire()
-    #                 node_info["cluster_head"] = str(tmp_ch.locator)
-    #                 node_info["cluster_set"] = []
-    #                 node_info['status'] = 4
-    #                 tagged.objective.value = cbor.dumps(node_info)
-    #                 mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
-    #                 tagged_sem.release()
-    #                 mprint(NEIGHBOR_INFO)
-    #                 CLUSTERING_DONE = True
-    #                 PHASE = 2
-    #                 break
-    #             elif NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] != 3:
-    #                 mprint("can't decide now!")
-    #                 PHASE = 3
-    #                 break
-                    
-                
-    #             #     mprint("\033[1;31;1m fucked up situation {} \033[0m")
-    #             #     tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
-    #             #     mprint("trying next heaviest node")
-    #             else:
-    #                 tmp_ch = find_next_heaviest(tmp_ch, HEAVIER) #TODO check how we can stick in the loop
-    #                 mprint("trying next heaviest node")
-    #         if tmp_ch == None:    
-    #             mprint("I'm clusterhead")
-    #             tagged_sem.acquire()
-    #             CLUSTERING_DONE = True 
-    #             CLUSTER_HEAD = True   
-    #             mprint("\033[1;35;1m I'm in update rcv - I'm cluster head 1\033[0m")
-    #             node_info['cluster_head'] = True
-    #             if not node_info['cluster_set'].__contains__(MY_ULA):
-    #                 node_info['cluster_set'].append(MY_ULA)
-    #             node_info['status'] = 2
-    #             # node_info = tagged.objective.value
-    #             tagged.objective.value = cbor.dumps(node_info)
-    #             mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
-    #             tagged_sem.release()
-    #             mprint(NEIGHBOR_INFO)
-    #             PHASE = 2
-
-
-# def update_3_step():
-#     pass
 
 def generate_topology():
     global TP_MAP
@@ -402,8 +311,6 @@ listen_1.start()
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()
 
-# init_1 = threading.Thread(target=init, args = [])
-# init_1.start()
 
 def control():
     while True:
@@ -431,8 +338,11 @@ def control():
             mprint("\033[1;35;1m DONE \033[0m")
             if CLUSTER_HEAD == True:
                 mprint("\033[1;35;1m I'm cluster head \033[0m")
+                threading.Thread(target=generate_topology, args=[]).start()
+
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:
             pass
+
 threading.Thread(target=control, args = []).start()

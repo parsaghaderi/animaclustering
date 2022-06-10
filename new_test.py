@@ -35,9 +35,7 @@ TP_MAP = {}
 MAP_SEM = threading.Semaphore()
 
 PHASE = 0
-
 listen_sub = None
-
 
 '''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
@@ -61,7 +59,6 @@ cluster_tagged_sem = threading.Semaphore()
 sub_cluster_obj, err = OBJ_REG("sub_cluster", cbor.dumps(TP_MAP), True, False, 10, asa)
 sub_cluster_tagged = TAG_OBJ(sub_cluster_obj, asa)
 cluster_tagged_sem = threading.Semaphore()
-
 
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
@@ -180,9 +177,9 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
+        sleep(5)
         cluster_listen_1.start()
-    PHASE = _next
-        
+    PHASE = _next      
 
 def on_update_rcv(_next):
     mprint("\033[1;35;1m *********************** 1\033[0m")
@@ -251,6 +248,7 @@ def on_update_rcv(_next):
                 TO_JOIN = None
                 CLUSTER_HEAD = True
                 PHASE = _next
+                sleep(5)
                 cluster_listen_1.start()
 
 def generate_topology():

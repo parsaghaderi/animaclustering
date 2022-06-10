@@ -180,8 +180,9 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
+        cluster_listen_1.start()
     PHASE = _next
-    cluster_listen_1.start()
+        
 
 def on_update_rcv(_next):
     mprint("\033[1;35;1m *********************** 1\033[0m")
@@ -338,7 +339,7 @@ def neg_cluster(_tagged, ll, _attempt):
         sleep(3)
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
-# listen_node_1.start()
+listen_node_1.start()
 
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()

@@ -343,7 +343,7 @@ discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_han
 discovery_1.start()
 
 cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster_listener_handler])
-cluster_discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_cluster_handler, 2])
+cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,discovery_cluster_handler, 2])
 
 def control():
     while True:

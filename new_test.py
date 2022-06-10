@@ -27,7 +27,7 @@ CLUSTERING_DONE = False
 SYNCH = False
 TO_JOIN = None
 
-CLUSTER_STR_TO_ULA = []
+CLUSTER_STR_TO_ULA = {}
 CLUSTER_NODES = {}
 CLUSTER_INFO  = {}
 
@@ -298,7 +298,6 @@ def generate_topology():
         cluster_tagged_sem.acquire()
         cluster_tagged.objective.value = cbor.dumps(TP_MAP)
         cluster_tagged_sem.release()
-        mprint(TP_MAP)
         sleep(15)
         cluster_discovery_1.start()
     else:

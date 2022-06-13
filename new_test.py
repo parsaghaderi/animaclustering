@@ -145,10 +145,12 @@ def neg(_tagged, ll, _attempt):
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
                     mprint("\033[1;32;1m neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                    break
                 else:
                     mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
             except Exception as e:
                 mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            
         else:
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
             attempt+=1
@@ -326,10 +328,12 @@ def neg_cluster(_tagged, ll, _attempt):
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
                     mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                    break
                 else:
                     mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]))
             except Exception as e:
                 mprint("\033[1;31;1m in cluster_neg_neg exception happened {} \033[0m".format(e))
+            
         else:
             mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
             attempt+=1

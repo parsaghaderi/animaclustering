@@ -37,6 +37,9 @@ MAP_SEM = threading.Semaphore()
 PHASE = 0
 listen_sub = None
 
+
+SENT_TO_CLUSTERHEADS = {}
+UPDATE = False
 '''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
 # status 1:not decided, 2:cluster-head, 3:want to join, 4:joined 5:changed (!)
@@ -101,7 +104,7 @@ def discovery_node_handler(_tagged, _locators):
     sleep(10)
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 
-def discovery_cluster_handler(_tagged, _locators):
+def discovery_cluster_handler(_tagged, _locators, _next = 6):
     for item in _locators:
         if str(item.locator) != MY_ULA:
             CLUSTER_INFO[item] = 0
@@ -110,7 +113,7 @@ def discovery_cluster_handler(_tagged, _locators):
             mprint("cluster head found at {}".format(str(item.locator)))
     sleep(10)
     mprint("")
-    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 2]).start()
+    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),_next, 2]).start()
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
@@ -281,6 +284,7 @@ def cluster_listener_handler(_tagged, _handle, _answer):
     cluster_tagged_sem.acquire()
     CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
     TP_MAP.update(tmp_answer)
+    SENT_TO_CLUSTERHEADS[CLUSTER_STR_TO_ULA[initiator_ula]] = TP_MAP
     cluster_tagged.objective.value =  cbor.dumps(TP_MAP)
     _answer.value = cluster_tagged.objective.value
     cluster_tagged_sem.release()
@@ -304,9 +308,10 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
     # for i in range(len(_locators)):
     for item in _locators:
         threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
-    sleep(15)
-    mprint("topology of the domain \n{}".format(TP_MAP))
-    PHASE = _next
+    sleep(20)
+    mprint("topology of the domain  - phase 1\n{}".format(TP_MAP))
+    # PHASE = _next
+    threading.Thread(target=check_to_update_clusterhead, args=[_tagged]).start()
 
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
@@ -315,6 +320,9 @@ def neg_cluster(_tagged, ll, _attempt):
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
             reason = answer
+            cluster_tagged_sem.acquire()
+            SENT_TO_CLUSTERHEADS[ll] = TP_MAP
+            cluster_tagged_sem.release()
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
@@ -351,6 +359,18 @@ discovery_1.start()
 cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster_listener_handler])
 cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,discovery_cluster_handler, 3])
 
+def check_to_update_clusterhead(_tagged, _next):
+    global UPDATE, PHASE
+    for k in CLUSTER_INFO:
+        if SENT_TO_CLUSTERHEADS[k] != TP_MAP:
+            UPDATE = True
+
+    if UPDATE:
+        threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 2]).start()
+    else:
+        PHASE = 0
+    UPDATE = False
+    
 def control():
     while True:
         if PHASE == 1:

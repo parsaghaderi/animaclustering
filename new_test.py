@@ -301,10 +301,10 @@ def cluster_listener_handler(_tagged, _handle, _answer):
 
 def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
     global PHASE
-    for i in range(len(_locators)):
-        for item in _locators:
-            threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
-        sleep(15)
+    # for i in range(len(_locators)):
+    for item in _locators:
+        threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
+    sleep(15)
     mprint("topology of the domain \n{}".format(TP_MAP))
     PHASE = _next
 

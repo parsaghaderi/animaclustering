@@ -157,7 +157,7 @@ def neg(_tagged, ll, _attempt):
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
             if attempt == 1:
                 mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
-                NEIGHBOR_INFO.remove(ll)
+                NEIGHBOR_INFO.pop(ll)
                 NEIGHBORS_STR.remove(str(ll.locator))
                 NEIGHBOR_STR_TO_LOCATOR.remove(str(ll.locator))
 

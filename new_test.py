@@ -94,12 +94,14 @@ def discovery_node_handler(_tagged, _locators):
             NEIGHBOR_STR_TO_LOCATOR[str(item.locator) ] = item
             NEIGHBORS_STR.append(str(item.locator))
             NEIGHBOR_INFO[item] = 0
+
+
             tagged_sem.acquire()
             _tagged.objective.value = cbor.dumps(node_info)
             tagged_sem.release()
     mprint(NEIGHBORS_STR)
     sleep(10)
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 2]).start()
 
 def discovery_cluster_handler(_tagged, _locators):
     for item in _locators:
@@ -110,7 +112,7 @@ def discovery_cluster_handler(_tagged, _locators):
             mprint("cluster head found at {}".format(str(item.locator)))
     sleep(10)
     mprint("")
-    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()
+    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 2]).start()
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
@@ -153,7 +155,13 @@ def neg(_tagged, ll, _attempt):
             
         else:
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-            attempt+=1
+            if attempt == 1:
+                mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
+                NEIGHBOR_INFO.remove(ll)
+                NEIGHBORS_STR.remove(str(ll.locator))
+                NEIGHBOR_STR_TO_LOCATOR.remove(str(ll.locator))
+                
+                #TODO remove from list of neighbors
         attempt-=1
         sleep(3)
     
@@ -309,6 +317,7 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
 
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
+    
     while attempt!= 0:
         mprint("start cluster negotiating with {} for {}th time - try {}".format(str(ll.locator), attempt, _attempt-attempt+1))
         if _old_API:
@@ -329,6 +338,7 @@ def neg_cluster(_tagged, ll, _attempt):
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
                     mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                    attempt = 0
                     break
                 else:
                     mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]))
@@ -337,7 +347,12 @@ def neg_cluster(_tagged, ll, _attempt):
             
         else:
             mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-            attempt+=1
+            if attempt == 1:
+                mprint("\033[1;31;1m due to multiple unresponsive attempts, removing peer {} from cluster head list \033[0m".format(str(ll.locator)))
+                CLUSTER_INFO.remove(ll)
+            #TODO remove 
+            # attempt+=1
+
         attempt-=1
         sleep(3)
 

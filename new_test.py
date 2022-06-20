@@ -374,7 +374,7 @@ def control():
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 3])
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 3:
@@ -382,7 +382,7 @@ def control():
             work_on_update_thread.start()
             work_on_update_thread.join()
         elif PHASE == 4:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 1])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 3])
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 5:

@@ -101,7 +101,7 @@ def discovery_node_handler(_tagged, _locators):
             tagged_sem.release()
     mprint(NEIGHBORS_STR)
     sleep(10)
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 2]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 3]).start()
 
 def discovery_cluster_handler(_tagged, _locators):
     for item in _locators:
@@ -157,7 +157,7 @@ def neg(_tagged, ll, _attempt):
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
             if attempt == 1:
                 mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
-                NEIGHBOR_INFO.remove(ll)
+                NEIGHBOR_INFO.pop(ll)
                 NEIGHBORS_STR.remove(str(ll.locator))
                 NEIGHBOR_STR_TO_LOCATOR.remove(str(ll.locator))
 

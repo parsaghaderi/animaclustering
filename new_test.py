@@ -63,7 +63,7 @@ cluster_tagged_sem = threading.Semaphore()
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
+    # mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer
     if node_info['cluster_set'].__contains__(initiator_ula):
         mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
@@ -94,14 +94,12 @@ def discovery_node_handler(_tagged, _locators):
             NEIGHBOR_STR_TO_LOCATOR[str(item.locator) ] = item
             NEIGHBORS_STR.append(str(item.locator))
             NEIGHBOR_INFO[item] = 0
-
-
             tagged_sem.acquire()
             _tagged.objective.value = cbor.dumps(node_info)
             tagged_sem.release()
     mprint(NEIGHBORS_STR)
     sleep(10)
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 3]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 
 def discovery_cluster_handler(_tagged, _locators):
     for item in _locators:
@@ -134,7 +132,7 @@ def neg(_tagged, ll, _attempt):
         if not err:
             mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
             NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
-            #mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
             
             if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
                 tagged_sem.acquire()
@@ -156,13 +154,6 @@ def neg(_tagged, ll, _attempt):
         else:
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
             attempt+=1
-            # if attempt == 1:
-            #     mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
-                # NEIGHBOR_INFO.pop(ll)
-                # NEIGHBORS_STR.remove(str(ll.locator))
-                # NEIGHBOR_STR_TO_LOCATOR.pop(str(ll.locator))
-
-                #TODO remove from list of neighbors
         attempt-=1
         sleep(3)
     
@@ -190,9 +181,7 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
-        if not cluster_listen_1.is_alive():
-            cluster_listen_1.start()
-        
+        cluster_listen_1.start()
     PHASE = _next      
 
 def on_update_rcv(_next):
@@ -287,7 +276,7 @@ def generate_topology():
 def cluster_listener_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    #mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
+    mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
     cluster_tagged_sem.acquire()
     CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
     TP_MAP.update(tmp_answer)
@@ -315,12 +304,11 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
         for item in _locators:
             threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
         sleep(15)
-    mprint("topology after {} steps of neg \n".format(TP_MAP))
+    mprint("topology of the domain \n{}".format(TP_MAP))
     PHASE = _next
 
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
-    
     while attempt!= 0:
         mprint("start cluster negotiating with {} for {}th time - try {}".format(str(ll.locator), attempt, _attempt-attempt+1))
         if _old_API:
@@ -329,9 +317,9 @@ def neg_cluster(_tagged, ll, _attempt):
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
-            #mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
             CLUSTER_INFO[ll] = cbor.loads(answer.value)
-            #mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#√
+            # mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#√
 
             cluster_tagged_sem.acquire()
             TP_MAP.update(cbor.loads(answer.value))
@@ -341,7 +329,6 @@ def neg_cluster(_tagged, ll, _attempt):
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
                     mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(str(ll.locator)))
-                    attempt = 0
                     break
                 else:
                     mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]))
@@ -350,15 +337,9 @@ def neg_cluster(_tagged, ll, _attempt):
             
         else:
             mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-            # if attempt == 1:
-            #     mprint("\033[1;31;1m due to multiple unresponsive attempts, removing peer {} from cluster head list \033[0m".format(str(ll.locator)))
-            #     CLUSTER_INFO.remove(ll)
-            #TODO remove 
             attempt+=1
-
         attempt-=1
         sleep(3)
-        mprint("Updated topology map \n {}".format(TP_MAP))
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_node_1.start()
@@ -377,7 +358,7 @@ def control():
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 3])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 3:
@@ -385,7 +366,7 @@ def control():
             work_on_update_thread.start()
             work_on_update_thread.join()
         elif PHASE == 4:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 3])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 1])
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 5:

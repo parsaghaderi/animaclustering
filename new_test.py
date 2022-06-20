@@ -312,7 +312,7 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
         for item in _locators:
             threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
         sleep(15)
-    mprint("topology after {} steps of neg \n{}".format(len(_locators)**2))
+    mprint("topology after {} steps of neg \n")
     PHASE = _next
 
 def neg_cluster(_tagged, ll, _attempt):

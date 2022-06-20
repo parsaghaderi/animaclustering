@@ -264,7 +264,8 @@ def generate_topology():
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({str(MY_ULA):node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        TP_MAP = {MY_ULA:tmp_map}
+        # TP_MAP = {MY_ULA:tmp_map}
+        TP_MAP = tmp_map
         cluster_tagged_sem.acquire()
         cluster_tagged.objective.value = cbor.dumps(TP_MAP)
         cluster_tagged_sem.release()

@@ -157,7 +157,7 @@ def neg(_tagged, ll, _attempt):
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
             if attempt == 1:
                 mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
-                NEIGHBOR_INFO.pop(ll)
+                NEIGHBOR_INFO.remove(ll)
                 NEIGHBORS_STR.remove(str(ll.locator))
                 NEIGHBOR_STR_TO_LOCATOR.remove(str(ll.locator))
 
@@ -312,7 +312,7 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
         for item in _locators:
             threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
         sleep(15)
-    mprint("topology after 1 round of neg \n{}".format(TP_MAP))
+    mprint("topology after {} steps of neg \n{}".format(len(_locators)**2))
     PHASE = _next
 
 def neg_cluster(_tagged, ll, _attempt):

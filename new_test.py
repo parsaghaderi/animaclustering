@@ -190,7 +190,9 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
-        cluster_listen_1.start()
+        if not cluster_listen_1.is_alive():
+            cluster_listen_1.start()
+        
     PHASE = _next      
 
 def on_update_rcv(_next):
@@ -313,7 +315,7 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
         for item in _locators:
             threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
         sleep(15)
-    mprint("topology after {} steps of neg \n")
+    mprint("topology after {} steps of neg \n".format(TP_MAP))
     PHASE = _next
 
 def neg_cluster(_tagged, ll, _attempt):

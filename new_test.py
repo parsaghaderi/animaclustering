@@ -160,7 +160,7 @@ def neg(_tagged, ll, _attempt):
                 NEIGHBOR_INFO.remove(ll)
                 NEIGHBORS_STR.remove(str(ll.locator))
                 NEIGHBOR_STR_TO_LOCATOR.remove(str(ll.locator))
-                
+
                 #TODO remove from list of neighbors
         attempt-=1
         sleep(3)
@@ -284,7 +284,7 @@ def generate_topology():
 def cluster_listener_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
+    #mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
     cluster_tagged_sem.acquire()
     CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
     TP_MAP.update(tmp_answer)
@@ -326,9 +326,9 @@ def neg_cluster(_tagged, ll, _attempt):
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
-            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
+            #mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
             CLUSTER_INFO[ll] = cbor.loads(answer.value)
-            mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#√
+            #mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#√
 
             cluster_tagged_sem.acquire()
             TP_MAP.update(cbor.loads(answer.value))
@@ -355,6 +355,7 @@ def neg_cluster(_tagged, ll, _attempt):
 
         attempt-=1
         sleep(3)
+        mprint("Updated topology map \n {}".format(TP_MAP))
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_node_1.start()

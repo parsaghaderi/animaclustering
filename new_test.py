@@ -155,11 +155,12 @@ def neg(_tagged, ll, _attempt):
             
         else:
             mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-            if attempt == 1:
-                mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
-                NEIGHBOR_INFO.pop(ll)
-                NEIGHBORS_STR.remove(str(ll.locator))
-                NEIGHBOR_STR_TO_LOCATOR.pop(str(ll.locator))
+            attempt+=1
+            # if attempt == 1:
+            #     mprint("\033[1;31;1m after multiple failed attempts, removing peer {} from the neighbor list \033[0m".format(str(ll.locator)))
+                # NEIGHBOR_INFO.pop(ll)
+                # NEIGHBORS_STR.remove(str(ll.locator))
+                # NEIGHBOR_STR_TO_LOCATOR.pop(str(ll.locator))
 
                 #TODO remove from list of neighbors
         attempt-=1
@@ -347,11 +348,11 @@ def neg_cluster(_tagged, ll, _attempt):
             
         else:
             mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-            if attempt == 1:
-                mprint("\033[1;31;1m due to multiple unresponsive attempts, removing peer {} from cluster head list \033[0m".format(str(ll.locator)))
-                CLUSTER_INFO.remove(ll)
+            # if attempt == 1:
+            #     mprint("\033[1;31;1m due to multiple unresponsive attempts, removing peer {} from cluster head list \033[0m".format(str(ll.locator)))
+            #     CLUSTER_INFO.remove(ll)
             #TODO remove 
-            # attempt+=1
+            attempt+=1
 
         attempt-=1
         sleep(3)

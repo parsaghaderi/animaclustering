@@ -293,6 +293,7 @@ def cluster_listener_handler(_tagged, _handle, _answer):
         else:
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
+            SENT_TO_CLUSTERHEADS[initiator_ula] = TP_MAP
             mprint("\033[1;32;1m cluster negotiation with peer {} ended successfully \033[0m".format(initiator_ula))  
         else:
             mprint("\033[1;31;1m in cluster listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]))
@@ -321,19 +322,18 @@ def neg_cluster(_tagged, ll, _attempt):
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
             reason = answer
-            # cluster_tagged_sem.acquire()
-            SENT_TO_CLUSTERHEADS[ll] = TP_MAP
-            # cluster_tagged_sem.release()
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         if not err:
+            SENT_TO_CLUSTERHEADS[str(ll.locator)] = TP_MAP
+
             mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
             CLUSTER_INFO[ll] = cbor.loads(answer.value)
-            # mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#√
-
+            # mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#
             cluster_tagged_sem.acquire()
             TP_MAP.update(cbor.loads(answer.value))
             cluster_tagged.objective.value = cbor.dumps(TP_MAP)
+        
             cluster_tagged_sem.release()
             try:
                 mprint("\033[1;32;1m replying to {} \033[0m".format(str(ll.locator)))
@@ -348,7 +348,8 @@ def neg_cluster(_tagged, ll, _attempt):
             
         else:
             mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
-            attempt+=1
+            if attempt == 1:
+                break
         attempt-=1
         sleep(3)
 

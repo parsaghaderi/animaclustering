@@ -336,6 +336,7 @@ def neg_cluster(_tagged, ll, _attempt):
             cluster_tagged.objective.value = cbor.dumps(TP_MAP)
             cluster_tagged_sem.release()
             try:
+                mprint("\033[1;32;1m replying to {} \033[0m".format(str(ll.locator)))
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
                     mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(str(ll.locator)))

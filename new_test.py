@@ -371,6 +371,7 @@ def check_to_update_clusterhead(_tagged, _next = 0):
     if UPDATE:
         threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 3]).start()
     else:
+        mprint("No changes")
         PHASE = 0
     UPDATE = False
     

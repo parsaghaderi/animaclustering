@@ -322,7 +322,7 @@ def neg_cluster(_tagged, ll, _attempt):
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
             reason = answer
             # cluster_tagged_sem.acquire()
-            # SENT_TO_CLUSTERHEADS[ll] = TP_MAP
+            SENT_TO_CLUSTERHEADS[ll] = TP_MAP
             # cluster_tagged_sem.release()
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)

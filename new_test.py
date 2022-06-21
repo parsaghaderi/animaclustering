@@ -365,7 +365,7 @@ cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,di
 def check_to_update_clusterhead(_tagged, _next = 0):
     global UPDATE, PHASE
     for k in CLUSTER_INFO:
-        if SENT_TO_CLUSTERHEADS[k] != TP_MAP:
+        if SENT_TO_CLUSTERHEADS[str(k.locator)] != TP_MAP:
             UPDATE = True
 
     if UPDATE:

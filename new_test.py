@@ -289,6 +289,7 @@ def cluster_listener_handler(_tagged, _handle, _answer):
     _answer.value = cluster_tagged.objective.value
     cluster_tagged_sem.release()
     try:
+        mprint("\033[1;32;1m sending response \033[0m")
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r

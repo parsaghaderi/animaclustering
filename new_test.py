@@ -7,7 +7,6 @@ from utility import _old_API as _old_API
 NEIGHBORS str(item.locator)
 NEIGHBOR_STR to stor ula addresses as string
 NEIGHBOR_DATA to store neighbor information
-
 HEAVIER to store heavier neighbors ()
 HEAVIEST to store the heaviest neighbor ()
 LIGHTER to store lighter neighbors ()
@@ -66,7 +65,7 @@ cluster_tagged_sem = threading.Semaphore()
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    # mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
+    #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer
     if node_info['cluster_set'].__contains__(initiator_ula):
         mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
@@ -113,7 +112,7 @@ def discovery_cluster_handler(_tagged, _locators, _next = 6):
             mprint("cluster head found at {}".format(str(item.locator)))
     sleep(10)
     mprint("")
-    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),_next, 2]).start()
+    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
@@ -267,8 +266,7 @@ def generate_topology():
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({str(MY_ULA):node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        # TP_MAP = {MY_ULA:tmp_map}
-        TP_MAP = tmp_map
+        TP_MAP = {MY_ULA:tmp_map}
         cluster_tagged_sem.acquire()
         cluster_tagged.objective.value = cbor.dumps(TP_MAP)
         cluster_tagged_sem.release()
@@ -284,12 +282,10 @@ def cluster_listener_handler(_tagged, _handle, _answer):
     cluster_tagged_sem.acquire()
     CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
     TP_MAP.update(tmp_answer)
-    SENT_TO_CLUSTERHEADS[CLUSTER_STR_TO_ULA[initiator_ula]] = TP_MAP
     cluster_tagged.objective.value =  cbor.dumps(TP_MAP)
     _answer.value = cluster_tagged.objective.value
     cluster_tagged_sem.release()
     try:
-        mprint("\033[1;32;1m sending response \033[0m")
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r
@@ -313,6 +309,10 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
     mprint("topology of the domain  - phase 1\n{}".format(TP_MAP))
     # PHASE = _next
     threading.Thread(target=check_to_update_clusterhead, args=[_tagged]).start()
+
+    # sleep(15)
+    # mprint("topology after 1 round of neg \n{}".format(TP_MAP))
+    # PHASE = _next
 
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt

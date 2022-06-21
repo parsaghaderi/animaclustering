@@ -360,7 +360,7 @@ discovery_1.start()
 cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster_listener_handler])
 cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,discovery_cluster_handler, 3])
 
-def check_to_update_clusterhead(_tagged, _next):
+def check_to_update_clusterhead(_tagged, _next = 0):
     global UPDATE, PHASE
     for k in CLUSTER_INFO:
         if SENT_TO_CLUSTERHEADS[k] != TP_MAP:

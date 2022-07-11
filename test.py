@@ -50,7 +50,7 @@ listen_sub = None
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
 
-mprint(asa)
+mprint(len(graspi._session_id_cache))
 
 
 # node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),

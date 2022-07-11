@@ -280,7 +280,8 @@ def cluster_listener_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
     cluster_tagged_sem.acquire()
-    CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
+    if CLUSTER_STR_TO_ULA.__contains__(initiator_ula):
+        CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
     TP_MAP.update(tmp_answer)
     cluster_tagged.objective.value =  cbor.dumps(TP_MAP)
     _answer.value = cluster_tagged.objective.value

@@ -1,7 +1,7 @@
 import ipaddress
 from utility import *
 from utility import _old_API as _old_API
-
+from grasp import get_session_id_cache
 
 '''
 # MY_ULA str
@@ -50,7 +50,7 @@ listen_sub = None
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
 
-mprint(graspi.get_session_id_cache(asa))
+mprint(get_session_id_cache(asa))
 
 
 # node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),

@@ -50,8 +50,10 @@ listen_sub = None
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
 
-mprint(len(get_session_id_cache()))
+asas = get_session_id_cache()
 
+asa_1 =asas[0]
+mprint(asa_1)
 
 # node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
 #              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 

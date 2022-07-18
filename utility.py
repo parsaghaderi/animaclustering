@@ -19,6 +19,9 @@ import multiping
 #########################
 def get_node_value():
     return random.random()
+
+def len_session():
+    return len(graspi._session_id_cache)
     
 #########################
 # utility print function

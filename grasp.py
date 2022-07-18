@@ -3013,7 +3013,8 @@ def _new_session(locator):
     # If we're here, something is deeply suspect and we have to give up.
     raise RuntimeError("Ten successive pseudo-random session ID clashes")
 
-
+def get_session_id_cache(x):
+    return _session_id_cache[x]
 
 
 def _insert_session(session_inst, _check_race = False):

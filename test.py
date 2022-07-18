@@ -1,7 +1,7 @@
 import ipaddress
 from utility import *
 from utility import _old_API as _old_API
-from utility import graspi._session_id_cache
+from utility import graspi
 
 
 '''

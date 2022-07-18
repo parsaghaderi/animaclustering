@@ -53,7 +53,7 @@ asa2, err = ASA_REG('cluster_neg')
 asas = get_session_id_cache()
 
 asa_1 =asas[0]
-mprint(asa_1)
+mprint(asa_1.id_source)
 
 # node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
 #              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 

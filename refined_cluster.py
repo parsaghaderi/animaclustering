@@ -93,7 +93,7 @@ def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
     neg_threads = []
     for item in _locators:
-        neg_threads.append(threading.Thread(target=neg, args=[_tagged, item, _attempts]))
+        neg_threads.append(threading.Thread(target=neg, args=[_tagged, NEIGHBOR_STR_TO_LOCATOR[item], _attempts]))
     for item in neg_threads:
         item.start()
     for item in neg_threads:

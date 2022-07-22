@@ -98,7 +98,7 @@ def run_neg(_tagged, _locators, _next, _attempts = 1):
         item.start()
     for item in neg_threads:
         item.join()
-    # sleep(10) #TODO check if can be reduced
+    sleep(10) #TODO check if can be reduced
     INITIAL_NEG = True
     PHASE = _next
 

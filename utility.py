@@ -22,8 +22,13 @@ def get_node_value():
     return random.random()
 
 def get_cache():
-    return ssss
-   
+    if _old_API:
+        return graspi._session_id_cache
+    else:
+        return graspi.grasp._session_id_cache
+
+
+
 
 
 #########################

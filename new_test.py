@@ -45,7 +45,7 @@ UPDATE = False
 '''
 asa, err = ASA_REG('node_neg')
 asa2, err = ASA_REG('cluster_neg')
-mprint("%%%%%%\n{}\n%%%%%%".format(asa.asa_handle))
+# mprint("%%%%%%\n{}\n%%%%%%".format(asa))
 node_info = {'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBORS_STR, 
              'status': 1} 

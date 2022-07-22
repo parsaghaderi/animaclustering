@@ -54,6 +54,11 @@ asas = get_session_id_cache()
 
 asa_1 =asas[0]
 mprint(asa_1.id_source)
+mprint(asa_1.id_value)
+mprint(asa_1.id_dq)
+mprint(asa_1.id_sock)
+mprint(asa_1.id_source)
+mprint(asa_1.id_relayed)
 
 # node_info = {'ula':str(acp._get_my_address()), 'weight':get_node_value(),
 #              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBOR_ULA, 

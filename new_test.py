@@ -63,8 +63,18 @@ sub_cluster_tagged = TAG_OBJ(sub_cluster_obj, asa)
 cluster_tagged_sem = threading.Semaphore()
 
 def listen_handler(_tagged, _handle, _answer):
+
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))
+    t = graspi.get_session_id_cache()
+    mprint("@@@@@@\nblah{}\n@@@@@@".format(len(t)))
+    # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_value)))
+    # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))
+    # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))
+    # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))
+
+
+    t = graspi.get_session_id_cache()
+    
     tmp_answer = cbor.loads(_answer.value)
     #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer

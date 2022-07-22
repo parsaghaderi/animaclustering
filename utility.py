@@ -6,7 +6,7 @@ from time import sleep
 import acp
 import ipaddress
 
-from grasp import _session_id_cache as ssss
+
 try:
     import graspi
     _old_API = False    

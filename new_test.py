@@ -64,6 +64,7 @@ cluster_tagged_sem = threading.Semaphore()
 
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    mprint("@@@@@@\n{}\n@@@@@@".format(type(_handle.id_value)))
     tmp_answer = cbor.loads(_answer.value)
     #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer

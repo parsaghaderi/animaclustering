@@ -176,7 +176,7 @@ def control():
     while True:
         if PHASE == 1:
             mprint("starting phase 0 - init")
-            init_thread = threading.Thread(target=init, args = [0])
+            init_thread = threading.Thread(target=init, args = [6])
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:

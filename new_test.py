@@ -66,7 +66,7 @@ def listen_handler(_tagged, _handle, _answer):
 
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     
-    mprint("@@@@@@\nblah{}\n@@@@@@".format(len_session())))
+    mprint("@@@@@@\nblah{}\n@@@@@@".format(len_session()))
     # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_value)))
     # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))
     # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))

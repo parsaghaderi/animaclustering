@@ -12,7 +12,7 @@ try:
 except:
     import grasp as graspi
     _old_API = True
-    import _session_id_cache from graspi 
+    from grasp import _session_id_cache
 import multiping 
 #########################
 # utility function for setting the value of

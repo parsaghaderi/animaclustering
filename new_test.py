@@ -1,7 +1,7 @@
-from ast import Pass
-from os import stat
+
 from utility import *
 from utility import _old_API as _old_API
+
 
 '''
 NEIGHBORS str(item.locator)
@@ -65,8 +65,8 @@ cluster_tagged_sem = threading.Semaphore()
 def listen_handler(_tagged, _handle, _answer):
 
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    t = graspi.get_session_id_cache()
-    mprint("@@@@@@\nblah{}\n@@@@@@".format(len(t)))
+    
+    mprint("@@@@@@\nblah{}\n@@@@@@".format(len(_session_id_cache)))
     # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_value)))
     # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))
     # mprint("@@@@@@\nblah{}\n@@@@@@".format(type(_handle.id_source)))

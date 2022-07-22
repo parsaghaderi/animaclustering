@@ -6,13 +6,13 @@ from time import sleep
 import acp
 import ipaddress
 
+from grasp import _session_id_cache
 try:
     import graspi
     _old_API = False    
 except:
     import grasp as graspi
     _old_API = True
-    from grasp import _session_id_cache
 import multiping 
 #########################
 # utility function for setting the value of
@@ -21,8 +21,10 @@ import multiping
 def get_node_value():
     return random.random()
 
-def len_session():
-    return len(graspi._session_id_cache)
+def get_cache():
+    return _session_id_cache
+   
+
 
 #########################
 # utility print function

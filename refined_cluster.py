@@ -64,7 +64,6 @@ cluster_tagged_sem = threading.Semaphore()
 
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    mprint("@@@@@@\n{}\n@@@@@@".format(type(_handle.id_source)))
     tmp_answer = cbor.loads(_answer.value)
     #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer
@@ -92,3 +91,145 @@ def listen_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err))
  
 
+ 
+def discovery_node_handler(_tagged, _locators):
+    for item in _locators:
+        if str(item.locator) not in NEIGHBOR_STR_TO_LOCATOR:
+            NEIGHBOR_STR_TO_LOCATOR[str(item.locator) ] = item
+            NEIGHBORS_STR.append(str(item.locator))
+            NEIGHBOR_INFO[item] = 0
+            tagged_sem.acquire()
+            _tagged.objective.value = cbor.dumps(node_info)
+            tagged_sem.release()
+    mprint(NEIGHBORS_STR)
+    sleep(10)
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
+
+def discovery_cluster_handler(_tagged, _locators, _next = 6):
+    for item in _locators:
+        if str(item.locator) != MY_ULA:
+            CLUSTER_INFO[item] = 0
+            CLUSTER_UPDATE[str(item.locator)] = False
+            CLUSTER_STR_TO_ULA[str(item.locator)] = item
+            mprint("cluster head found at {}".format(str(item.locator)))
+    sleep(10)
+    mprint("")
+    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()
+
+def run_neg(_tagged, _locators, _next, _attempts = 1):
+    global INITIAL_NEG, PHASE
+    for item in _locators:
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    sleep(10) #TODO check if can be reduced
+    INITIAL_NEG = True
+    PHASE = _next
+
+
+def neg(_tagged, ll, _attempt):
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _attempt-attempt+1))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        if not err:
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
+            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+            
+            if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
+                tagged_sem.acquire()
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                if not node_info['cluster_set'].__contains__(str(ll.locator)):
+                    node_info['cluster_set'].append(str(ll.locator))
+                tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
+            try:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                    break
+                else:
+                    mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+            except Exception as e:
+                mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            
+        else:
+            mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+            attempt+=1
+        attempt-=1
+        sleep(3)
+    
+    
+def init(_next):
+    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
+    
+    while not INITIAL_NEG:
+        pass
+    
+    mprint("entering init phase - deciding role")
+    HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
+
+    
+    if HEAVIEST == None:
+        mprint("I'm clusterhead")
+        tagged_sem.acquire()
+        node_info['cluster_head'] = True
+        node_info['status'] = 2
+        if not node_info['cluster_set'].__contains__(MY_ULA):
+            node_info['cluster_set'].append(MY_ULA)
+        tagged.objective.value = cbor.dumps(node_info)
+        tagged_sem.release()
+        mprint(node_info['weight'])
+        mprint(NEIGHBOR_INFO)
+        TO_JOIN = None
+        CLUSTER_HEAD = True
+        CLUSTERING_DONE = True
+        cluster_listen_1.start()
+    PHASE = _next      
+
+
+listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
+listen_node_1.start()
+
+discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
+discovery_1.start()
+
+
+def control():
+    while True:
+        if PHASE == 1:
+            mprint("starting phase 0 - init")
+            init_thread = threading.Thread(target=init, args = [2])
+            init_thread.start()
+            init_thread.join()
+        elif PHASE == 2:
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
+            run_neg_thread.start()
+            run_neg_thread.join()
+        # elif PHASE == 3:
+        #     work_on_update_thread = threading.Thread(target = on_update_rcv, args=[4])
+        #     work_on_update_thread.start()
+        #     work_on_update_thread.join()
+        # elif PHASE == 4:
+        #     run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 1])
+        #     run_neg_thread.start()
+        #     run_neg_thread.join()
+        # elif PHASE == 5:
+        #     work_on_update_thread = threading.Thread(target = on_update_rcv, args=[6])
+        #     work_on_update_thread.start()
+        #     work_on_update_thread.join()
+        #     mprint("\033[1;35;1m DONE \033[0m")
+        #     if CLUSTER_HEAD == True:
+        #         mprint("\033[1;35;1m I'm cluster head \033[0m")
+        #         threading.Thread(target=generate_topology, args=[]).start()
+        #         sleep(20)
+        #         cluster_discovery_1.start()
+            # else:
+            #     mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
+        elif PHASE == 6:
+            pass
+
+threading.Thread(target=control, args = []).start()

@@ -175,6 +175,7 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
+    sleep(10)
     PHASE = _next   
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name

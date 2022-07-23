@@ -99,8 +99,8 @@ def run_neg(_tagged, _locators, _next, _attempts = 1):
     for item in neg_threads:
         item.join()
     sleep(10) #TODO check if can be reduced
-    INITIAL_NEG = True
-    PHASE = _next
+    # INITIAL_NEG = True
+    # PHASE = _next
 
 def neg(_tagged, ll, _attempt):
     attempt = _attempt
@@ -139,32 +139,32 @@ def neg(_tagged, ll, _attempt):
         attempt-=1
         sleep(3)
 
-def init(_next):
-    global HEAVIER, HEAVIEST, LIGHTER, node_info, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE #,INITIAL_NEG
+# def init(_next):
+#     global HEAVIER, HEAVIEST, LIGHTER, node_info, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE #,INITIAL_NEG
     
-    # while not INITIAL_NEG:
-    #     pass
+#     # while not INITIAL_NEG:
+#     #     pass
     
-    mprint("\033[1;32;1m  entering init phase - deciding role  {}\033[0m")
-    HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
+#     mprint("\033[1;32;1m  entering init phase - deciding role  {}\033[0m")
+#     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 
     
-    if HEAVIEST == None:
-        mprint("I'm clusterhead")
-        tagged_sem.acquire()
-        node_info['cluster_head'] = True
-        node_info['status'] = 2
-        if not node_info['cluster_set'].__contains__(MY_ULA):
-            node_info['cluster_set'].append(MY_ULA)
-        tagged.objective.value = cbor.dumps(node_info)
-        tagged_sem.release()
-        mprint(node_info['weight'])
-        mprint(NEIGHBOR_INFO)
-        TO_JOIN = None
-        CLUSTER_HEAD = True
-        CLUSTERING_DONE = True
-        # cluster_listen_1.start()
-    PHASE = _next   
+#     if HEAVIEST == None:
+#         mprint("I'm clusterhead")
+#         tagged_sem.acquire()
+#         node_info['cluster_head'] = True
+#         node_info['status'] = 2
+#         if not node_info['cluster_set'].__contains__(MY_ULA):
+#             node_info['cluster_set'].append(MY_ULA)
+#         tagged.objective.value = cbor.dumps(node_info)
+#         tagged_sem.release()
+#         mprint(node_info['weight'])
+#         mprint(NEIGHBOR_INFO)
+#         TO_JOIN = None
+#         CLUSTER_HEAD = True
+#         CLUSTERING_DONE = True
+#         # cluster_listen_1.start()
+#     PHASE = _next   
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_node_1.start()
@@ -172,38 +172,38 @@ listen_node_1.start()
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()
 
-def control():
-    while True:
-        if PHASE == 1:
-            mprint("starting phase 0 - init")
-            init_thread = threading.Thread(target=init, args = [6])
-            init_thread.start()
-            init_thread.join()
-        elif PHASE == 2:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
-            run_neg_thread.start()
-            run_neg_thread.join()
-        elif PHASE == 3:
-            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[4])
-            work_on_update_thread.start()
-            work_on_update_thread.join()
-        elif PHASE == 4:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 1])
-            run_neg_thread.start()
-            run_neg_thread.join()
-        elif PHASE == 5:
-            work_on_update_thread = threading.Thread(target = on_update_rcv, args=[6])
-            work_on_update_thread.start()
-            work_on_update_thread.join()
-            mprint("\033[1;35;1m DONE \033[0m")
-            if CLUSTER_HEAD == True:
-                mprint("\033[1;35;1m I'm cluster head \033[0m")
-                threading.Thread(target=generate_topology, args=[]).start()
-                sleep(20)
-                cluster_discovery_1.start()
-            else:
-                mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
-        elif PHASE == 6:
-            pass
+# def control():
+#     while True:
+#         if PHASE == 1:
+#             mprint("starting phase 0 - init")
+#             init_thread = threading.Thread(target=init, args = [6])
+#             init_thread.start()
+#             init_thread.join()
+#         elif PHASE == 2:
+#             run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
+#             run_neg_thread.start()
+#             run_neg_thread.join()
+#         elif PHASE == 3:
+#             work_on_update_thread = threading.Thread(target = on_update_rcv, args=[4])
+#             work_on_update_thread.start()
+#             work_on_update_thread.join()
+#         elif PHASE == 4:
+#             run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),5, 1])
+#             run_neg_thread.start()
+#             run_neg_thread.join()
+#         elif PHASE == 5:
+#             work_on_update_thread = threading.Thread(target = on_update_rcv, args=[6])
+#             work_on_update_thread.start()
+#             work_on_update_thread.join()
+#             mprint("\033[1;35;1m DONE \033[0m")
+#             if CLUSTER_HEAD == True:
+#                 mprint("\033[1;35;1m I'm cluster head \033[0m")
+#                 threading.Thread(target=generate_topology, args=[]).start()
+#                 sleep(20)
+#                 cluster_discovery_1.start()
+#             else:
+#                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
+#         elif PHASE == 6:
+#             pass
 
-threading.Thread(target=control, args = []).start()
+# threading.Thread(target=control, args = []).start()

@@ -66,7 +66,7 @@ def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
     #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
-    NEIGHBOR_INFO[NEIGHBOR_STR_TO_LOCATOR[initiator_ula]] = tmp_answer
+    NEIGHBOR_INFO[initiator_ula] = tmp_answer
     if node_info['cluster_set'].__contains__(initiator_ula):
         mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     tagged_sem.acquire()
@@ -95,7 +95,7 @@ def discovery_node_handler(_tagged, _locators):
         if str(item.locator) not in NEIGHBOR_STR_TO_LOCATOR:
             NEIGHBOR_STR_TO_LOCATOR[str(item.locator) ] = item
             NEIGHBORS_STR.append(str(item.locator))
-            NEIGHBOR_INFO[item] = 0
+            NEIGHBOR_INFO[str(item.locator)] = 0
             tagged_sem.acquire()
             _tagged.objective.value = cbor.dumps(node_info)
             tagged_sem.release()
@@ -125,14 +125,14 @@ def run_neg(_tagged, _locators, _next, _attempts = 1):
 def neg(_tagged, ll, _attempt):
     attempt = _attempt
     while attempt!=0:
-        mprint("start negotiating with {} for {}th time - try {}".format(ll.locator, attempt, _attempt-attempt+1))
+        mprint("start negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1))
         if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, NEIGHBOR_STR_TO_LOCATOR[ll], 10000) #TODO
             reason = answer
         else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, NEIGHBOR_STR_TO_LOCATOR[ll], None)
         if not err:
-            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(ll, _attempt-attempt+1))
             NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
             mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
             

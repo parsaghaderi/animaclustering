@@ -54,7 +54,7 @@ def listen_handler(_tagged, _handle, _answer):
     if node_info['cluster_set'].__contains__(initiator_ula):
         mprint("update from sub-cluster node\nNode_INFO already updated!")
         
-    if tmp_answer['cluster_head'] == str(MY_ULA):
+    if tmp_answer['cluster_head'] == str(MY_ULA) and CLUSTER_HEAD == True:
         mprint("\033[1;32;1m neg_initiator selected ME as cluster head \033[0m")
         tagged_sem.acquire()
         node_info['cluster_set'].append(initiator_ula)
@@ -123,7 +123,7 @@ def neg(_tagged, ll, _attempt):
             NEIGHBOR_INFO[str(ll.locator)] = cbor.loads(answer.value)#TODO check
             mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[str(ll.locator)]))#√
             
-            if NEIGHBOR_INFO[str(ll.locator)]['cluster_head'] == str(MY_ULA): #√
+            if NEIGHBOR_INFO[str(ll.locator)]['cluster_head'] == str(MY_ULA) and CLUSTER_HEAD == True: #√
                 tagged_sem.acquire()
                 # tagged.objective.value = cbor.loads(tagged.objective.value)
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):

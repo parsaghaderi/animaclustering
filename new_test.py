@@ -106,7 +106,7 @@ def discovery_node_handler(_tagged, _locators):
 def discovery_cluster_handler(_tagged, _locators, _next = 6):
     for item in _locators:
         if str(item.locator) != MY_ULA:
-            CLUSTER_INFO[item] = 0
+            CLUSTER_INFO[str(item.locator)] = 0
             CLUSTER_UPDATE[str(item.locator)] = False
             CLUSTER_STR_TO_ULA[str(item.locator)] = item
             mprint("cluster head found at {}".format(str(item.locator)))
@@ -116,9 +116,16 @@ def discovery_cluster_handler(_tagged, _locators, _next = 6):
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
+    neg_threads = []
     for item in _locators:
-        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
-    sleep(10) #TODO check if can be reduced
+        neg_threads.append(threading.Thread(target=neg, args=[_tagged, NEIGHBOR_STR_TO_LOCATOR[item], _attempts]))
+    for item in neg_threads:
+        item.start()
+    for item in neg_threads:
+        item.join()
+    # for item in _locators:
+    #     threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    sleep(5) #TODO check if can be reduced
     INITIAL_NEG = True
     PHASE = _next
 
@@ -280,7 +287,9 @@ def cluster_listener_handler(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)
     mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
     cluster_tagged_sem.acquire()
-    CLUSTER_INFO[CLUSTER_STR_TO_ULA[initiator_ula]] = tmp_answer
+    
+    CLUSTER_INFO[initiator_ula] = tmp_answer
+    
     TP_MAP.update(tmp_answer)
     cluster_tagged.objective.value =  cbor.dumps(TP_MAP)
     _answer.value = cluster_tagged.objective.value
@@ -304,9 +313,19 @@ def cluster_listener_handler(_tagged, _handle, _answer):
 def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
     global PHASE
     # for i in range(len(_locators)):
+    neg_threads = []
     for item in _locators:
-        threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
-    sleep(20)
+        if CLUSTER_STR_TO_ULA.__contains__(item):
+            neg_threads.append(threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]))
+    for item in neg_threads:
+        item.start()
+    for item in neg_threads:
+        item.join()
+    
+    # for item in _locators:
+    #     if CLUSTER_STR_TO_ULA.__contains__(item):
+    #         threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
+    sleep(5)
     mprint("topology of the domain  - phase 1\n{}".format(TP_MAP))
     # PHASE = _next
     threading.Thread(target=check_to_update_clusterhead, args=[_tagged]).start()
@@ -318,16 +337,16 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
     while attempt!= 0:
-        mprint("start cluster negotiating with {} for {}th time - try {}".format(str(ll.locator), attempt, _attempt-attempt+1))
+        mprint("start cluster negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1))
         if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, CLUSTER_STR_TO_ULA[ll], 10000) #TODO
             reason = answer
         else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, CLUSTER_STR_TO_ULA[ll], None)
         if not err:
-            SENT_TO_CLUSTERHEADS[str(ll.locator)] = TP_MAP
+            SENT_TO_CLUSTERHEADS[ll] = TP_MAP
 
-            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(ll, _attempt-attempt+1))
             CLUSTER_INFO[ll] = cbor.loads(answer.value)
             # mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#
             cluster_tagged_sem.acquire()
@@ -336,10 +355,10 @@ def neg_cluster(_tagged, ll, _attempt):
         
             cluster_tagged_sem.release()
             try:
-                mprint("\033[1;32;1m replying to {} \033[0m".format(str(ll.locator)))
+                mprint("\033[1;32;1m replying to {} \033[0m".format(ll))
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
-                    mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                    mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(ll))
                     break
                 else:
                     mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]))
@@ -347,7 +366,7 @@ def neg_cluster(_tagged, ll, _attempt):
                 mprint("\033[1;31;1m in cluster_neg_neg exception happened {} \033[0m".format(e))
             
         else:
-            mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+            mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(ll, graspi.etext[err]))
             if attempt == 1:
                 break
         attempt-=1

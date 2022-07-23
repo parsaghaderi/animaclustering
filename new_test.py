@@ -116,16 +116,10 @@ def discovery_cluster_handler(_tagged, _locators, _next = 6):
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
-    neg_threads = []
+    
     for item in _locators:
-        neg_threads.append(threading.Thread(target=neg, args=[_tagged, NEIGHBOR_STR_TO_LOCATOR[item], _attempts]))
-    for item in neg_threads:
-        item.start()
-    for item in neg_threads:
-        item.join()
-    # for item in _locators:
-    #     threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
-    sleep(5) #TODO check if can be reduced
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    sleep(10) #TODO check if can be reduced
     INITIAL_NEG = True
     PHASE = _next
 
@@ -313,19 +307,10 @@ def cluster_listener_handler(_tagged, _handle, _answer):
 def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
     global PHASE
     # for i in range(len(_locators)):
-    neg_threads = []
     for item in _locators:
         if CLUSTER_STR_TO_ULA.__contains__(item):
-            neg_threads.append(threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]))
-    for item in neg_threads:
-        item.start()
-    for item in neg_threads:
-        item.join()
-    
-    # for item in _locators:
-    #     if CLUSTER_STR_TO_ULA.__contains__(item):
-    #         threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
-    sleep(5)
+            threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
+    sleep(20)
     mprint("topology of the domain  - phase 1\n{}".format(TP_MAP))
     # PHASE = _next
     threading.Thread(target=check_to_update_clusterhead, args=[_tagged]).start()

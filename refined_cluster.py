@@ -86,7 +86,7 @@ def discovery_node_handler(_tagged, _locators):
             tagged_sem.release()
     mprint(NEIGHBORS_STR)
     sleep(10)
-    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
+    threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 6, 1]).start()
 
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):

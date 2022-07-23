@@ -99,7 +99,7 @@ def run_neg(_tagged, _locators, _next, _attempts = 1):
     for item in neg_threads:
         item.join()
     sleep(10) #TODO check if can be reduced
-    # INITIAL_NEG = True
+    INITIAL_NEG = True
     PHASE = _next
 
 def neg(_tagged, ll, _attempt):
@@ -182,6 +182,7 @@ def control():
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
+            mprint("in phase 2")
             run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),6, 1])
             run_neg_thread.start()
             run_neg_thread.join()

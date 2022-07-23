@@ -176,11 +176,11 @@ def control():
     while True:
         if PHASE == 1:
             mprint("starting phase 0 - init")
-            init_thread = threading.Thread(target=init, args = [6])
+            init_thread = threading.Thread(target=init, args = [2])
             init_thread.start()
             init_thread.join()
         elif PHASE == 2:
-            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),3, 1])
+            run_neg_thread = threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(),6, 1])
             run_neg_thread.start()
             run_neg_thread.join()
         elif PHASE == 3:

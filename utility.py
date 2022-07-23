@@ -23,10 +23,11 @@ def get_node_value():
 #########################
 # utility print function
 #########################
-def mprint(msg):
-    print("\n#######################")
-    print(msg)
-    print("#######################\n")
+def mprint(msg, mode = 1):
+    if mode!= 1:
+        print("\n#######################")
+        print(msg)
+        print("#######################\n")
 
 ##############
 # geting the locators as strings

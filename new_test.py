@@ -69,9 +69,11 @@ def listen_handler(_tagged, _handle, _answer):
     NEIGHBOR_INFO[initiator_ula] = tmp_answer
     if node_info['cluster_set'].__contains__(initiator_ula):
         mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
+    
     tagged_sem.acquire()
-    if tmp_answer['cluster_head'] == str(MY_ULA):
+    if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contain__(initiator_ula)):
         node_info['cluster_set'].append(initiator_ula)
+        mprint(node_info, 2)
         _tagged.objective.value = cbor.dumps(node_info)
     _answer.value = _tagged.objective.value
     tagged_sem.release()
@@ -144,6 +146,7 @@ def neg(_tagged, ll, _attempt):
                     node_info['cluster_set'].append(ll)
                 tagged.objective.value = cbor.dumps(node_info)
                 tagged_sem.release()
+                mprint(node_info, 2)
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:

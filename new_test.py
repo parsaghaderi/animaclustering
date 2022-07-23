@@ -220,7 +220,7 @@ def on_update_rcv(_next):
                     mprint("\033[1;35;1m Joining next heaviest{} 1\033[0m".format(HEAVIEST))
                     tagged_sem.acquire()
                     CLUSTERING_DONE = True
-                    node_info['cluster_head'] = str(tmp_ch.locator)
+                    node_info['cluster_head'] = tmp_ch
                     node_info['cluster_set'] = []
                     node_info['status'] = 4
                     tagged.objective.value = cbor.dumps(node_info)

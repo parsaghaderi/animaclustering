@@ -262,7 +262,7 @@ def generate_topology():
     if len(tmp_tagged['cluster_set']) != 0:
         for item in tmp_tagged['cluster_set']:
             for locators in NEIGHBOR_INFO:
-                if item == str(locators.locator) and item != MY_ULA:
+                if item == locators and item != MY_ULA:
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({str(MY_ULA):node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))

@@ -121,8 +121,10 @@ def neg(_tagged, ll, _attempt):
                 # tagged.objective.value = cbor.loads(tagged.objective.value)
                 if not node_info['cluster_set'].__contains__(str(ll.locator)):
                     node_info['cluster_set'].append(str(ll.locator))
+                    mprint("added a new member to cluster set")
                 tagged.objective.value = cbor.dumps(node_info)
                 tagged_sem.release()
+            
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:

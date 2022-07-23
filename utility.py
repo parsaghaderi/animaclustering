@@ -97,6 +97,7 @@ def listen(_tagged, _listen_handler):
 #shouldn't be here, but whatever !!!!
 def sort_weight(_my_weight, _neighbor_info, _heavier, _heaviest, _lighter):
     max_weight = _my_weight
+    mprint(_neighbor_info)
     for item in _neighbor_info:
         if _neighbor_info[item]['weight']> _my_weight:
             _heavier[item] = _neighbor_info[item]['weight']

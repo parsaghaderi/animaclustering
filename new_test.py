@@ -146,7 +146,7 @@ def neg(_tagged, ll, _attempt):
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
-                    mprint("\033[1;32;1m neg with {} ended successfully\033[0m".format(str(ll.locator)))
+                    mprint("\033[1;32;1m neg with {} ended successfully\033[0m".format(ll.locator))
                     break
                 else:
                     mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
@@ -154,7 +154,7 @@ def neg(_tagged, ll, _attempt):
                 mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
             
         else:
-            mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(str(ll.locator), graspi.etext[err]))
+            mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(ll, graspi.etext[err]))
             attempt+=1
         attempt-=1
         sleep(3)
@@ -197,10 +197,10 @@ def on_update_rcv(_next):
     if HEAVIEST != None:
         if NEIGHBOR_INFO[HEAVIEST]['cluster_head'] == True:
             mprint("\033[1;35;1m ####################### 1\033[0m")
-            mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST.locator))
+            mprint("\033[1;35;1m Joining {} 1\033[0m".format(HEAVIEST))
             tagged_sem.acquire()
             CLUSTERING_DONE = True
-            node_info['cluster_head'] = str(HEAVIEST.locator)
+            node_info['cluster_head'] = str(HEAVIEST)
             node_info['cluster_set'] = []
             node_info['status'] = 4
             tagged.objective.value = cbor.dumps(node_info)
@@ -216,7 +216,7 @@ def on_update_rcv(_next):
             while tmp_ch!=None:
                 mprint("\033[1;35;1m ^^^^^^^^^^^^^^^^^^^ 1\033[0m")
                 if NEIGHBOR_INFO[tmp_ch]['cluster_head'] == True and NEIGHBOR_INFO[tmp_ch]['status'] == 2:
-                    mprint("\033[1;35;1m Joining next heaviest{} 1\033[0m".format(HEAVIEST.locator))
+                    mprint("\033[1;35;1m Joining next heaviest{} 1\033[0m".format(HEAVIEST))
                     tagged_sem.acquire()
                     CLUSTERING_DONE = True
                     node_info['cluster_head'] = str(tmp_ch.locator)

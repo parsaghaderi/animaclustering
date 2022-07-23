@@ -12,6 +12,7 @@ HEAVIEST = None
 
 
 CLUSTER_HEAD = False
+CLUSTER_HEAD_ULA = None
 INITIAL_NEG = False
 CLUSTERING_DONE = False
 SYNCH = False
@@ -29,7 +30,7 @@ listen_sub = None
 
 SENT_TO_CLUSTERHEADS = {}
 UPDATE = False
-
+TO_JOIN = {}
 MAP = None
 
 asa, err = ASA_REG('node_neg')
@@ -57,6 +58,12 @@ def listen_handler(_tagged, _handle, _answer):
         mprint("\033[1;32;1m neg_initiator selected ME as cluster head \033[0m")
         tagged_sem.acquire()
         node_info['cluster_set'].append(initiator_ula)
+        _tagged.objective.value = cbor.dumps(node_info)
+        tagged_sem.release()
+    if tmp_answer['cluster_head'] == True and HEAVIEST == str(MY_ULA):
+        mprint("\033[1;32;1m joining {} as cluster head \033[0m".format(initiator_ula))
+        tagged_sem.acquire()
+        node_info['cluster_head'] = initiator_ula
         _tagged.objective.value = cbor.dumps(node_info)
         tagged_sem.release()
     _answer.value = _tagged.objective.value
@@ -99,7 +106,7 @@ def run_neg(_tagged, _locators, _next, _attempts = 1):
     for item in neg_threads:
         item.join()
     sleep(10) #TODO check if can be reduced
-    INITIAL_NEG = True
+    # INITIAL_NEG = True
     PHASE = _next
 
 def neg(_tagged, ll, _attempt):
@@ -126,7 +133,10 @@ def neg(_tagged, ll, _attempt):
                 tagged_sem.release()
             if NEIGHBOR_INFO[str(ll.locator)]['cluster_head'] == True and HEAVIEST == str(ll.locator):
                 mprint("\033[1;32;1m joining {}\033[0m".format(str(ll.locator)))
-                
+                tagged_sem.acquire()                
+                node_info['cluster_head'] = str(ll.locator)
+                tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
@@ -146,8 +156,6 @@ def neg(_tagged, ll, _attempt):
 def init(_next):
     global HEAVIER, HEAVIEST, LIGHTER, node_info, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE #,INITIAL_NEG
     
-    # while not INITIAL_NEG:
-    #     pass
     
     mprint("\033[1;32;1m  entering init phase - deciding role  {}\033[0m")
     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
@@ -167,7 +175,6 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
-        # cluster_listen_1.start()
     PHASE = _next   
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name

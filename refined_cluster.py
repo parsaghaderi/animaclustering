@@ -114,7 +114,7 @@ def neg(_tagged, ll, _attempt):
         if not err:
             mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(str(ll.locator), _attempt-attempt+1))
             NEIGHBOR_INFO[str(ll.locator)] = cbor.loads(answer.value)#TODO check
-            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[ll]))#√
+            mprint("neg_step value : peer {} offered {}".format(str(ll.locator), NEIGHBOR_INFO[str(ll.locator]))#√
             
             if NEIGHBOR_INFO[str(ll.locator)]['cluster_head'] == str(MY_ULA): #√
                 tagged_sem.acquire()

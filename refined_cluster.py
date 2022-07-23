@@ -124,7 +124,9 @@ def neg(_tagged, ll, _attempt):
                     mprint("added a new member to cluster set")
                 tagged.objective.value = cbor.dumps(node_info)
                 tagged_sem.release()
-            
+            if NEIGHBOR_INFO[str(ll.locator)]['cluster_head'] == True and str(ll.locator) == HEAVIEST:
+                mprint("\033[1;32;1m joining {}\033[0m".format(str(ll.locator)))
+                
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:

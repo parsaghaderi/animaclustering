@@ -337,7 +337,7 @@ def neg_cluster(_tagged, ll, _attempt):
         if not err:
             SENT_TO_CLUSTERHEADS[ll] = TP_MAP
 
-            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(ll, _attempt-attempt+1))
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(ll, _attempt-attempt+1), 2)
             CLUSTER_INFO[ll] = cbor.loads(answer.value)
             # mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#
             cluster_tagged_sem.acquire()
@@ -349,15 +349,15 @@ def neg_cluster(_tagged, ll, _attempt):
                 mprint("\033[1;32;1m replying to {} \033[0m".format(ll))
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 if not _err:
-                    mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(ll))
+                    mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(ll), 2)
                     break
                 else:
-                    mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+                    mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]), 2)
             except Exception as e:
-                mprint("\033[1;31;1m in cluster_neg_neg exception happened {} \033[0m".format(e))
+                mprint("\033[1;31;1m in cluster_neg_neg exception happened {} \033[0m".format(e), 2)
             
         else:
-            mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(ll, graspi.etext[err]))
+            mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(ll, graspi.etext[err]), 2)
             if attempt == 1:
                 break
         attempt-=1
@@ -371,6 +371,7 @@ discovery_1.start()
 
 cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster_listener_handler])
 cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,discovery_cluster_handler, 3])
+
 
 def check_to_update_clusterhead(_tagged, _next = 0):
     global UPDATE, PHASE

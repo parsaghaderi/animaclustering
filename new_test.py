@@ -111,7 +111,7 @@ def discovery_cluster_handler(_tagged, _locators, _next = 6):
             CLUSTER_INFO[str(item.locator)] = 0
             CLUSTER_UPDATE[str(item.locator)] = False
             CLUSTER_STR_TO_ULA[str(item.locator)] = item
-            mprint("cluster head found at {}".format(str(item.locator)))
+            mprint("cluster head found at {}".format(str(item.locator)), 2)
     sleep(10)
     mprint("")
     threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()

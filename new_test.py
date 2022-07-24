@@ -71,7 +71,7 @@ def listen_handler(_tagged, _handle, _answer):
         mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     
     tagged_sem.acquire()
-    if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contain__(initiator_ula)):
+    if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contains__(initiator_ula)):
         node_info['cluster_set'].append(initiator_ula)
         mprint(node_info, 2)
         _tagged.objective.value = cbor.dumps(node_info)

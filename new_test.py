@@ -435,8 +435,7 @@ def control():
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:
             mprint("entering maintenance phase")
-            maintenance_thread = threading.Thread(target=maintenance, args = [])
-            maintenance_thread.start()
+            maintenance_thread = threading.Thread(target=maintenance, args = []).start()
             pass
 
 threading.Thread(target=control, args = []).start()

@@ -335,7 +335,7 @@ def neg_cluster(_tagged, ll, _attempt):
         else:
             try:
                 err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, CLUSTER_STR_TO_ULA[ll], None)
-            except Exception e:
+            except Exception as e:
                 mprint("exception in neg_cluster req_neg with {} with code {}".format(ll, graspi.etext[e]), 2)
         if not err:
             SENT_TO_CLUSTERHEADS[ll] = TP_MAP

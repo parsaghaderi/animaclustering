@@ -394,13 +394,14 @@ def check_to_update_clusterhead(_tagged, _next = 0):
 
 def maintenance():
     global PHASE
-    for item in CLUSTER_STR_TO_ULA:
-        if CLUSTER_INFO[item] != TP_MAP:
-            update_neighbor_CH = threading.Thread(target = run_neg, args = [cluster_tagged, CLUSTER_STR_TO_ULA[item], 3])
-            update_neighbor_CH.start()
-            update_neighbor_CH.join()
-    PHASE = 6
-    sleep(10)
+    while True:
+        for item in CLUSTER_STR_TO_ULA:
+            if CLUSTER_INFO[item] != TP_MAP:
+                update_neighbor_CH = threading.Thread(target = run_neg, args = [cluster_tagged, CLUSTER_STR_TO_ULA[item], 3])
+                update_neighbor_CH.start()
+                update_neighbor_CH.join()
+        PHASE = 6
+        sleep(10)
 
 def control():
     while True:
@@ -434,8 +435,8 @@ def control():
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:
-            mprint("entering maintenance phase")
-            maintenance_thread = threading.Thread(target=maintenance, args = []).start()
+            # mprint("entering maintenance phase")
+            # maintenance_thread = threading.Thread(target=maintenance, args = []).start()
             pass
 
 threading.Thread(target=control, args = []).start()

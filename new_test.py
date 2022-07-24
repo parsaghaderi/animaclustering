@@ -36,7 +36,8 @@ MAP_SEM = threading.Semaphore()
 PHASE = 0
 listen_sub = None
 
-
+TMP_CLUSTER_VERSION = None
+SYNCH_COUNTER = 0
 SENT_TO_CLUSTERHEADS = {}
 UPDATE = False
 '''
@@ -106,6 +107,7 @@ def discovery_node_handler(_tagged, _locators):
     threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 
 def discovery_cluster_handler(_tagged, _locators, _next = 6):
+    global PHASE
     for item in _locators:
         if str(item.locator) != MY_ULA:
             CLUSTER_INFO[str(item.locator)] = 0
@@ -114,7 +116,8 @@ def discovery_cluster_handler(_tagged, _locators, _next = 6):
             mprint("cluster head found at {}".format(str(item.locator)), 2)
     sleep(10)
     mprint("")
-    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()
+    PHASE = _next
+    # threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
@@ -316,7 +319,7 @@ def run_cluster_neg(_tagged, _locators, _next, _attempts = 1):
     sleep(20)
     mprint("topology of the domain  - phase 1\n{}".format(TP_MAP))
     # PHASE = _next
-    threading.Thread(target=check_to_update_clusterhead, args=[_tagged]).start()
+    # threading.Thread(target=check_to_update_clusterhead, args=[_tagged]).start()
 
     # sleep(15)
     # mprint("topology after 1 round of neg \n{}".format(TP_MAP))
@@ -376,13 +379,29 @@ def check_to_update_clusterhead(_tagged, _next = 0):
     #         UPDATE = True
 
     # if UPDATE:
-    threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 3]).start()
+    if TMP_CLUSTER_VERSION == CLUSTER_INFO and SYNCH_COUNTER == 2:
+        mprint("done synchronizing")
+        PHASE = 6
+    else:
+        mprint("Synchronizing")
+        threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 3]).start()
+
     sleep(5)
     # else:
     #     mprint("No changes")
     #     PHASE = 0
     # UPDATE = False
-    
+
+def maintenance():
+    global PHASE
+    for item in CLUSTER_STR_TO_ULA:
+        if CLUSTER_INFO[item] != TP_MAP:
+            update_neighbor_CH = threading.Thread(target = run_neg, args = [cluster_tagged, CLUSTER_STR_TO_ULA[item], 3])
+            update_neighbor_CH.start()
+            update_neighbor_CH.join()
+    PHASE = 6
+    sleep(10)
+
 def control():
     while True:
         if PHASE == 1:
@@ -415,6 +434,9 @@ def control():
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:
+            mprint("entering maintenance phase")
+            maintenance_thread = threading.Thread(target=maintenance, args = [])
+            maintenance_thread.start()
             pass
 
 threading.Thread(target=control, args = []).start()

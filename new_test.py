@@ -114,7 +114,7 @@ def discovery_cluster_handler(_tagged, _locators, _next = 6):
             CLUSTER_UPDATE[str(item.locator)] = False
             CLUSTER_STR_TO_ULA[str(item.locator)] = item
             mprint("cluster head found at {}".format(str(item.locator)), 2)
-    sleep(10)
+    sleep(20)
     threading.Thread(target=maintenance, args=[]).start()
     PHASE = 6
     # threading.Thread(target=run_cluster_neg, args=[_tagged, CLUSTER_INFO.keys(),0, 1]).start()
@@ -190,7 +190,8 @@ def init(_next):
         TO_JOIN = None
         CLUSTER_HEAD = True
         CLUSTERING_DONE = True
-        cluster_listen_1.start()
+        if not cluster_listen_1.is_alive():
+            cluster_listen_1.start()
     PHASE = _next      
 
 def on_update_rcv(_next):
@@ -260,7 +261,8 @@ def on_update_rcv(_next):
                 TO_JOIN = None
                 CLUSTER_HEAD = True
                 PHASE = _next
-                cluster_listen_1.start()
+                if not cluster_listen_1.is_alive():
+                    cluster_listen_1.start()
 
 def generate_topology():
     global TP_MAP

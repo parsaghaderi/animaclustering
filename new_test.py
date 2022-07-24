@@ -397,9 +397,11 @@ def maintenance():
     while True:
         for item in CLUSTER_STR_TO_ULA:
             if CLUSTER_INFO[item] != TP_MAP:
+                mprint("TP map didn't match with {}".format(item), 2)
                 update_neighbor_CH = threading.Thread(target = run_neg, args = [cluster_tagged, CLUSTER_STR_TO_ULA[item], 3])
                 update_neighbor_CH.start()
                 update_neighbor_CH.join()
+                mprint("TP map of {} update".format(CLUSTER_INFO[item]), 2)
         PHASE = 6
         sleep(10)
 

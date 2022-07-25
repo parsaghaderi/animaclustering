@@ -15,20 +15,21 @@ pledge_tagged = TAG_OBJ(pledge, asa)
 
 def discovery_proxy(_tagged):
     global PROXY_LOCATOR
-    mprint("discoverying proxy")
+    mprint("discoverying proxy", 2)
     _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
     mprint("proxy locator found at {}".format(str(ll[0].locator)), 2)
     PROXY_LOCATOR = ll[0]
+    mprint("start negotiation with proxy", 2)
     threading.Thread(target=neg_with_proxy, args=[_tagged, PROXY_LOCATOR]).start()
 
 def discovery_registrar(_tagged): 
     global PROXY_STATE
     if PROXY_STATE:
-        mprint("looking for registrar")
+        mprint("looking for registrar", 2)
 
 def neg_with_proxy(_tagged, ll):
     global PROXY_STATE
-    mprint("negotiating with REGISTRAR")
+    mprint("negotiating with REGISTRAR", 2)
     try:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
@@ -38,7 +39,7 @@ def neg_with_proxy(_tagged, ll):
 
         if not err:
             if cbor.loads(answer.value) == True:
-                mprint("can join network - key stored for further comm - ACP booted up")
+                mprint("can join network - key stored for further comm - ACP booted up", 2)
                 PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 return answer
@@ -47,7 +48,7 @@ def neg_with_proxy(_tagged, ll):
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
             return False
     except Exception as e:
-        mprint("there was an error occurred in neg_REGISTRAR with code {}".format(graspi.etext[e]))
+        mprint("there was an error occurred in neg_REGISTRAR with code {}".format(graspi.etext[e]), 2)
 
 # def proxy_listen_handler(_tagged, _handle, _answer):
 

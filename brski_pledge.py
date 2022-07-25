@@ -31,7 +31,8 @@ def discovery_registrar(_tagged):
     mprint("discoverying registrar", 2)
     _, ll =  graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
     mprint("Registrar found at {}".format(str(ll[0].locator)), 2)
-    
+    REGISTRAR_LOCATOR = ll[0]
+    threading.Thread(target=neg_with_registrar, args=[_tagged, REGISTRAR_LOCATOR]).start()
 
 def neg_with_proxy(_tagged, ll):
     global PROXY_STATE, registrar_tagged
@@ -51,11 +52,34 @@ def neg_with_proxy(_tagged, ll):
                 mprint("looking for the registrar", 2)
                 threading.Thread(target=discovery_registrar, args=[registrar_tagged]).start()   
         else:
+            mprint("Proxy didn't respond")
+            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+            return False
+    except Exception as e:
+        mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+
+def neg_with_registrar(_tagged, ll):
+    mprint("negotiating with registrar")
+    try:
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+
+        if not err:
+            if cbor.loads(answer.value) == True:
+                mprint("communicating with the registrar", 2)
+                PROXY_STATE = True
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                
+        else:
             mprint("Registrar didn't respond")
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
             return False
     except Exception as e:
-        mprint("there was an error occurred in neg_REGISTRAR with code {}".format(graspi.etext[e]), 2)
+        mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
+
 
 # def proxy_listen_handler(_tagged, _handle, _answer):
 

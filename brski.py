@@ -32,8 +32,7 @@ def listen_proxy_req(_tagged, _listen_handler=None):
             else:
                 mprint("From Proxy")
 
-if REGISTRAR:
-    threading.Thread(target=listen_proxy_req, args=[tagged_obj]).start()
-else:
+threading.Thread(target=listen_proxy_req, args=[tagged_obj]).start()
+if not REGISTRAR:
     threading.Thread(target=discovery_proxy, args=[tagged_obj]).start()
 

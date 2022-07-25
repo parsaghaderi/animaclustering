@@ -13,6 +13,10 @@ asa, err  = ASA_REG('brski')
 pledge, err = OBJ_REG('pledge', cbor.dumps(False), True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
 
+
+registrar, err = OBJ_REG('registrar', cbor.dumps(False), True, False, 10, asa)
+registrar_tagged = TAG_OBJ(registrar, asa)
+
 def discovery_proxy(_tagged):
     global PROXY_LOCATOR
     mprint("discoverying proxy", 2)
@@ -23,12 +27,14 @@ def discovery_proxy(_tagged):
     threading.Thread(target=neg_with_proxy, args=[_tagged, PROXY_LOCATOR]).start()
 
 def discovery_registrar(_tagged): 
-    global PROXY_STATE
-    if PROXY_STATE:
-        mprint("looking for registrar", 2)
+    global REGISTRAR_LOCATOR
+    mprint("discoverying registrar", 2)
+    _, ll =  graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+    mprint("Registrar found at {}".format(str(ll[0].locator)), 2)
+    
 
 def neg_with_proxy(_tagged, ll):
-    global PROXY_STATE
+    global PROXY_STATE, registrar_tagged
     mprint("negotiating with REGISTRAR", 2)
     try:
         if _old_API:
@@ -42,7 +48,8 @@ def neg_with_proxy(_tagged, ll):
                 mprint("can join network - key stored for further comm - ACP booted up", 2)
                 PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                return answer
+                mprint("looking for the registrar", 2)
+                threading.Thread(target=discovery_registrar, args=[registrar_tagged]).start()   
         else:
             mprint("Registrar didn't respond")
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")

@@ -42,6 +42,27 @@ def listen_proxy_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
 
 def listen_registrar_handler(_tagged, _handle, _answer):
-    pass
+    initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula), 2)
+    tmp_answer = cbor.loads(_answer.value)
+    _answer.value = cbor.dumps(True)
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+                err, temp, answer = _r
+                reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula), 2)  
+        else:
+            mprint("\033[1;31;1m in listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
+            pass
+    except Exception as err:
+        mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
+        
+
+
 
 threading.Thread(target=listen, args=[pledge_tagged, listen_proxy_handler]).start()
+threading.Thread(target=listen, args=[registrar_tagged, listen_registrar_handler]).start()

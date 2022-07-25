@@ -19,7 +19,7 @@ registrar_tagged = TAG_OBJ(registrar, asa)
 def listen_proxy_handler(_tagged, _handle, _answer):
     global list_of_approved
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    mprint("\033[1;32;1m incoming request from {}\033[0m".format())
+    mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula))
     tmp_answer = cbor.loads(_answer.value)
     if True:
         mprint("contacting MASA with the Pledge's certificate")

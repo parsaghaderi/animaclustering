@@ -10,7 +10,7 @@ PROXY_STATE = False
 
 asa, err  = ASA_REG('brski')
 
-pledge, err = OBJ_REG('pledge', False, True, False, 10, asa)
+pledge, err = OBJ_REG('pledge', cbor.dumps(False), True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
 
 def discovery_proxy(_tagged):

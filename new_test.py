@@ -287,7 +287,7 @@ def generate_topology():
 def cluster_listener_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
-    mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer))
+    mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer), 2)
     cluster_tagged_sem.acquire()
     
     CLUSTER_INFO[initiator_ula] = tmp_answer

@@ -37,7 +37,7 @@ def neg_with_proxy(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
 
         if not err:
-            if cbor.loads(answer) == True:
+            if cbor.loads(answer.value) == True:
                 mprint("can join network - key stored for further comm - ACP booted up")
                 PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")

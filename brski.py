@@ -2,7 +2,7 @@ from utility import *
 from utility import _old_API as _old_API
 import sys
 
-REGISTRAR = sys.argv[2] == "True"
+REGISTRAR = sys.argv[1] == "True"
 REGISTRAR_LOCATOR = None
 PROXY_LOCATOR = None
 

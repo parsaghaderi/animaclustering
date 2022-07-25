@@ -16,7 +16,7 @@ def discovery_proxy(_tagged):
     global PROXY_LOCATOR
     mprint("discoverying proxy")
     _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-    mprint("proxy locator found at {}".format(str(ll.locator)), 2)
+    mprint("proxy locator found at {}".format(str(ll[0].locator)), 2)
     PROXY_LOCATOR = ll[0]
 
 def listen_proxy_req(_tagged, _listen_handler=None):

@@ -17,6 +17,11 @@ pledge_tagged = TAG_OBJ(pledge, asa)
 registrar, err = OBJ_REG('registrar', cbor.dumps(False), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 
+proxy, err = OBJ_REG('proxy', None, True, False, 10, asa)
+proxy_tagged = TAG_OBJ(proxy, asa)
+proxy_sem = threading.Semaphore()
+
+
 def discovery_proxy(_tagged):
     global PROXY_LOCATOR
     mprint("discoverying proxy", 2)
@@ -50,7 +55,12 @@ def neg_with_proxy(_tagged, ll):
                 PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 mprint("looking for the registrar", 2)
-                threading.Thread(target=discovery_registrar, args=[registrar_tagged]).start()   
+                discovery_registrar_thread = threading.Thread(target=discovery_registrar, args=[registrar_tagged])
+                discovery_registrar_thread.start()
+                discovery_registrar_thread.join()
+                threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start()
+            else:
+                mprint("Registrar rejected Pledge or there is problem in communication with Registrar")
         else:
             mprint("Proxy didn't respond")
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
@@ -72,7 +82,7 @@ def neg_with_registrar(_tagged, ll):
                 mprint("communicating with the registrar", 2)
                 PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                
+                return True
         else:
             mprint("Registrar didn't respond")
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
@@ -80,11 +90,49 @@ def neg_with_registrar(_tagged, ll):
     except Exception as e:
         mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
 
+def relay(_answer):
+    global proxy_tagged
+    mprint("relaying voucher request")
+    proxy_tagged.objective.value = _answer.value
+    try:
+        if _old_API:
+                err, handle, answer = graspi.req_negotiate(proxy_tagged.source,proxy_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
+                reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(proxy_tagged.source,proxy_tagged.objective, REGISTRAR_LOCATOR, None)
+
+        if not err:
+            mprint("got voucher response form registrar")
+            _err = graspi.end_negotiate(proxy_tagged.source, handle, True, reason="value received")
+            return cbor.loads(answer)
+    except Exception as e:
+        mprint("exception experienced during relay negotiation process with code {}".format(graspi.etext[e]), 2)
+        return cbor.dumps(False)
 
 # def proxy_listen_handler(_tagged, _handle, _answer):
 
+def proxy_listen_handler(_tagged, _handle, _answer):
+    initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    relay_result = relay(_answer)
+
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, relay_result, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            mprint("\033[1;32;1m negotiation with pledge {} ended successfully \033[0m".format(initiator_ula), 2)  
+        else:
+            mprint("\033[1;31;1m in proxy_listen_handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
+            pass
+    except Exception as err:
+        mprint("\033[1;31;1m exception in proxy_listen_handler {} \033[0m".format(err), 2)
 
 
+
+        
 def init_proxy(): #listener
     global PROXY_STATE
     while not PROXY_STATE:
@@ -92,4 +140,4 @@ def init_proxy(): #listener
     mprint("acting as proxy")
     
 
-threading.Thread(target=discovery_proxy, args=[pledge_tagged]).start()
+threading.Thread(target=discovery_proxy, args=[proxy_tagged]).start()

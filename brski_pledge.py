@@ -8,16 +8,19 @@ PROXY_LOCATOR = None
 
 PROXY_STATE = False
 PHASE = 1
+
+MAP = {MY_ULA:NEIGHBOR_ULA}
 asa, err  = ASA_REG('brski')
 
-pledge, err = OBJ_REG('pledge', cbor.dumps(False), True, False, 10, asa)
+pledge, err = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
+pledge_sem = threading.Semaphore()
 
-
-registrar, err = OBJ_REG('registrar', cbor.dumps(NEIGHBOR_ULA), True, False, 10, asa)
+registrar, err = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
+registrar_sem = threading.Semaphore()
 
-proxy, err = OBJ_REG('proxy', cbor.dumps(False), True, False, 10, asa, True)
+proxy, err = OBJ_REG('proxy', cbor.dumps({MY_ULA:NEIGHBOR_ULA}), True, False, 10, asa, True)
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
 
@@ -50,7 +53,7 @@ def discovery_registrar(_tagged):
             threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
             sleep(5)
             mprint("entering phase 4",2)
-            PHASE = 4
+            PHASE = 5
             break   
         else:
             sleep(5)
@@ -71,9 +74,17 @@ def neg_with_proxy(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
 
         if not err:
-            if cbor.loads(answer.value) == True:
+            if cbor.loads(answer.value) != False:
                 mprint("can join network - key stored for further comm - ACP booted up", 2)
+                
+                registrar_sem.acquire()
+                pledge_sem.acquire()
+                registrar_tagged.objective.value = cbor.loads(answer.value)
+                pledge_tagged.objective.value = cbor.loads(answer.value)
+                registrar_sem.release()
+                pledge_sem.release()
                 PROXY_STATE = True
+
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 mprint("looking for the registrar", 2)
                 PHASE = 3

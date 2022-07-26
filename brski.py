@@ -1,3 +1,4 @@
+from brski_pledge import pledge_listen_handler
 from utility import *
 from utility import _old_API as _old_API
 import sys
@@ -9,14 +10,15 @@ list_of_approved = []
 
 asa, err  = ASA_REG('brski')
 
-pledge, err = OBJ_REG('pledge', True, True, False, 10, asa)
+pledge, err = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
+pledge_sem = threading.Semaphore()
 
 registrar, err = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 registrar_sem = threading.Semaphore()
 
-proxy, err = OBJ_REG('proxy', cbor.dumps(False), True, False, 10, asa, True)
+proxy, err = OBJ_REG('proxy', cbor.dumps(MAP), True, False, 10, asa, True)
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
 # proxy, err = OBJ_REG('brski_proxy', False, True, False, 10, asa)
@@ -24,7 +26,7 @@ proxy_sem = threading.Semaphore()
 
 
 def listen_proxy_handler(_tagged, _handle, _answer):
-    global list_of_approved
+    global list_of_approved, pledge_tagged, proxy_tagged
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula), 2)
     tmp_answer = cbor.loads(_answer.value)
@@ -34,7 +36,21 @@ def listen_proxy_handler(_tagged, _handle, _answer):
         mprint(list_of_approved)
 
     try:
-        _answer.value = cbor.dumps(True)
+        if random.randint(0, 10)%3 != 0:
+            proxy_sem.acquire()
+            registrar_sem.acquire()
+            pledge_sem.acquire()
+            MAP.update(tmp_answer)
+            _tagged.objective.value = cbor.dumps(MAP)
+            proxy_tagged.objective.value = cbor.dumps(MAP)
+            pledge_tagged.objective.value = cbor.dumps(MAP)
+            _answer.value = cbor.dumps(MAP)
+            proxy_sem.release()
+            registrar_sem.release()
+            pledge_sem.release()
+        else:
+            _answer.value = cbor.dumps(False)
+
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r
@@ -54,8 +70,21 @@ def listen_registrar_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula), 2)
     tmp_answer = cbor.loads(_answer.value)
-    MAP[initiator_ula] = tmp_answer
+    # MAP[initiator_ula] = tmp_answer
+    # registrar_sem.acquire()
+
+    proxy_sem.acquire()
     registrar_sem.acquire()
+    pledge_sem.acquire()
+    MAP.update(tmp_answer)
+    _tagged.objective.value = cbor.dumps(MAP)
+    proxy_tagged.objective.value = cbor.dumps(MAP)
+    pledge_tagged.objective.value = cbor.dumps(MAP)
+    _answer.value = cbor.dumps(MAP)
+    proxy_sem.release()
+    registrar_sem.release()
+    pledge_sem.release()
+
     _answer.value = cbor.dumps(MAP)
     registrar_tagged.objective.value = cbor.dumps(MAP)
     registrar_sem.release()

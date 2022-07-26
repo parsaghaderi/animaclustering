@@ -90,10 +90,10 @@ def neg_with_registrar(_tagged, ll):
     mprint("negotiating with registrar")
     try:
         if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll.locator, 10000) #TODO
             reason = answer
         else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll.locator, None)
 
         if not err:
             if cbor.loads(answer.value) == True:

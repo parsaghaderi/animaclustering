@@ -186,5 +186,7 @@ def control():
             neg_with_registrar_thread = threading.Thread(target=neg_with_registrar, args=[registrar_tagged, REGISTRAR_LOCATOR])
             neg_with_registrar_thread.start()
             neg_with_registrar_thread.join()
+        elif PHASE == 5:
+            pass
         sleep(1)
 threading.Thread(target=control, args = []).start()

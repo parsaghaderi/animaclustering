@@ -56,13 +56,13 @@ def ASA_REG(name):
 #########################
 #Registering objectives
 #########################
-def OBJ_REG(name, value, neg, synch, loop_count, ASA):
+def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = False):
     obj = graspi.objective(name)
     obj.value = value
     obj.neg = neg
     obj.synch = synch
     obj.loop_count = loop_count
-    err = graspi.register_obj(ASA, obj)
+    err = graspi.register_obj(ASA, obj, local=_local)
     if not err:
         mprint("Objective registered successfully")
     else:

@@ -4566,7 +4566,7 @@ def _initialise_grasp():
         # DULL mode?                       # 
         ####################################
 
-        DULL = False
+        DULL = True
 
         try:
             # _l = input("Insecure link-local mode (DULL)? Y/N:")

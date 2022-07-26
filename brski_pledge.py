@@ -104,7 +104,7 @@ def neg_with_registrar(_tagged, ll):
 def relay(_answer):
     global registrar_tagged
     mprint("relaying voucher request")
-    registrar_tagged.objective.value = _answer.value
+    registrar_tagged.objective.value = cbor.dumps(_answer)
     try:
         if _old_API:
                 err, handle, answer = graspi.req_negotiate(registrar_tagged.source,registrar_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
@@ -124,7 +124,7 @@ def relay(_answer):
 
 def proxy_listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    _answer.value = relay(_answer)
+    _answer.value = relay(cbor.loads(_answer.value))#TODO
 
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)

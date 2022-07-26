@@ -17,7 +17,7 @@ pledge_tagged = TAG_OBJ(pledge, asa)
 registrar, err = OBJ_REG('registrar', cbor.dumps(False), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 
-proxy, err = OBJ_REG('proxy', None, True, False, 10, asa)
+proxy, err = OBJ_REG('proxy', cbor.dumps(None), True, False, 10, asa)
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
 
@@ -45,7 +45,7 @@ def discovery_registrar(_tagged):
 
 def neg_with_proxy(_tagged, ll):
     global PROXY_STATE, registrar_tagged, PHASE
-    mprint("negotiating with REGISTRAR", 2)
+    mprint("negotiating with proxy", 2)
     try:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO

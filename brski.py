@@ -9,10 +9,10 @@ asa, err  = ASA_REG('brski')
 pledge, err = OBJ_REG('pledge', True, True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
 
-registrar, err = OBJ_REG('registrar', True, True, False, 10, asa)
+registrar, err = OBJ_REG('registrar', cbor.dumps(True), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 
-proxy, err = OBJ_REG('proxy', None, True, False, 10, asa)
+proxy, err = OBJ_REG('proxy', cbor.dumps(None), True, False, 10, asa)
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
 # proxy, err = OBJ_REG('brski_proxy', False, True, False, 10, asa)

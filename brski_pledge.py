@@ -111,17 +111,20 @@ def neg_with_registrar(_tagged, ll):
 def relay(_answer):
     global registrar_tagged, proxy_tagged
     mprint("relaying voucher request")
+    proxy_sem.acquire()
     proxy_tagged.objective.value = cbor.dumps(_answer)
+    
     try:
         if _old_API:
                 err, handle, answer = graspi.req_negotiate(proxy_tagged.source,proxy_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
                 reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(proxy_tagged.source,proxy_tagged.objective, REGISTRAR_LOCATOR, None)
-
+        proxy_sem.release()
         if not err:
             mprint("got voucher response form registrar", 2)
             _err = graspi.end_negotiate(proxy_tagged.source, handle, True, reason="value received")
+            proxy_sem.release()
             return cbor.loads(answer.value)
     except Exception as e:
         mprint("exception experienced during relay negotiation process with code {}".format(graspi.etext[e]), 2)

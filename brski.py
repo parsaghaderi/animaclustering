@@ -12,8 +12,9 @@ asa, err  = ASA_REG('brski')
 pledge, err = OBJ_REG('pledge', True, True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
 
-registrar, err = OBJ_REG('registrar', cbor.dumps(True), True, False, 10, asa)
+registrar, err = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
+registrar_sem = threading.Semaphore()
 
 proxy, err = OBJ_REG('proxy', cbor.dumps(False), True, False, 10, asa, True)
 proxy_tagged = TAG_OBJ(proxy, asa)
@@ -54,7 +55,10 @@ def listen_registrar_handler(_tagged, _handle, _answer):
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula), 2)
     tmp_answer = cbor.loads(_answer.value)
     MAP[initiator_ula] = tmp_answer
+    registrar_sem.acquire()
     _answer.value = cbor.dumps(MAP)
+    registrar_tagged.objective.value = cbor.dumps(MAP)
+    registrar_sem.release()
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
@@ -64,6 +68,7 @@ def listen_registrar_handler(_tagged, _handle, _answer):
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula), 2)  
+        
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
             pass

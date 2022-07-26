@@ -46,13 +46,18 @@ def discovery_registrar(_tagged):
         if len(ll)!= 0:
             mprint("Registrar found at {}".format(str(ll[0].locator)), 2)
             REGISTRAR_LOCATOR = ll[0]
-            break   
+            threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
+            threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
+            sleep(5)
+            mprint("entering phase 4")
+            PHASE = 4
+            return   
         else:
             sleep(5)
-    threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
-    threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
-    sleep(5)
-    PHASE = 4
+    # threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
+    # threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
+    # sleep(5)
+    # PHASE = 4
     
 
 def neg_with_proxy(_tagged, ll):

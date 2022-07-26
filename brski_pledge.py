@@ -51,6 +51,7 @@ def discovery_registrar(_tagged):
             sleep(5)
     threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
     threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
+    sleep(5)
     PHASE = 4
     
 
@@ -176,6 +177,7 @@ def control():
             discovery_registrar_thread.start()
             discovery_registrar_thread.join()
         elif PHASE == 4:
+            mprint("calling neg with registrar")
             neg_with_registrar_thread = threading.Thread(target=neg_with_registrar, args=[registrar_tagged, REGISTRAR_LOCATOR])
             neg_with_registrar_thread.start()
             neg_with_registrar_thread.join()

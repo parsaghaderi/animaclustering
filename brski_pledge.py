@@ -40,10 +40,15 @@ def discovery_proxy(_tagged):
 
 def discovery_registrar(_tagged): 
     global REGISTRAR_LOCATOR, PHASE
-    mprint("discoverying registrar", 2)
-    _, ll =  graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-    mprint("Registrar found at {}".format(str(ll[0].locator)), 2)
-    REGISTRAR_LOCATOR = ll[0]
+    while True:
+        mprint("discoverying registrar", 2)
+        _, ll =  graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        if len(ll)!= 0:
+            mprint("Registrar found at {}".format(str(ll[0].locator)), 2)
+            REGISTRAR_LOCATOR = ll[0]
+            break   
+        else:
+            sleep(5)
     threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
     threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
     PHASE = 4
@@ -90,10 +95,10 @@ def neg_with_registrar(_tagged, ll):
     mprint("negotiating with registrar")
     try:
         if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll.locator, 10000) #TODO
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
             reason = answer
         else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll.locator, None)
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
 
         if not err:
             if cbor.loads(answer.value) == True:

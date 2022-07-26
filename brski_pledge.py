@@ -163,3 +163,5 @@ def control():
             discovery_registrar_thread.join()
         elif PHASE == 4:
                 pass
+
+threading.Thread(target=control, args = []).start()

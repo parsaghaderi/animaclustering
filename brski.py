@@ -3,6 +3,8 @@ from utility import _old_API as _old_API
 import sys
 import random
 
+MAP = {}
+
 list_of_approved = []
 
 asa, err  = ASA_REG('brski')
@@ -47,10 +49,12 @@ def listen_proxy_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
 
 def listen_registrar_handler(_tagged, _handle, _answer):
+    global MAP
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula), 2)
     tmp_answer = cbor.loads(_answer.value)
-    _answer.value = cbor.dumps(True)
+    MAP[initiator_ula] = tmp_answer
+    _answer.value = cbor.dumps(MAP)
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:

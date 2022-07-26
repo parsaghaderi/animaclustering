@@ -14,7 +14,7 @@ pledge, err = OBJ_REG('pledge', cbor.dumps(False), True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
 
 
-registrar, err = OBJ_REG('registrar', cbor.dumps(False), True, False, 10, asa)
+registrar, err = OBJ_REG('registrar', cbor.dumps(NEIGHBOR_ULA), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 
 proxy, err = OBJ_REG('proxy', cbor.dumps(False), True, False, 10, asa, True)
@@ -172,6 +172,7 @@ def control():
             discovery_registrar_thread.start()
             discovery_registrar_thread.join()
         elif PHASE == 4:
-                pass
-
+            neg_with_registrar_thread = threading.Thread(target=neg_with_registrar, args=[registrar_tagged, REGISTRAR_LOCATOR])
+            neg_with_registrar_thread.start()
+            neg_with_registrar_thread.join()
 threading.Thread(target=control, args = []).start()

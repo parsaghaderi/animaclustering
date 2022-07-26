@@ -1,6 +1,7 @@
 from utility import *
 from utility import _old_API as _old_API
 import sys
+import random
 
 list_of_approved = []
 
@@ -28,8 +29,9 @@ def listen_proxy_handler(_tagged, _handle, _answer):
         mprint("contacting MASA with the Pledge's certificate", 2)
         list_of_approved.append(initiator_ula)
         mprint(list_of_approved)
+
     try:
-        _answer.value = cbor.dumps(True)
+        _answer.value = cbor.dumps(cbor.dumps(random.randint(0, 10)%2 == 3))
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r

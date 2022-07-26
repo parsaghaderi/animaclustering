@@ -98,7 +98,7 @@ def neg_with_proxy(_tagged, ll):
         
 
 def neg_with_registrar(_tagged, ll):
-    mprint("negotiating with registrar")
+    mprint("negotiating with registrar", 2)
     try:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
@@ -182,7 +182,7 @@ def control():
             discovery_registrar_thread.start()
             discovery_registrar_thread.join()
         elif PHASE == 4:
-            mprint("calling neg with registrar")
+            mprint("calling neg with registrar", 2)
             neg_with_registrar_thread = threading.Thread(target=neg_with_registrar, args=[registrar_tagged, REGISTRAR_LOCATOR])
             neg_with_registrar_thread.start()
             neg_with_registrar_thread.join()

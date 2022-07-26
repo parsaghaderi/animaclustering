@@ -28,7 +28,7 @@ def discovery_proxy(_tagged):
         mprint("discoverying proxy", 2)
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         if len(ll) != 0:
-            mprint("proxy locator found at {}".format(ll), 2)
+            mprint("proxy locator found at {}".format(str(ll.locator), 2)
             # PROXY_LOCATOR = ll[0]
             mprint("start negotiation with proxy", 2)
             PHASE = 2

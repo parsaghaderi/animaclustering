@@ -1,4 +1,3 @@
-from brski_pledge import pledge_listen_handler
 from utility import *
 from utility import _old_API as _old_API
 import sys

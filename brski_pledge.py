@@ -103,7 +103,6 @@ def neg_with_registrar(_tagged, ll):
         if not err:
             if cbor.loads(answer.value) == True:
                 mprint("communicating with the registrar", 2)
-                PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 return True
         else:
@@ -180,4 +179,5 @@ def control():
             neg_with_registrar_thread = threading.Thread(target=neg_with_registrar, args=[registrar_tagged, REGISTRAR_LOCATOR])
             neg_with_registrar_thread.start()
             neg_with_registrar_thread.join()
+        sleep(1)
 threading.Thread(target=control, args = []).start()

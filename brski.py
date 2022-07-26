@@ -3,7 +3,7 @@ from utility import _old_API as _old_API
 import sys
 import random
 
-MAP = {}
+MAP = {MY_ULA:NEIGHBOR_ULA}
 
 list_of_approved = []
 

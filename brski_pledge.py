@@ -113,9 +113,9 @@ def relay(_answer):
             err, handle, answer, reason = graspi.request_negotiate(registrar_tagged.source,registrar_tagged.objective, REGISTRAR_LOCATOR, None)
 
         if not err:
-            mprint("got voucher response form registrar")
+            mprint("got voucher response form registrar", 2)
             _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
-            return answer
+            return cbor.loads(answer.value)
     except Exception as e:
         mprint("exception experienced during relay negotiation process with code {}".format(graspi.etext[e]), 2)
         return cbor.dumps(False)
@@ -124,7 +124,7 @@ def relay(_answer):
 
 def proxy_listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    _answer.value = relay(cbor.loads(_answer.value))#TODO
+    _answer.value = cbor.dumps(relay(cbor.loads(_answer.value)))#TODO
 
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)

@@ -31,7 +31,7 @@ def listen_proxy_handler(_tagged, _handle, _answer):
         mprint(list_of_approved)
 
     try:
-        _answer.value = cbor.dumps(random.randint(0, 10)%3 == 0)
+        _answer.value = cbor.dumps(random.randint(0, 10)%2 == 0)
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r

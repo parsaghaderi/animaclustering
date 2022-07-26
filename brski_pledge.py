@@ -52,7 +52,7 @@ def discovery_registrar(_tagged):
             sleep(5)
             mprint("entering phase 4",2)
             PHASE = 5
-            break   
+            return   
         else:
             sleep(5)
     # threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar

@@ -106,7 +106,7 @@ def neg_with_registrar(_tagged, ll):
             reason = answer
         else:
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-
+        mprint("testing 123", 2)
         if not err:
             if cbor.loads(answer.value) == True:
                 mprint("communicating with the registrar", 2)

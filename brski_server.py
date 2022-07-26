@@ -106,7 +106,7 @@ def listen(_tagged):
         err, handle, answer = graspi.listen_negotiate(_tagged.source, _tagged.objective)
         if not err:
             if _tagged.objective.name == "node":
-                pass
+                threading.Thread(target=listen_node_handler, args=[_tagged, handle, answer]).start()
             elif _tagged.objective.name == "server":
                 pass
         else:
@@ -138,20 +138,6 @@ def discover_neighbor(_tagged, _attempts = 3):
                 NEIGHBOR_INFO[item.locator] = []
                 mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
 
-def neg(_tagged, ll, _attempts, _phase):
-    _try = 1
-    attempt = _attempts
-    while attempt != 0:
-        mprint("\033[1;32;1m in phase: {}, start negotiating with {} for {}th time - try {} \033[0m".format(_phase, ll.locator, attempt, _try))
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-        if err:
-            mprint("\033[1;31;1m in neg error happened {} \033[0m".format(graspi.etext[err]))
-        else:
-            mprint("\033[1;32;1m negotiation ended with reason {}\033[0m".format(reason))
 #on client
 def listen_brski_update(_tagged, _handle, _answer):
     tmp_answer = cbor.loads(_answer.value)

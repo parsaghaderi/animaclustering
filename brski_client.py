@@ -117,8 +117,23 @@ def discover_neighbor(_tagged, _attempts = 3):
                 LOCATOR_STR[str(item.locator)] = item.locator
                 NEIGHBOR_INFO[item.locator] = []
                 mprint("\033[1;32;1m new neighbor found {}\033[0m".format(str(item.locator)))
+    sleep(5)
+    threading.Thread(target=discovery_brski, args=[tagged_server]).start()
 
-
+def neg(_tagged, ll, _attempts=3):
+    _try = 1
+    attempt = _attempts
+    while attempt != 0:
+        mprint("\033[1;32;1m in phase: {}, start negotiating with {} for {}th time - try {} \033[0m".format(_phase, ll.locator, attempt, _try))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        if err:
+            mprint("\033[1;31;1m in neg error happened {} \033[0m".format(graspi.etext[err]))
+        else:
+            mprint("\033[1;32;1m negotiation ended with reason {}\033[0m".format(reason))
 
 def discovery_brski(_tagged, _attempts = 3):
     global BRSKI_locator
@@ -130,7 +145,8 @@ def discovery_brski(_tagged, _attempts = 3):
     for item in ll:
         BRSKI_locator = item.locator
     mprint("\033[1;32;1m brski server found {}\033[0m".format(str(BRSKI_locator)))
+    sleep(5)
+    threading.Thread(target=neg, args=[tagged, BRSKI_locator]).start()
 
 threading.Thread(target=listen, args=[tagged]).start()
 threading.Thread(target=discover_neighbor, args=[tagged]).start()
-threading.Thread(target=discovery_brski, args=[tagged_server]).start()

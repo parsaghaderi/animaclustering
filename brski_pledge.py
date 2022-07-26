@@ -108,14 +108,14 @@ def neg_with_registrar(_tagged, ll):
             err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
         
         if not err:
-            if cbor.loads(answer.value) == True:
-                mprint("communicating with the registrar with answer {}", 2)
-                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                PHASE = 5
-        else:
-            mprint("Registrar didn't respond", 2)
+            # if cbor.loads(answer.value) == True:
+            mprint("communicating with the registrar with answer {}".format(cbor.loads(answer.value)), 2)
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
             PHASE = 5
+        # else:
+        #     mprint("Registrar didn't respond", 2)
+        #     _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+        #     PHASE = 5
     except Exception as e:
         mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
 

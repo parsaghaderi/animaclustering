@@ -7,7 +7,7 @@ REGISTRAR_LOCATOR = None
 PROXY_LOCATOR = None
 
 PROXY_STATE = False
-
+PHASE = 0
 asa, err  = ASA_REG('brski')
 
 pledge, err = OBJ_REG('pledge', cbor.dumps(False), True, False, 10, asa)
@@ -23,24 +23,28 @@ proxy_sem = threading.Semaphore()
 
 
 def discovery_proxy(_tagged):
-    global PROXY_LOCATOR
+    global PROXY_LOCATOR, PHASE
     mprint("discoverying proxy", 2)
     _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
     mprint("proxy locator found at {}".format(str(ll[0].locator)), 2)
     PROXY_LOCATOR = ll[0]
     mprint("start negotiation with proxy", 2)
-    threading.Thread(target=neg_with_proxy, args=[_tagged, PROXY_LOCATOR]).start()
+    PHASE = 2
+    # threading.Thread(target=neg_with_proxy, args=[_tagged, PROXY_LOCATOR]).start()
 
 def discovery_registrar(_tagged): 
-    global REGISTRAR_LOCATOR
+    global REGISTRAR_LOCATOR, PHASE
     mprint("discoverying registrar", 2)
     _, ll =  graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
     mprint("Registrar found at {}".format(str(ll[0].locator)), 2)
     REGISTRAR_LOCATOR = ll[0]
-    threading.Thread(target=neg_with_registrar, args=[_tagged, REGISTRAR_LOCATOR]).start()
+    threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
+    threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
+    PHASE = 4
+    
 
 def neg_with_proxy(_tagged, ll):
-    global PROXY_STATE, registrar_tagged
+    global PROXY_STATE, registrar_tagged, PHASE
     mprint("negotiating with REGISTRAR", 2)
     try:
         if _old_API:
@@ -55,18 +59,25 @@ def neg_with_proxy(_tagged, ll):
                 PROXY_STATE = True
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 mprint("looking for the registrar", 2)
-                discovery_registrar_thread = threading.Thread(target=discovery_registrar, args=[registrar_tagged])
-                discovery_registrar_thread.start()
-                discovery_registrar_thread.join()
-                threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start()
+                PHASE = 3
+                # discovery_registrar_thread = threading.Thread(target=discovery_registrar, args=[registrar_tagged])
+                # discovery_registrar_thread.start()
+                # discovery_registrar_thread.join()
+                # threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start()
             else:
                 mprint("Registrar rejected Pledge or there is problem in communication with Registrar")
+                sleep(20)
+                PHASE = 1
         else:
             mprint("Proxy didn't respond")
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-            return False
+            sleep(20)
+            PHASE = 1
+            
     except Exception as e:
         mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+        PHASE = 1
+        
 
 def neg_with_registrar(_tagged, ll):
     mprint("negotiating with registrar")
@@ -91,20 +102,20 @@ def neg_with_registrar(_tagged, ll):
         mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
 
 def relay(_answer):
-    global proxy_tagged
+    global registrar_tagged
     mprint("relaying voucher request")
-    proxy_tagged.objective.value = _answer.value
+    registrar_tagged.objective.value = _answer.value
     try:
         if _old_API:
-                err, handle, answer = graspi.req_negotiate(proxy_tagged.source,proxy_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
+                err, handle, answer = graspi.req_negotiate(registrar_tagged.source,registrar_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
                 reason = answer
         else:
-            err, handle, answer, reason = graspi.request_negotiate(proxy_tagged.source,proxy_tagged.objective, REGISTRAR_LOCATOR, None)
+            err, handle, answer, reason = graspi.request_negotiate(registrar_tagged.source,registrar_tagged.objective, REGISTRAR_LOCATOR, None)
 
         if not err:
             mprint("got voucher response form registrar")
-            _err = graspi.end_negotiate(proxy_tagged.source, handle, True, reason="value received")
-            return cbor.loads(answer)
+            _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
+            return answer
     except Exception as e:
         mprint("exception experienced during relay negotiation process with code {}".format(graspi.etext[e]), 2)
         return cbor.dumps(False)
@@ -130,14 +141,25 @@ def proxy_listen_handler(_tagged, _handle, _answer):
     except Exception as err:
         mprint("\033[1;31;1m exception in proxy_listen_handler {} \033[0m".format(err), 2)
 
+def pledge_listen_handler(_tagged, _handle, _answer):
+    mprint("waiting for updates from registrar", 2)
 
 
-        
-def init_proxy(): #listener
-    global PROXY_STATE
-    while not PROXY_STATE:
-        sleep(5)
-    mprint("acting as proxy")
-    
 
-threading.Thread(target=discovery_proxy, args=[proxy_tagged]).start()
+def control():
+    global PHASE
+    while True:
+        if PHASE == 1:
+            discovery_proxy_thread = threading.Thread(target=discovery_proxy, args=[proxy_tagged])
+            discovery_proxy_thread.start()
+            discovery_proxy_thread.join()
+        elif PHASE == 2:
+            neg_with_proxy_thread = threading.Thread(target=neg_with_proxy, args=[proxy_tagged, PROXY_LOCATOR])
+            neg_with_proxy_thread.start()
+            neg_with_proxy_thread.join()
+        elif PHASE == 3:
+            discovery_registrar_thread = threading.Thread(target=discovery_registrar, args=[registrar_tagged])
+            discovery_registrar_thread.start()
+            discovery_registrar_thread.join()
+        elif PHASE == 4:
+                pass

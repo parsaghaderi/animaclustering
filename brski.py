@@ -12,6 +12,9 @@ pledge_tagged = TAG_OBJ(pledge, asa)
 registrar, err = OBJ_REG('registrar', True, True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 
+proxy, err = OBJ_REG('proxy', None, True, False, 10, asa)
+proxy_tagged = TAG_OBJ(proxy, asa)
+proxy_sem = threading.Semaphore()
 # proxy, err = OBJ_REG('brski_proxy', False, True, False, 10, asa)
 # proxy_tagged = TAG_OBJ(proxy, asa)
 
@@ -64,5 +67,5 @@ def listen_registrar_handler(_tagged, _handle, _answer):
 
 
 
-threading.Thread(target=listen, args=[pledge_tagged, listen_proxy_handler]).start()
+threading.Thread(target=listen, args=[proxy_tagged, listen_proxy_handler]).start()
 threading.Thread(target=listen, args=[registrar_tagged, listen_registrar_handler]).start()

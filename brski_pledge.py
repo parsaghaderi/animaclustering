@@ -7,7 +7,7 @@ REGISTRAR_LOCATOR = None
 PROXY_LOCATOR = None
 
 PROXY_STATE = False
-PHASE = 0
+PHASE = 1
 asa, err  = ASA_REG('brski')
 
 pledge, err = OBJ_REG('pledge', cbor.dumps(False), True, False, 10, asa)

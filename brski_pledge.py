@@ -72,11 +72,12 @@ def neg_with_proxy(_tagged, ll):
                 # threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start()
             else:
                 mprint("Registrar rejected Pledge or there is problem in communication with Registrar")
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 sleep(20)
                 PHASE = 1
         else:
             mprint("Proxy didn't respond")
-            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+            # _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
             sleep(20)
             PHASE = 1
             

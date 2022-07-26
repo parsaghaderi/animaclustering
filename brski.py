@@ -39,7 +39,7 @@ def listen_proxy_handler(_tagged, _handle, _answer):
         else:
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
-            mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula), 2)  
+            mprint("\033[1;32;1m negotiation with peer {} ended successfully with value {}\033[0m".format(initiator_ula, cbor.loads(_answer.value)), 2)  
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
             pass

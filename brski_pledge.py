@@ -109,7 +109,7 @@ def neg_with_registrar(_tagged, ll):
         mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
 
 def relay(_answer):
-    global registrar_tagged, proxy_tagged
+    global proxy_tagged
     mprint("relaying voucher request")
     proxy_sem.acquire()
     proxy_tagged.objective.value = cbor.dumps(_answer)

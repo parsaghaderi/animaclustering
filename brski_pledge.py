@@ -23,13 +23,19 @@ proxy_sem = threading.Semaphore()
 
 
 def discovery_proxy(_tagged):
-    global PROXY_LOCATOR, PHASE
-    mprint("discoverying proxy", 2)
-    _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
-    mprint("proxy locator found at {}".format(ll), 2)
-    # PROXY_LOCATOR = ll[0]
-    mprint("start negotiation with proxy", 2)
-    PHASE = 2
+    while True:
+        global PROXY_LOCATOR, PHASE
+        mprint("discoverying proxy", 2)
+        _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
+        if len(ll) != 0:
+            mprint("proxy locator found at {}".format(ll), 2)
+            # PROXY_LOCATOR = ll[0]
+            mprint("start negotiation with proxy", 2)
+            PHASE = 2
+            break
+        else:
+            sleep(10)
+    
     # threading.Thread(target=neg_with_proxy, args=[_tagged, PROXY_LOCATOR]).start()
 
 def discovery_registrar(_tagged): 

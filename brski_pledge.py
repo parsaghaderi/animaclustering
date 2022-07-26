@@ -124,7 +124,7 @@ def relay(_answer):
 
 def proxy_listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
-    _answer.value = relay(_answer.value)
+    _answer.value = relay(_answer)
 
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)

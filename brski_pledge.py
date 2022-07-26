@@ -1,7 +1,5 @@
-from cmath import phase
 from utility import *
 from utility import _old_API as _old_API
-import sys
 
 REGISTRAR_LOCATOR = None
 PROXY_LOCATOR = None

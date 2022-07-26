@@ -1,6 +1,5 @@
 from utility import *
 from utility import _old_API as _old_API
-import sys
 import random
 
 MAP = {MY_ULA:NEIGHBOR_ULA}

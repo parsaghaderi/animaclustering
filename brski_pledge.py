@@ -49,9 +49,9 @@ def discovery_registrar(_tagged):
             threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
             threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
             sleep(5)
-            mprint("entering phase 4")
+            mprint("entering phase 4",2)
             PHASE = 4
-            return   
+            break   
         else:
             sleep(5)
     # threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
@@ -98,6 +98,7 @@ def neg_with_proxy(_tagged, ll):
         
 
 def neg_with_registrar(_tagged, ll):
+    global PHASE
     mprint("negotiating with registrar", 2)
     try:
         if _old_API:
@@ -110,11 +111,11 @@ def neg_with_registrar(_tagged, ll):
             if cbor.loads(answer.value) == True:
                 mprint("communicating with the registrar", 2)
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                return True
+                PHASE = 5
         else:
             mprint("Registrar didn't respond")
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-            return False
+            PHASE = 5
     except Exception as e:
         mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
 

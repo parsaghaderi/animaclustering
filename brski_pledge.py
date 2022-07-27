@@ -21,7 +21,7 @@ MAP['PORTS']['registrar'] = registrar_port
 registrar_tagged = TAG_OBJ(registrar, asa)
 registrar_sem = threading.Semaphore()
 
-proxy, err, proxy_port = OBJ_REG('proxy', cbor.dumps({MY_ULA:NEIGHBOR_ULA}), True, False, 10, asa, True)
+proxy, err, proxy_port = OBJ_REG('proxy', cbor.dumps(MAP), True, False, 10, asa, True)
 MAP['PORTS']['proxy'] = proxy_port
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()

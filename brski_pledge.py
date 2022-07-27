@@ -51,7 +51,7 @@ def discovery_registrar(_tagged):
             threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
             sleep(5)
             mprint("entering phase 4",2)
-            PHASE = 5
+            PHASE = 4
             return   
         else:
             sleep(5)

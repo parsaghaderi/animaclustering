@@ -94,7 +94,7 @@ def check_alive(_neighbors):
 
 
 def listen(_tagged, _listen_handler):
-    mprint("start listening for objective {}".format(_tagged.objective.name))
+    mprint("start listening for objective {}".format(_tagged.objective.name), 2)
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
                                                       _tagged.objective)       

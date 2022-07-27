@@ -1,7 +1,7 @@
 from utility import *
 from utility import _old_API as _old_API
 import random
-MAP = {MY_ULA:NEIGHBOR_ULA, 'PORTS':{'pledge':0, 'registrar':0, 'proxy':0}}
+MAP = {'MAP':{MY_ULA:NEIGHBOR_ULA}, 'PORTS':{'pledge':0, 'registrar':0, 'proxy':0}}
 
 list_of_approved = []
 
@@ -38,7 +38,7 @@ def listen_proxy_handler(_tagged, _handle, _answer):
             proxy_sem.acquire()
             registrar_sem.acquire()
             pledge_sem.acquire()
-            MAP.update(tmp_answer)
+            MAP['MAP'].update(tmp_answer['MAP'])
             _tagged.objective.value = cbor.dumps(MAP)
             proxy_tagged.objective.value = cbor.dumps(MAP)
             pledge_tagged.objective.value = cbor.dumps(MAP)
@@ -59,7 +59,7 @@ def listen_proxy_handler(_tagged, _handle, _answer):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully with value {}\033[0m".format(initiator_ula, cbor.loads(_answer.value)), 2)  
             mprint("trying to contact pledge", 2)
             sleep(10)
-            threading.Thread(target=neg_with_pledge, args=[registrar_tagged,ipaddress.IPv6Address('fdff:c446:355:0:1a:9016:559:c'),MAP['PORTS']['registrar']]).start()
+            threading.Thread(target=neg_with_pledge, args=[registrar_tagged,ipaddress.IPv6Address('fdff:c446:355:0:1a:9016:559:c'),tmp_answer['PORTS']['registrar']]).start()
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
             pass

@@ -66,7 +66,7 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = False):
     err = graspi.register_obj(ASA, obj, local=_local)
     if not err:
         mprint("Objective registered successfully")
-        for item in _obj_registry:
+        for item in graspi._obj_registry:
             if item.objective.name == name:
                 mprint("$%#\n{}\n#$%".format(item.port),2)
 

@@ -10,6 +10,8 @@ except:
     _old_API = True
 import multiping
 from time import sleep 
+import ipaddress
+
 #########################
 # utility function for setting the value of
 # each node randomly. 

@@ -1,10 +1,5 @@
 import random
 import threading
-import cbor
-import subprocess as sp
-from time import sleep
-import acp
-import ipaddress
 
 try:
     import graspi
@@ -57,6 +52,7 @@ def ASA_REG(name):
 #Registering objectives
 #########################
 def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = False):
+    global _obj_registry
     obj = graspi.objective(name)
     obj.value = value
     obj.neg = neg

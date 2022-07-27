@@ -110,6 +110,7 @@ def neg_with_proxy(_tagged, ll):
 def neg_with_registrar(_tagged, ll):
     global PHASE
     mprint("negotiating with registrar", 2)
+    mprint("***\n{}\n***".format(ll.port),2)
     try:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO

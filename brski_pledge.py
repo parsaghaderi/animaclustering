@@ -20,7 +20,7 @@ registrar, err, registrar_port = OBJ_REG('registrar', cbor.dumps(MAP), True, Fal
 MAP['PORTS']['registrar'] = registrar_port
 registrar_tagged = TAG_OBJ(registrar, asa)
 registrar_sem = threading.Semaphore()
-
+mprint("!@#\n{}\n!@#".format(registrar_port), 2)
 proxy, err, proxy_port = OBJ_REG('proxy', cbor.dumps(MAP), True, False, 10, asa, True)
 MAP['PORTS']['proxy'] = proxy_port
 proxy_tagged = TAG_OBJ(proxy, asa)

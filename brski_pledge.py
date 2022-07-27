@@ -186,6 +186,7 @@ def pledge_listen_handler(_tagged, _handle, _answer):
 
 def registrar_update_listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    mprint("\033[1;32;1m incoming request from {}\033[0m".format(initiator_ula), 2)
     tmp_answer = cbor.loads(_answer.value)
     MAP['MAP'].update(tmp_answer['MAP'])
     try:

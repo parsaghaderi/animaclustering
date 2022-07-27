@@ -59,23 +59,22 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = False):
     obj.synch = synch
     obj.loop_count = loop_count
     err = graspi.register_obj(ASA, obj, local=_local)
+    port  = None
     if not err:
         mprint("Objective registered successfully")
         if _old_API:
           for item in graspi._obj_registry:
                 if item.objective.name == name:
-                    mprint 
+                    port = item.port 
         else:
             for item in graspi.grasp._obj_registry:
                 if item.objective.name == name:
-                    mprint("$%#\n{}\n#$%".format(item.port),2)
-
-
-
+                    port = item.port
     else:
         mprint("Cannot register Objective:\n\t"+ graspi.etext[err])
         mprint("exiting now.")
-    return obj, err
+        exit(0)
+    return obj, err, port
 
 ###########
 # mapping each objective to an ASA

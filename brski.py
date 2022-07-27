@@ -48,7 +48,7 @@ def listen_proxy_handler(_tagged, _handle, _answer):
             pledge_sem.release()
         else:
             _answer.value = cbor.dumps(False)
-
+        mprint(MAP, 2)
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r

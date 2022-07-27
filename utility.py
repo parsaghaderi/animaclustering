@@ -1,6 +1,6 @@
 import random
 import threading
-
+import cbor, cbor2
 try:
     import graspi
     _old_API = False    

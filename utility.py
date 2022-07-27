@@ -99,7 +99,7 @@ def listen(_tagged, _listen_handler):
         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
                                                       _tagged.objective)       
         if not err:
-            mprint("\033[1;32;1m incoming request \033[0m")
+            mprint("\033[1;32;1m incoming request \033[0m",2)
             threading.Thread(target=_listen_handler, args=[_tagged,handle,answer]).start()
         else:
             mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))

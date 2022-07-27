@@ -51,7 +51,7 @@ def discovery_registrar(_tagged):
             threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
             sleep(5)
             mprint("entering phase 4",2)
-            PHASE = 4
+            PHASE = 5
             return   
         else:
             sleep(5)
@@ -86,7 +86,7 @@ def neg_with_proxy(_tagged, ll):
 
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 mprint("looking for the registrar", 2)
-                PHASE = 5
+                PHASE = 3
                 # discovery_registrar_thread = threading.Thread(target=discovery_registrar, args=[registrar_tagged])
                 # discovery_registrar_thread.start()
                 # discovery_registrar_thread.join()

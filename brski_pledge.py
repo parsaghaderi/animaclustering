@@ -64,7 +64,7 @@ def discovery_registrar(_tagged):
 def neg_with_proxy(_tagged, ll):
     global PROXY_STATE, registrar_tagged, PHASE
     mprint("negotiating with proxy", 2)
-    mprint("***\n{}\n***".format(type(ll.port)),2)
+    mprint("***\n{}\n***".format(ll.port),2)
     try:
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO

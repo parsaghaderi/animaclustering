@@ -13,6 +13,7 @@ asa, err  = ASA_REG('brski')
 pledge, err, pledge_port = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
 MAP['PORTS']['pledge'] = pledge_port
 pledge_tagged = TAG_OBJ(pledge, asa)
+
 pledge_sem = threading.Semaphore()
 
 registrar, err, registrar_port = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
@@ -24,6 +25,9 @@ proxy, err, proxy_port = OBJ_REG('proxy', cbor.dumps({MY_ULA:NEIGHBOR_ULA}), Tru
 MAP['PORTS']['proxy'] = proxy_port
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
+
+pledge_tagged.objective.value = cbor.dumps(MAP)
+registrar_tagged.objective.value = cbor.dumps(MAP)
 
 
 def discovery_proxy(_tagged):
@@ -224,3 +228,5 @@ def control():
             pass
         sleep(1)
 threading.Thread(target=control, args = []).start()
+
+

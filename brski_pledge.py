@@ -86,7 +86,7 @@ def neg_with_proxy(_tagged, ll):
 
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 mprint("looking for the registrar", 2)
-                PHASE = 3
+                PHASE = 5
                 # discovery_registrar_thread = threading.Thread(target=discovery_registrar, args=[registrar_tagged])
                 # discovery_registrar_thread.start()
                 # discovery_registrar_thread.join()

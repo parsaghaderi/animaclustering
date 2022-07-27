@@ -1606,6 +1606,7 @@ def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
     try:
         ttprint("Sending req_negotiate to",peer.locator, peer.port)
         sock.settimeout(5) #there should always be a listener
+        print("%%%%%\n{}\n{}\n{}%%%%%".format(str(peer.locator), peer.port, _ifi))
         sock.connect((str(peer.locator), peer.port,0,_ifi))
         msg_bytes = _ass_message(M_REQ_NEG, neg_sess, None, obj)
         sock.sendall(msg_bytes,0)

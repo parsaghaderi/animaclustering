@@ -38,8 +38,8 @@ def listen_proxy_handler(_tagged, _handle, _answer):
             proxy_sem.acquire()
             registrar_sem.acquire()
             pledge_sem.acquire()
-            MAP['MAP'].update(tmp_answer['MAP'])
-            _tagged.objective.value = cbor.dumps(MAP)
+            # MAP['MAP'].update(tmp_answer['MAP'])
+            _tagged.objective.value = cbor.dumps(tmp_answer)
             proxy_tagged.objective.value = cbor.dumps(MAP)
             pledge_tagged.objective.value = cbor.dumps(MAP)
             _answer.value = cbor.dumps(MAP)
@@ -48,7 +48,7 @@ def listen_proxy_handler(_tagged, _handle, _answer):
             pledge_sem.release()
         else:
             _answer.value = cbor.dumps(False)
-        mprint(MAP, 2)
+        mprint(tmp_answer, 2)
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r

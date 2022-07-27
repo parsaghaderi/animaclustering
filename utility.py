@@ -13,7 +13,6 @@ except:
     import grasp as graspi
     _old_API = True
 import multiping 
-from graspi import _obj_registry
 #########################
 # utility function for setting the value of
 # each node randomly. 

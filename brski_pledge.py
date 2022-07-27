@@ -1,24 +1,27 @@
 from utility import *
 from utility import _old_API as _old_API
-
+import ipaddress
 REGISTRAR_LOCATOR = None
 PROXY_LOCATOR = None
 
 PROXY_STATE = False
 PHASE = 1
 
-MAP = {MY_ULA:NEIGHBOR_ULA}
+MAP = {'MAP': {MY_ULA:NEIGHBOR_ULA}, 'PORTS':{'pledge':0, 'registrar':0, 'proxy':0}}
 asa, err  = ASA_REG('brski')
 
-pledge, err = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
+pledge, err, pledge_port = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
+MAP['PORTS']['pledge'] = pledge_port
 pledge_tagged = TAG_OBJ(pledge, asa)
 pledge_sem = threading.Semaphore()
 
-registrar, err = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
+registrar, err, registrar_port = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
+MAP['PORTS']['registrar'] = registrar_port
 registrar_tagged = TAG_OBJ(registrar, asa)
 registrar_sem = threading.Semaphore()
 
-proxy, err = OBJ_REG('proxy', cbor.dumps({MY_ULA:NEIGHBOR_ULA}), True, False, 10, asa, True)
+proxy, err, proxy_port = OBJ_REG('proxy', cbor.dumps({MY_ULA:NEIGHBOR_ULA}), True, False, 10, asa, True)
+MAP['PORTS']['proxy'] = proxy_port
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
 
@@ -48,7 +51,8 @@ def discovery_registrar(_tagged):
             mprint("Registrar found at {}".format(str(ll[0].port)), 2)
             REGISTRAR_LOCATOR = ll[0]
             threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
-            threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
+            # threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
+            threading.Thread(target = listen, args=[registrar_tagged, registrar_update_listen_handler]).start()
             sleep(5)
             mprint("entering phase 4",2)
             PHASE = 5
@@ -176,6 +180,24 @@ def proxy_listen_handler(_tagged, _handle, _answer):
 def pledge_listen_handler(_tagged, _handle, _answer):
     mprint("waiting for updates from registrar", 2)
 
+def registrar_update_listen_handler(_tagged, _handle, _answer):
+    initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    tmp_answer = cbor.loads(_answer.value)
+    MAP['MAP'].update(tmp_answer['MAP'])
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            mprint("\033[1;32;1m negotiation with pledge {} ended successfully \033[0m".format(initiator_ula), 2)  
+        else:
+            mprint("\033[1;31;1m in proxy_listen_handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
+            pass
+    except Exception as e:
+        mprint("\033[1;31;1m exception in proxy_listen_handler {} \033[0m".format(err), 2)
 
 
 def control():

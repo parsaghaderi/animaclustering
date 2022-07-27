@@ -8,7 +8,8 @@ try:
 except:
     import grasp as graspi
     _old_API = True
-import multiping 
+import multiping
+from time import sleep 
 #########################
 # utility function for setting the value of
 # each node randomly. 

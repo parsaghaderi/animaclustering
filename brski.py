@@ -1,22 +1,21 @@
 from utility import *
 from utility import _old_API as _old_API
 import random
-
-MAP = {MY_ULA:NEIGHBOR_ULA}
+MAP = {MY_ULA:NEIGHBOR_ULA, 'PORTS':{'pledge':0, 'registrar':0, 'proxy':0}}
 
 list_of_approved = []
 
 asa, err  = ASA_REG('brski')
 
-pledge, err = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
+pledge, err, pledge_port = OBJ_REG('pledge', cbor.dumps(MAP), True, False, 10, asa)
 pledge_tagged = TAG_OBJ(pledge, asa)
 pledge_sem = threading.Semaphore()
 
-registrar, err = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
+registrar, err, registrar_port = OBJ_REG('registrar', cbor.dumps(MAP), True, False, 10, asa)
 registrar_tagged = TAG_OBJ(registrar, asa)
 registrar_sem = threading.Semaphore()
 
-proxy, err = OBJ_REG('proxy', cbor.dumps(MAP), True, False, 10, asa, True)
+proxy, err, proxy_port = OBJ_REG('proxy', cbor.dumps(MAP), True, False, 10, asa, True)
 proxy_tagged = TAG_OBJ(proxy, asa)
 proxy_sem = threading.Semaphore()
 # proxy, err = OBJ_REG('brski_proxy', False, True, False, 10, asa)
@@ -58,6 +57,9 @@ def listen_proxy_handler(_tagged, _handle, _answer):
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully with value {}\033[0m".format(initiator_ula, cbor.loads(_answer.value)), 2)  
+            mprint("trying to contact pledge", 2)
+            sleep(10)
+            threading.Thread(target=neg_with_pledge, args=[registrar_tagged,_handle.id_source,MAP['PORTS']['registrar']]).start()
         else:
             mprint("\033[1;31;1m in listen handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
             pass
@@ -104,6 +106,24 @@ def listen_registrar_handler(_tagged, _handle, _answer):
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
         
 
+def neg_with_pledge(_tagged, _ll, _port):
+    
+    tmp_locator = graspi.asa_locator(_ll, 0, True)
+    tmp_locator.port = _port
+
+    try:
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, tmp_locator, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, tmp_locator, None)
+
+        if not err:
+            mprint("communicating with the pledge with answer {}".format(cbor.loads(answer.value)), 2)
+            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+            
+    except Exception as e:
+        mprint("there was an error occurred in neg_with_registrar with code {}".format(graspi.etext[e]), 2)
 
 
 threading.Thread(target=listen, args=[proxy_tagged, listen_proxy_handler]).start()

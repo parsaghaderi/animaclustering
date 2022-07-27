@@ -1617,6 +1617,8 @@ def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
         msg_bytes = _ass_message(M_REQ_NEG, neg_sess, None, obj)
         print("here 7")
         sock.sendall(msg_bytes,0)
+        print("here 8")
+
     except OSError as ex:
         tprint("Socket error sending negotiation request", ex)
         sock.close()
@@ -1635,6 +1637,7 @@ def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
         return errors.noReply, shandle, None
     
     # call common code to wait for reply and handle it
+    print("here 9")
     return _negloop(shandle, obj, timeout, sock, True)          
 
 

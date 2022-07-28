@@ -91,6 +91,7 @@ def neg_registrar(_tagged, ll):
 
     mprint("sending updates to {}".format(str(ll.locator)), 2)
     try:
+        _tagged.objective.value = cbor.dumps(MAP)
         if _old_API:
             err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
             reason = answer

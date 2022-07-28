@@ -301,7 +301,7 @@ def discover(_tagged):
             mprint("proxy locator found at {}\n{}\n{}\n{}".format(str(ll[0].locator), str(ll[0].ifi), str(ll[0].port), str(ll[0].diverted)), 2)
             sleep(5)
             threading.Thread(target=negotiate_obj, args=[_tagged, ll[0]]).start()
-
+            break
         else:
             sleep(10)
 

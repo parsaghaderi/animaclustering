@@ -33,6 +33,7 @@ pledge_sem = threading.Semaphore()
 def discover_proxy(_tagged):
     global PROXY_LOCATOR
     while True:
+        mprint("looking for proxy", 2)
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         if len(ll) != 0:
             mprint("proxy found at {}".format(str(ll[0].locator)), 2)
@@ -184,7 +185,7 @@ def listen_registrar(_tagged, _handle, _answer): #listen to registrar for update
 
     mprint("the new map is {}".format(MAP), 2)
     _answer.value = cbor.dumps(node_info)
-    
+
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:

@@ -14,11 +14,11 @@ node_info = {'MAP':MAP, 'PORTS':PORTS}
 
 asa, err = ASA_REG('brski')
 
-proxy_obj, err, PORTS['PORTS']['proxy'] = OBJ_REG('proxy', None, True, False, 10, asa, True) #for pledges and communication only
+proxy_obj, err, PORTS['proxy'] = OBJ_REG('proxy', None, True, False, 10, asa, True) #for pledges and communication only
 proxy_tagged = TAG_OBJ(proxy_obj,asa)
 proxy_sem = threading.Semaphore()
 
-registrar_obj, err, PORTS['PORTS']['registrar'] = OBJ_REG('registrar', None, True, False, 10, asa, False) #for transferring updates
+registrar_obj, err, PORTS['registrar'] = OBJ_REG('registrar', None, True, False, 10, asa, False) #for transferring updates
 registrar_tagged = TAG_OBJ(registrar_obj, asa)
 registrar_sem = threading.Semaphore()
 

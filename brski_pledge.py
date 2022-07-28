@@ -32,7 +32,7 @@ pledge_sem = threading.Semaphore()
 
 def discover_proxy(_tagged):
     global PROXY_LOCATOR
-    for i in range(0, 3):
+    for i in range(0, 5):
         _, ll = graspi.discover(_tagged.source,_tagged.objective, 10000, flush=True, minimum_TTL=50000)
         if len(ll) != 0:
             mprint("proxy found at {}".format(str(ll[0].locator)), 2)
@@ -42,7 +42,7 @@ def discover_proxy(_tagged):
             return
         else:
             mprint("trying one more time - waiting for {}".format(5*(i+1)), 2)
-            sleep(5*(i+1))
+            sleep(4*(i+1))
     mprint("no proxy found", 2)
 
 def send_voucher_req(_tagged, ll):

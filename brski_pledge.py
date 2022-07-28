@@ -239,7 +239,7 @@ from grasp import asa_locator
 
 asa, err = ASA_REG('asa')
 _value = {'ula':MY_ULA, 'port':0, 'value':15}
-obj, err, obj_port = OBJ_REG('obj', None, True, False, 10, asa)
+obj, err, obj_port = OBJ_REG('obj', None, True, False, 10, asa, True)
 _value['port'] = obj_port
 obj.value = cbor.dumps(_value)
 obj_tagged = TAG_OBJ(obj, asa)

@@ -38,6 +38,7 @@ def discovery_proxy(_tagged):
         if len(ll) != 0:
             mprint("proxy locator found at {} on interface {}".format(str(ll[0].locator), str(ll[0].ifi)), 2)
             PROXY_LOCATOR = ll[0]
+            mprint("!!!!!!!!!!!!\n{}\n!!!!!!!!!!!!!!!!".format(ll[0].diverted), 2)
             mprint("start negotiation with proxy", 2)
             PHASE = 2
             break

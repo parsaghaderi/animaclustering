@@ -56,7 +56,7 @@ def discovery_registrar(_tagged):
             REGISTRAR_LOCATOR = ll[0]
             threading.Thread(target=listen, args=[proxy_tagged, proxy_listen_handler]).start() #to communicate with registrar
             # threading.Thread(target=listen, args=[pledge_tagged, pledge_listen_handler]).start() #to update registred nodes
-            threading.Thread(target = listen, args=[registrar_tagged, registrar_update_listen_handler]).start()
+            threading.Thread(target=listen, args=[registrar_tagged, registrar_update_listen_handler]).start()
             sleep(5)
             mprint("entering phase 4",2)
             PHASE = 5

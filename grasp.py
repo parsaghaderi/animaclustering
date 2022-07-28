@@ -1607,7 +1607,7 @@ def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
     else:
         _ifi = 0
     print("here 4")
-    print("%%%%%\n{}\n{}\n{}%%%%%".format(str(peer.locator), peer.port, _ifi))
+    print("%%%%%\n{}\n{}\n{}%%%%%".format(type(peer.locator), peer.port, _ifi))
     try:
         ttprint("Sending req_negotiate to",peer.locator, peer.port)
         sock.settimeout(5) #there should always be a listener

@@ -61,6 +61,8 @@ def send_voucher_req(_tagged, ll):
                 mprint("Registrar accepted request, can join network!", 2)
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 post_join()
+            else:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
     except Exception as e:
         mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
 

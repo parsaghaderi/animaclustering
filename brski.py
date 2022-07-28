@@ -23,6 +23,8 @@ pledge_obj, err, pledge_port = OBJ_REG('pledge', None, True, False, 10, asa, Tru
 pledge_tagged = TAG_OBJ(pledge_obj, asa)
 pledge_sem = threading.Semaphore()
 
+proxy_tagged.objective.value = cbor.dumps(node_info)
+registrar_tagged.objective.value = cbor.dumps(node_info)
 
 def listen_proxy(_tagged, _handle, _answer): #to join pledge
     
@@ -38,6 +40,7 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
         proxy_sem.acquire()
         registrar_sem.acquire()
         MAP.update(tmp_answer['MAP'])
+        node_info['MAP'].update(tmp_answer['MAP'])
         nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
         _answer.value = cbor.dumps(node_info)
         proxy_sem.release()

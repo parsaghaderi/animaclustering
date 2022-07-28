@@ -46,25 +46,44 @@ def discover_proxy(_tagged):
     mprint("no proxy found", 2)
 
 def send_voucher_req(_tagged, ll):
-    global registrar_tagged, REGISTRAR_LOCATOR
+    global registrar_tagged, REGISTRAR_LOCATOR, node_info, MAP, proxy_tagged
     mprint("negotiating with registrar through proxy {}".format(str(ll.locator)), 2)
-    try:
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-    
-        if not err:
-            mprint("response from registrar = {}".format(cbor.loads(answer.value)),2)
-            if cbor.loads(answer.value) != False:
-                mprint("Registrar accepted request, can join network!", 2)
-                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                post_join()
+    for i in range(2):
+        try:
+            if _old_API:
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+                reason = answer
             else:
-                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-    except Exception as e:
-        mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        
+            if not err:
+                mprint("response from registrar = {}".format(cbor.loads(answer.value)),2)
+                if cbor.loads(answer.value) != False:
+                    tmp_answer = cbor.loads(answer.value)
+
+                    proxy_sem.acquire()
+                    registrar_sem.acquire()
+
+                    node_info['MAP'].update(tmp_answer['MAP'])
+                    MAP.update(tmp_answer['MAP'])
+
+                    proxy_tagged.objective.value = cbor.dumps(node_info)
+                    registrar_tagged.objective.value = cbor.dumps(node_info)
+
+                    proxy_sem.release()
+                    registrar_sem.release()
+
+                    mprint("Registrar accepted request, can join network!", 2)
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                    post_join()
+                    return
+                else:
+                    mprint("Failed - maybe try again after 5s Zzz", 2)
+                    sleep(5)
+        except Exception as e:
+            mprint("there was an error occurred in neg_with_proxy with code {} - trying again".format(graspi.etext[e]), 2)
+            sleep(3)
+    return 
 
 def listen_proxy(_tagged, _handle, _answer):
     pledge_ula = str(ipaddress.IPv6Address(_handle.id_source))
@@ -100,21 +119,22 @@ def listen_proxy(_tagged, _handle, _answer):
 
 def relay(_tagged, _p): #listen for incoming request from pledge to forward to the registrar
     mprint("forwarding pledge's {} voucher request to registrar".format(_p), 2)
-    try:
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, REGISTRAR_LOCATOR, None)
-        if not err:
-            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-            return answer
-        else:
-            mprint("\033[1;31;1m negotiation in relay with registrar interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
+    for i in range(3):
+        try:
+            if _old_API:
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
+                reason = answer
+            else:
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, REGISTRAR_LOCATOR, None)
+            if not err:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                return answer
+            else:
+                mprint("\033[1;31;1m negotiation in relay with registrar interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
+                return False
+        except Exception as e:
+            mprint("there was an error occurred in relay with code {}".format(graspi.etext[e]), 2)
             return False
-    except Exception as e:
-        mprint("there was an error occurred in relay with code {}".format(graspi.etext[e]), 2)
-        return False
 
 def post_join():
     global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
@@ -146,9 +166,25 @@ def listen_registrar(_tagged, _handle, _answer): #listen to registrar for update
     global MAP
     mprint("incoming request from registrar for updates!", 2)  #registrar already has my map, so the new update includes mine as well 
     tmp_answer = cbor.loads(_answer.value)
+    mprint("tmp asnwer is {}".format(cbor.loads(_answer.value)), 2)
+
+    tmp_answer = cbor.loads(_answer.value)
+
+    proxy_sem.acquire()
+    registrar_sem.acquire()
+
+    node_info['MAP'].update(tmp_answer['MAP'])
     MAP.update(tmp_answer['MAP'])
+
+    proxy_tagged.objective.value = cbor.dumps(node_info)
+    registrar_tagged.objective.value = cbor.dumps(node_info)
+
+    proxy_sem.release()
+    registrar_sem.release()
+
     mprint("the new map is {}".format(MAP), 2)
-    _answer.value = cbor.dumps(MAP)
+    _answer.value = cbor.dumps(node_info)
+    
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:

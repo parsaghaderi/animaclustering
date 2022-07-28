@@ -37,12 +37,17 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
         mprint("connecting to MASA", 2)
         sleep(2)
         mprint("MASA approved")
+        
         proxy_sem.acquire()
         registrar_sem.acquire()
+        
         MAP.update(tmp_answer['MAP'])
         node_info['MAP'].update(tmp_answer['MAP'])
         nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
         _answer.value = cbor.dumps(node_info)
+        proxy_tagged.objective.value = cbor.dumps(node_info)
+        registrar_tagged.objective.value = cbor.dumps(node_info)
+
         proxy_sem.release()
         registrar_sem.release()
         
@@ -69,11 +74,26 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
             mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
 
 def listen_registrar(_tagged, _handle, _answer):#to get updates from nodes
-    mprint("incoming request from node {}".format(str(ipaddress.IPv6Address(_handle.id_source))), 2)
+    actual_initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    mprint("incoming request from node {}".format(actual_initiator_ula), 2)
 
     tmp_answer = cbor.loads(_answer.value)
+    # MAP.update(tmp_answer['MAP'])
+    # _answer = cbor.dumps(MAP)
+
+    proxy_sem.acquire()
+    registrar_sem.acquire()
+
     MAP.update(tmp_answer['MAP'])
-    _answer = cbor.dumps(MAP)
+    node_info['MAP'].update(tmp_answer['MAP'])
+    nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
+    _answer.value = cbor.dumps(node_info)
+    proxy_tagged.objective.value = cbor.dumps(node_info)
+    registrar_tagged.objective.value = cbor.dumps(node_info)
+
+    proxy_sem.release()
+    registrar_sem.release()
+
 
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
@@ -103,8 +123,22 @@ def neg_registrar(_tagged, ll):
 
         if not err:
             mprint("got response from node {}".format(str(ll.locator)), 2)
+
             tmp_answer = cbor.loads(answer.value)
+
+            proxy_sem.acquire()
+            registrar_sem.acquire()
+
             MAP.update(tmp_answer['MAP'])
+            node_info['MAP'].update(tmp_answer['MAP'])
+            nodes_locator[str(ll.locator)] = tmp_answer['PORTS']
+            proxy_tagged.objective.value = cbor.dumps(node_info)
+            registrar_tagged.objective.value = cbor.dumps(node_info)
+
+            proxy_sem.release()
+            registrar_sem.release()
+
+
             mprint("MAP updated\n {}".format(MAP), 2)
 
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")

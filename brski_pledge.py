@@ -41,7 +41,7 @@ def discover_proxy(_tagged):
             threading.Thread(target=send_voucher_req, args = [_tagged, PROXY_LOCATOR]).start()
             return
         else:
-            mprint("trying one more time - waiting for {}".format(5*(i+1)), 2)
+            mprint("trying one more time - waiting for {} seconds".format(5), 2)
             sleep(5)
     mprint("no proxy found", 2)
 

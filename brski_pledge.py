@@ -64,3 +64,4 @@ def send_voucher_req(_tagged, ll):
 def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has already cached the locator
     pass
 
+threading.Thread(target=discover_proxy, args=[proxy_tagged]).start()

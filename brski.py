@@ -19,7 +19,7 @@ registrar_obj, err, registrar_port = OBJ_REG('registrar', None, True, False, 10,
 registrar_tagged = TAG_OBJ(registrar_obj, asa)
 registrar_sem = threading.Semaphore()
 
-pledge_obj, err, pledge_port = OBJ_REG()#for communication with pledge only
+pledge_obj, err, pledge_port = OBJ_REG('pledge', None, True, False, 10, asa, True)#for communication with pledge only
 pledge_tagged = TAG_OBJ(pledge_obj, asa)
 pledge_sem = threading.Semaphore()
 

@@ -42,7 +42,7 @@ def discover_proxy(_tagged):
             return
         else:
             mprint("trying one more time - waiting for {}".format(5*(i+1)), 2)
-            sleep(4*(i+1))
+            sleep(6*(i+1))
     mprint("no proxy found", 2)
 
 def send_voucher_req(_tagged, ll):

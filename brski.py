@@ -185,11 +185,11 @@ def listen_handler(_tagged, _handle, _answer):
 
 
 
-def locator_maker(_ip, _port, _diverted):
-    locator_obj = asa_locator(ipaddress.IPv6Address(_ip),0, _diverted)
-    locator_obj.port = _port
+# def locator_maker(_ip, _port, _diverted):
+#     locator_obj = asa_locator(ipaddress.IPv6Address(_ip),0, _diverted)
+#     locator_obj.port = _port
 
-    return locator_obj
+#     return locator_obj
 
 
 threading.Thread(target=listen, args=[obj_tagged, listen_handler]).start()

@@ -152,3 +152,10 @@ def discovery(_tagged, _discovery_handler, _attempts=3):
             mprint(str(item.locator))
         attempt-=1
     _discovery_handler(_tagged, ll)
+
+
+def locator_maker(_ip, _port, _diverted):
+    locator_obj = graspi.asa_locator(ipaddress.IPv6Address(_ip),0, _diverted)
+    locator_obj.port = _port
+
+    return locator_obj

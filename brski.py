@@ -125,7 +125,7 @@ threading.Thread(target=listen, args = [proxy_tagged    , listen_proxy])    .sta
 threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
 
 def run_update(_tagged):
-    sleep(100)
+    sleep(200)
     mprint("sending updates to nodes", 2)
     update(_tagged)
 

@@ -55,7 +55,7 @@ def ASA_REG(name):
 #########################
 #Registering objectives
 #########################
-def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = True):
+def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = False):
     obj = graspi.objective(name)
     obj.value = value
     obj.neg = neg

@@ -257,8 +257,11 @@ def negotiate_obj(_tagged, _ll):
         if not err:
             mprint("the offered value is {}".format(cbor.loads(answer.value)),2)
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+            sleep(5)
+            threading.Thread(target=listen, args=[_tagged, listen_handler]).start()
         else:
             mprint("error occurred!", 2)
+
     except Exception as e:
         mprint("exception happended at negotiation {}".format(graspi.etext[e]), 2)
 
@@ -298,6 +301,7 @@ def discover(_tagged):
             mprint("proxy locator found at {}\n{}\n{}\n{}".format(str(ll[0].locator), str(ll[0].ifi), str(ll[0].port), str(ll[0].diverted)), 2)
             sleep(5)
             threading.Thread(target=negotiate_obj, args=[_tagged, ll[0]]).start()
+
         else:
             sleep(10)
 

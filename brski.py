@@ -159,9 +159,10 @@ def negotiate_obj(_tagged, _ll):
 
 
 def listen_handler(_tagged, _handle, _answer):
+    global reply, reply2
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("incoming request from {}".format(initiator_ula), 2)
-
+    reply = cbor.loads(_answer.value)
     try:
         _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
         if _old_API:
@@ -171,6 +172,11 @@ def listen_handler(_tagged, _handle, _answer):
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula), 2)  
+            sleep(10)
+            mprint("starting negotiation with peer without discovery", 2)
+            ll = locator_maker(reply['ula'], reply['port'], False)
+            threading.Thread(target=negotiate_obj, args=[_tagged, ll]).start()
+
         else:
             mprint("\033[1;31;1m in listen_handler - neg with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]), 2)
             pass

@@ -61,10 +61,12 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
             pass
     except Exception as err:
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
-    
-threading.Thread(target=listen, args = [proxy_tagged, listen_proxy]).start()
-
 
 def listen_registrar(_tagged, _handle, _answer):#to get updates from nodes
     pass
+
+    
+threading.Thread(target=listen, args = [proxy_tagged    , listen_proxy])    .start()
+threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
+
 

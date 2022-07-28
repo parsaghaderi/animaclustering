@@ -174,7 +174,7 @@ def listen_handler(_tagged, _handle, _answer):
             mprint("\033[1;32;1m negotiation with peer {} ended successfully \033[0m".format(initiator_ula), 2)  
             sleep(10)
             mprint("starting negotiation with peer without discovery", 2)
-            ll = locator_maker(reply['ula'], reply['port'], False)
+            ll = locator_maker(reply['ula'], int(reply['port']), False)
             threading.Thread(target=negotiate_obj, args=[_tagged, ll]).start()
 
         else:

@@ -108,7 +108,7 @@ def listen_registrar_handler(_tagged, _handle, _answer):
 
 def neg_with_pledge(_tagged, _ll, _port):
     
-    tmp_locator = graspi.asa_locator(_ll, 0, True)
+    tmp_locator = graspi.asa_locator(_ll, 0, False)
     tmp_locator.port = _port
 
     try:

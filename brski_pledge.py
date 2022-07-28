@@ -75,22 +75,26 @@ def listen_proxy(_tagged, _handle, _answer):
         pass
     else:
         mprint("returning registrar's response to the pledge")
-        try:
-            _tagged.objective.value = registrar_response
-            _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
-            if _old_API:
-                err, temp, answer = _r
-                reason = answer
-            else:
-                err, temp, answer, reason = _r
-            if (not err) and (temp == None):
-                mprint("\033[1;32;1m negotiation with pledge {} ended successfully.\033[0m".format(str(REGISTRAR_LOCATOR.locator)), 2)  
-                proxy_sem.release()
-            else:
-                mprint("\033[1;31;1m negotiation in listen_proxy with pledge interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
-                proxy_sem.release()
-        except Exception as e:
-            mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(graspi.etext[e]), 2)
+        for i in range(3):
+            try:
+                _tagged.objective.value = registrar_response
+                _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+                if _old_API:
+                    err, temp, answer = _r
+                    reason = answer
+                else:
+                    err, temp, answer, reason = _r
+                if (not err) and (temp == None):
+                    mprint("\033[1;32;1m negotiation with pledge {} ended successfully.\033[0m".format(str(REGISTRAR_LOCATOR.locator)), 2)  
+                    proxy_sem.release()
+                    break
+                else:
+                    mprint("\033[1;31;1m negotiation in listen_proxy with pledge interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
+                    proxy_sem.release()
+                    mprint("3s Zzz", 2)
+                    sleep(3)
+            except Exception as e:
+                mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(graspi.etext[e]), 2)
 
 def relay(_tagged, _p): #listen for incoming request from pledge to forward to the registrar
     mprint("forwarding pledge's {} voucher request to registrar".format(_p), 2)
@@ -129,10 +133,36 @@ def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has alre
         if len(ll) != 0:
             mprint("registrar found at {}".format(str(ll[0].locator)), 2)
             REGISTRAR_LOCATOR = ll[0]
-            return
+            mprint("3 Zzz", 2)
+            mprint("start listening for updates from registrar", 2)
+            threading.Thread(target=listen, args=[_tagged, listen_registrar]).start()
         else:
             mprint("no registrar found, trying again", 2)
     mprint("No registrar found!", 2)
 
+def listen_registrar(_tagged, _handle, _answer): #listen to registrar for updates
+    global MAP
+    mprint("incoming request from registrar for updates!", 2)  #registrar already has my map, so the new update includes mine as well 
+    tmp_answer = cbor.loads(_answer.value)
+    MAP.update(tmp_answer['MAP'])
+    mprint("the new map is {}".format(MAP), 2)
+    _answer.value = cbor.dumps(MAP)
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+            mprint("\033[1;32;1m negotiation with registrar ended successfully with value {}\033[0m".format(cbor.loads(_answer.value)), 2)  
+        else:
+            mprint("\033[1;31;1m in registrar listen handler - neg with registrar interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
+            mprint("5s Zzz", 2)
+            sleep(5)
+            
+    except Exception as err:
+        mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
+        
 threading.Thread(target=discover_proxy, args=[proxy_tagged]).start()
 

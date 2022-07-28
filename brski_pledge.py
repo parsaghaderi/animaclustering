@@ -174,8 +174,8 @@ def listen_registrar(_tagged, _handle, _answer): #listen to registrar for update
     proxy_sem.acquire()
     registrar_sem.acquire()
 
-    node_info['MAP'].update(tmp_answer['MAP'])
-    MAP.update(tmp_answer['MAP'])
+    node_info['MAP'].update(tmp_answer)
+    MAP.update(tmp_answer)
 
     proxy_tagged.objective.value = cbor.dumps(node_info)
     registrar_tagged.objective.value = cbor.dumps(node_info)

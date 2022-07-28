@@ -5,10 +5,9 @@ import random
 
 MAP = {MY_ULA:NEIGHBOR_ULA} #the whole map of the network, only map
 NETWORK_INFO = {} #what info was received from each node
-
 nodes_locator = {}
 
-node_info = {'MAP':MAP, 'PORTS':PORTS} #my info
+node_info = {'MAP':MAP} #my info
 
 asa, err = ASA_REG('brski')
 

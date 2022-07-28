@@ -36,14 +36,30 @@ def discover_proxy(_tagged):
         if len(ll) != 0:
             mprint("proxy found at {}".format(str(ll[0].locator)), 2)
             PROXY_LOCATOR = ll[0]
+            sleep(2)
+            threading.Thread(target=send_voucher_req, args = [_tagged, PROXY_LOCATOR]).start()
             return
         else:
-            mprint("trying one more time")
+            mprint("trying one more time", 2)
             sleep(5)
-    
+    mprint("no proxy found", 2)
 
-def send_voucher_req(_tagged, _proxy):
-    pass
+def send_voucher_req(_tagged, ll):
+    mprint("negotiating with registrar through proxy {}".format(str(ll.locator)), 2)
+    try:
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+    
+        if not err:
+            mprint("response from registrar = {}".format(cbor.loads(answer.value)),2)
+            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+    except Exception as e:
+        mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+
+
 
 def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has already cached the locator
     pass

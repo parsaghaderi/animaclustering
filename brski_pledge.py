@@ -29,7 +29,7 @@ pledge_sem = threading.Semaphore()
 
 
 registrar_ports = {'registrar':0, 'proxy':0}
-proxy_tagged.objective.value = cbor.dumps({'ula':MY_ULA, 'key':True})
+proxy_tagged.objective.value = cbor.dumps(node_info)
 
 def discover_proxy(_tagged):
     global PROXY_LOCATOR

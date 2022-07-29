@@ -35,7 +35,7 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
     actual_initiator_ula = tmp_answer['my_ula']
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(actual_initiator_ula), 2)
 
-    if (random.randint(0, 10)%4 != 0):
+    if (True):
         _answer.value = cbor.dumps(True)
         mprint("allowing {} to join the domain".format(tmp_answer), 2)
         

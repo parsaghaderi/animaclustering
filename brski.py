@@ -27,7 +27,7 @@ proxy_tagged.objective.value = cbor.dumps(node_info)
 registrar_tagged.objective.value = cbor.dumps(node_info)
 
 def listen_proxy(_tagged, _handle, _answer): #to join pledge
-    
+    mprint("the handler is link-local {}".format(ipaddress.IPv6Address(_handle.id_source).is_link_local) ,2)
     proxy_address = str(ipaddress.IPv6Address(_handle.id_source))
 
     tmp_answer = cbor.loads(_answer.value) #{map:..., ports:....}

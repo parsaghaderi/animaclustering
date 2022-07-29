@@ -78,7 +78,7 @@ def listen_proxy(_tagged, _handle, _answer):
     mprint("incoming request from pledge {}, forwarding it to registrar".format(pledge_ula), 2)
     proxy_sem.acquire()
     _tagged.objective.value = _answer.value
-    registrar_response = relay(_tagged, pledge_ula)
+    registrar_response = cbor.loads(relay(_tagged, pledge_ula))
     proxy_sem.release()
     if registrar_response == False:
         pass
@@ -86,7 +86,7 @@ def listen_proxy(_tagged, _handle, _answer):
         mprint("returning registrar's response to the pledge")
         for i in range(3):
             try:
-                _answer.value = registrar_response
+                _answer.value = cbor.dumps(registrar_response)
                 _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
                 if _old_API:
                     err, temp, answer = _r

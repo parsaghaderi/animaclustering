@@ -1628,7 +1628,6 @@ def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
         return errors.noReply, shandle, None
     
     # call common code to wait for reply and handle it
-    print("here 9")
     return _negloop(shandle, obj, timeout, sock, True)          
 
 

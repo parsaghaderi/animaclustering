@@ -85,7 +85,7 @@ def listen_proxy(_tagged, _handle, _answer):
         mprint("returning registrar's response to the pledge")
         for i in range(3):
             try:
-                _tagged.objective.value = registrar_response
+                _answer.value = registrar_response
                 _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
                 if _old_API:
                     err, temp, answer = _r

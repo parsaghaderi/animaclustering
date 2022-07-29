@@ -11,7 +11,7 @@ PROXY_LOCATOR = None
 NODE_INFO = {}
 REGISTRAR_UPDATES = {}
 PORTS = {'proxy':0, 'registrar':0}
-node_info = {MY_ULA}
+node_info = {'please let':'me in'}
 
 asa, err = ASA_REG('brski')
 
@@ -23,7 +23,7 @@ registrar_obj, err, PORTS['registrar'] = OBJ_REG('registrar', None, True, False,
 registrar_tagged = TAG_OBJ(registrar_obj, asa)
 registrar_sem = threading.Semaphore()
 
-# proxy_tagged.objective.value = cbor.dumps(node_info)
+proxy_tagged.objective.value = cbor.dumps(node_info)
 # registrar_tagged.objective.value = cbor.dumps(node_info)
 
 pledge_obj, err, pledge_port = OBJ_REG('pledge', None, True, False, 10, asa, True)#for communication with pledge only

@@ -24,7 +24,7 @@ registrar_obj, err, PORTS['registrar'] = OBJ_REG('registrar', None, True, False,
 registrar_tagged = TAG_OBJ(registrar_obj, asa)
 registrar_sem = threading.Semaphore()
 
-pledge_obj, err, pledge_port = OBJ_REG('pledge', None, True, False, 10, asa, True)#for communication with pledge only
+pledge_obj, err, pledge_port = OBJ_REG('pledge', False, True, False, 10, asa, True)#for communication with pledge only
 pledge_tagged = TAG_OBJ(pledge_obj, asa)
 pledge_sem = threading.Semaphore()
 
@@ -143,7 +143,7 @@ def send_map_to_registrar():
             mprint("got response from registrar at {} with value {}".format(str(REGISTRAR_LOCATOR.locator), tmp_answer), 2)
             MAP.update(tmp_answer['MAP'])
             mprint("MAP updated", 2)
-            PROXY_LOCATOR_ULA = locator_maker(str(REGISTRAR_LOCATOR.locator), tmp_answer['PORTS']['proxy'], False)
+            REGISTRAR_LOCATOR = locator_maker(str(REGISTRAR_LOCATOR.locator), tmp_answer['PORTS']['proxy'], False)
             _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
             mprint("start listening for updates from registrar")
             # threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
@@ -155,9 +155,10 @@ def send_map_to_registrar():
 
 def post_acceptance():
     global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
-    discover_registrar_thread = threading.Thread(target=discover_registrar, args=[registrar_tagged])
-    discover_registrar_thread.start()
-    discover_registrar_thread.join()
+    if REGISTRAR_LOCATOR != None:
+        discover_registrar_thread = threading.Thread(target=discover_registrar, args=[registrar_tagged])
+        discover_registrar_thread.start()
+        discover_registrar_thread.join()
     if REGISTRAR_LOCATOR != None:
         sleep(2)
         mprint("start negotiation with registrar", 2)

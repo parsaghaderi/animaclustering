@@ -170,4 +170,4 @@ def run_update(_tagged):
     mprint("sending updates to nodes", 2)
     update(_tagged)
 
-threading.Thread(target=run_update, args=[registrar_tagged]).start()
+# threading.Thread(target=run_update, args=[registrar_tagged]).start()

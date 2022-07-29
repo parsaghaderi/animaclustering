@@ -173,7 +173,7 @@ def send_map_to_registrar():
             mprint("start listening for updates from registrar")
             _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
             
-            # threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
+            threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
             threading.Thread(target=listen, args=[proxy_tagged, listen_proxy]).start()
         else:
             mprint("negotiation failed due to an error", 2)
@@ -202,7 +202,6 @@ def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has alre
         if len(ll) != 0:
             mprint("registrar found at {}".format(str(ll[0].locator)), 2)
             REGISTRAR_LOCATOR = ll[0]
-            mprint("3 Zzz", 2)
             mprint("start listening for updates from registrar", 2)
             threading.Thread(target=listen, args=[_tagged, listen_registrar]).start()
         else:

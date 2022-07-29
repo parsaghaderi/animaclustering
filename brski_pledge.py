@@ -174,7 +174,7 @@ def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has alre
             mprint("registrar found at {}".format(str(ll[0].locator)), 2)
             REGISTRAR_LOCATOR = ll[0]
             mprint("negotiating updates with registrar at {}".format(str(REGISTRAR_LOCATOR.locator)), 2)
-            threading.Thread(target=send_map_to_registrar, args=[]).start()
+            # threading.Thread(target=send_map_to_registrar, args=[]).start()
         else:
             mprint("no registrar found, trying again", 2)
 

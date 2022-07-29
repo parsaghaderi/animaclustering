@@ -175,6 +175,7 @@ def send_map_to_registrar():
             _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
             
             threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
+            threading.Thread(target=listen, args=[proxy_tagged, listen_proxy]).start()
         else:
             mprint("negotiation failed due to an error", 2)
     except Exception as e:

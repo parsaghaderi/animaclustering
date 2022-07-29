@@ -11,7 +11,7 @@ PROXY_LOCATOR = None
 NODE_INFO = {}
 REGISTRAR_UPDATES = {}
 PORTS = {'proxy':0, 'registrar':0}
-node_info = {MY_ULA}
+node_info = {'my_ula':MY_ULA}
 
 asa, err = ASA_REG('brski')
 

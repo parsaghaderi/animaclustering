@@ -79,6 +79,7 @@ def listen_proxy(_tagged, _handle, _answer):
     proxy_sem.acquire()
     _tagged.objective.value = _answer.value
     registrar_response = relay(_tagged, pledge_ula)
+    proxy_sem.release()
     if registrar_response == False:
         pass
     else:
@@ -94,18 +95,16 @@ def listen_proxy(_tagged, _handle, _answer):
                     err, temp, answer, reason = _r
                 if (not err) and (temp == None):
                     mprint("\033[1;32;1m negotiation with pledge {} ended successfully.\033[0m".format(str(REGISTRAR_LOCATOR.locator)), 2)  
-                    proxy_sem.release()
+                    
                     break
                 else:
                     mprint("\033[1;31;1m negotiation in listen_proxy with pledge interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
-                    # proxy_sem.release()
                     mprint("3s Zzz", 2)
                     sleep(3)
             except Exception as e:
                 mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(graspi.etext[e]), 2)
-                proxy_sem.release()
                 break
-        proxy_sem.release()
+        
 
 def relay(_tagged, _p): #listen for incoming request from pledge to forward to the registrar
     mprint("forwarding pledge's {} voucher request to registrar".format(_p), 2)

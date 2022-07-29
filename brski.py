@@ -144,4 +144,4 @@ def run_update(_tagged):
     sleep(2)
     update(_tagged)
 
-threading.Thread(target=run_update, args=[registrar_tagged]).start()
+# threading.Thread(target=run_update, args=[registrar_tagged]).start()

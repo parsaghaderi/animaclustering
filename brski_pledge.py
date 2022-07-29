@@ -94,11 +94,11 @@ def listen_proxy(_tagged, _handle, _answer):
     pledge_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("incoming request from pledge {}, forwarding it to registrar".format(pledge_ula), 2)
     proxy_sem.acquire()
-    _tagged.objective.value = _answer.value
+    _tagged.objective.value = cbor.loads(_answer.value)
     registrar_response = relay(_tagged, pledge_ula)
     if registrar_response == False:
         proxy_sem.release()
-        pass
+        
     else:
         mprint("returning registrar's response to the pledge")
         for i in range(3):

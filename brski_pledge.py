@@ -48,7 +48,7 @@ def discover_proxy(_tagged):
 def send_voucher_req(_tagged, ll):
     
     mprint("negotiating with proxy {}".format(str(ll.locator)), 2)
-    for i in range(2):
+    for i in range(3):
         mprint("trying for the {} time".format(i), 2)
         try:
             if _old_API:
@@ -68,8 +68,9 @@ def send_voucher_req(_tagged, ll):
                     mprint("registrar refused to allow me to join the network", 2)
                     mprint("trying again after 10s Zzz", 2)
                     _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                    
-
+            else:
+                mprint("there was an error with code {}".format(graspi.etext[err]), 2)
+                
         except Exception as e:
             mprint("there was an error occurred in neg_with_proxy with code {} - trying again".format(graspi.etext[e]), 2)
             

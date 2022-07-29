@@ -62,13 +62,23 @@ def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local):
     obj.neg = neg
     obj.synch = synch
     obj.loop_count = loop_count
+    port = None
     err = graspi.register_obj(ASA, obj, local=_local)
     if not err:
         mprint("Objective registered successfully")
+        if _old_API:
+          for item in graspi._obj_registry:
+                if item.objective.name == name:
+                    port = item.port 
+        else:
+            for item in graspi.grasp._obj_registry:
+                if item.objective.name == name:
+                    port = item.port
     else:
         mprint("Cannot register Objective:\n\t"+ graspi.etext[err])
         mprint("exiting now.")
-    return obj, err
+        exit(0)
+    return obj, err, port
 
 ###########
 # mapping each objective to an ASA
@@ -143,3 +153,9 @@ def discovery(_tagged, _discovery_handler, _attempts=3):
             mprint(str(item.locator))
         attempt-=1
     _discovery_handler(_tagged, ll)
+
+def locator_maker(_ip, _port, _diverted):
+    locator_obj = graspi.asa_locator(ipaddress.IPv6Address(_ip),0, _diverted)
+    locator_obj.port = _port
+
+    return locator_obj

@@ -179,20 +179,15 @@ def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has alre
         else:
             mprint("no registrar found, trying again", 2)
 
-def listen_registrar(_tagged, _handle, _answer): #listen to registrar for updates
+def listen_registrar_update(_tagged, _handle, _answer): #listen to registrar for updates
     global MAP
     mprint("incoming request from registrar for updates!", 2)  #registrar already has my map, so the new update includes mine as well 
     tmp_answer = cbor.loads(_answer.value)
     mprint("update from registrar {}".format(tmp_answer), 2)
 
-    registrar_sem.acquire()
-
-    # node_info['MAP'].update(tmp_answer['MAP'])
     MAP.update(tmp_answer['MAP'])
-    registrar_tagged.objective.value = cbor.dumps(node_info)
-
-    registrar_sem.release()
-
+    
+    
     mprint("the new map is {}".format(MAP), 2)
     _answer.value = cbor.dumps(MAP)
 
@@ -206,12 +201,33 @@ def listen_registrar(_tagged, _handle, _answer): #listen to registrar for update
         if (not err) and (temp == None):
             mprint("\033[1;32;1m negotiation with registrar ended successfully with value {}\033[0m".format(cbor.loads(_answer.value)), 2)  
         else:
-            mprint("\033[1;31;1m in registrar listen handler - neg with registrar interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
-            mprint("5s Zzz", 2)
-            sleep(5)
-            
+            mprint("\033[1;31;1m in registrar listen update interuption with error code {} \033[0m".format(graspi.etext[err]), 2)
     except Exception as err:
         mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
-        
+
+def send_update():
+    global pledge_tagged, REGISTRAR_LOCATOR, pledge_sem
+    try:
+        mprint("sending updates to registrar")
+        pledge_tagged.acquire()
+        pledge_tagged.objective.value = cbor.dumps(MAP)
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(pledge_tagged.source,pledge_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(pledge_tagged.source,pledge_tagged.objective, REGISTRAR_LOCATOR, None)
+        pledge_tagged.release()
+        if not err:
+            tmp_answer = cbor.loads(answer.value)
+            mprint("got response from registrar at {} with value {}".format(str(REGISTRAR_LOCATOR.locator), tmp_answer), 2)
+            MAP.update(tmp_answer['MAP'])
+            mprint("MAP updated", 2)
+            _err = graspi.end_negotiate(pledge_tagged.source, handle, True, reason="value received")            
+        else:
+            mprint("negotiation failed due to an error", 2)
+    except Exception as e:
+        mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+
+
 threading.Thread(target=discover_proxy, args=[proxy_tagged]).start()
 

@@ -123,15 +123,39 @@ def neg_registrar(_tagged, ll):
             mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
             return
 
+def send_update(_tagged, ll):
+    global MAP, pledge_sem, pledge_tagged
+    mprint("sending updates to {}".format(str(ll.locator)), 2)
+    for i in range(2):
+        try:
+            _tagged.objective.value = cbor.dumps(MAP)
+            if _old_API:
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+                reason = answer
+            else:
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            if not err:
+                tmp_answer = cbor.loads(answer)
+                pledge_sem.acquire()
+                MAP.update(tmp_answer)
+                mprint("MAP updated {}".format(MAP), 2)
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                return
+            else:
+                mprint("update not received by node\ntrying again after 10s Zzz", 2)
+                sleep(10)
+        except Exception as e:
+            mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+            return
 
-
+            
 def update(_tagged):
     locators = []
     for item in nodes_locator:
         locators.append(locator_maker(item, nodes_locator[item]['registrar'], False))
     
     for item in locators:
-        threading.Thread(target=neg_registrar, args=[_tagged, item]).start()
+        threading.Thread(target=send_update(), args=[_tagged, item]).start()
 
 
 threading.Thread(target=listen, args = [proxy_tagged    , listen_proxy])    .start()
@@ -144,4 +168,4 @@ def run_update(_tagged):
     sleep(2)
     update(_tagged)
 
-# threading.Thread(target=run_update, args=[registrar_tagged]).start()
+threading.Thread(target=run_update, args=[pledge_tagged]).start()

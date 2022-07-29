@@ -162,6 +162,36 @@ def neg(_tagged, ll, _attempt):
         attempt-=1
         sleep(3)
     
+def init(_next):
+    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
+    
+    while not INITIAL_NEG:
+        pass
+    
+    mprint("entering init phase - deciding role")
+    HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
+
+    
+    if HEAVIEST == None:
+        mprint("I'm clusterhead")
+        tagged_sem.acquire()
+        node_info['cluster_head'] = True
+        node_info['status'] = 2
+        if not node_info['cluster_set'].__contains__(MY_ULA):
+            node_info['cluster_set'].append(MY_ULA)
+        tagged.objective.value = cbor.dumps(node_info)
+        tagged_sem.release()
+        mprint(node_info['weight'])
+        mprint(NEIGHBOR_INFO)
+        TO_JOIN = None
+        CLUSTER_HEAD = True
+        CLUSTERING_DONE = True
+        # if not cluster_listen_1.is_alive():
+        #     cluster_listen_1.start()
+    else:
+        mprint("I'm not the heaviest")
+    PHASE = _next      
+
 
 
 def control():

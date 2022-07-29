@@ -230,4 +230,4 @@ def control():
             # maintenance_thread = threading.Thread(target=maintenance, args = []).start()
             pass
 
-# threading.Thread(target=control, args = []).start()
+threading.Thread(target=control, args = []).start()

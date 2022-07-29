@@ -104,7 +104,7 @@ def discovery_node_handler(_tagged, _locators):
             tagged_sem.acquire()
             _tagged.objective.value = cbor.dumps(node_info)
             tagged_sem.release()
-    mprint(NEIGHBORS_STR)
+    mprint(NEIGHBORS_STR, 2)
     sleep(10)
     # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 

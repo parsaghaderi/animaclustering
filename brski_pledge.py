@@ -155,7 +155,7 @@ def send_map_to_registrar():
 
 def post_acceptance():
     global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
-    if REGISTRAR_LOCATOR != None:
+    if REGISTRAR_LOCATOR == None:
         discover_registrar_thread = threading.Thread(target=discover_registrar, args=[registrar_tagged])
         discover_registrar_thread.start()
         discover_registrar_thread.join()

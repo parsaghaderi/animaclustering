@@ -155,7 +155,7 @@ def update(_tagged):
         locators.append(locator_maker(item, nodes_locator[item]['registrar'], False))
     
     for item in locators:
-        threading.Thread(target=send_update(), args=[_tagged, item]).start()
+        threading.Thread(target=send_update, args=[_tagged, item]).start()
 
 
 threading.Thread(target=listen, args = [proxy_tagged    , listen_proxy])    .start()

@@ -172,6 +172,8 @@ def send_map_to_registrar():
             MAP.update(tmp_answer)
             mprint("MAP updated", 2)
             mprint("start listening for updates from registrar")
+            _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
+            
             threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
         else:
             mprint("negotiation failed due to an error", 2)

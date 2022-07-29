@@ -51,19 +51,21 @@ asa2, err = ASA_REG('cluster_neg')
 
 node_info = {'weight':get_node_value(),
              'cluster_head':False, 'cluster_set':[], 'neighbors':NEIGHBORS_STR, 
-             'status': 1, 'ports':{'cluster':0, 'obj':0}} 
+             'status': 1, 'ports':{'cluster':0, 'obj':0, 'sub_cluster':0}} 
 
-obj, err = OBJ_REG('node', cbor.dumps(node_info), True, False, 10, asa, False)
+obj, err, node_info['ports']['obj'] = OBJ_REG('node', None, True, False, 10, asa, False)
 tagged   = TAG_OBJ(obj, asa)
 tagged_sem = threading.Semaphore()
 
-cluster_obj1, err = OBJ_REG("cluster_head", cbor.dumps(TP_MAP), True, False, 10, asa, False)
+cluster_obj1, err, node_info['ports']['cluster'] = OBJ_REG("cluster_head", cbor.dumps(TP_MAP), True, False, 10, asa, False)
 cluster_tagged = TAG_OBJ(cluster_obj1, asa)
 cluster_tagged_sem = threading.Semaphore()
 
-sub_cluster_obj, err = OBJ_REG("sub_cluster", cbor.dumps(TP_MAP), True, False, 10, asa, False)
+sub_cluster_obj, err, node_info['ports']['sub_cluster'] = OBJ_REG("sub_cluster", cbor.dumps(TP_MAP), True, False, 10, asa, False)
 sub_cluster_tagged = TAG_OBJ(sub_cluster_obj, asa)
 cluster_tagged_sem = threading.Semaphore()
+
+obj.value = cbor.dumps(node_info)
 
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))

@@ -35,23 +35,24 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(actual_initiator_ula), 2)
 
     if (random.randint(0, 10)%4 != 0):
-        mprint("connecting to MASA", 2)
-        sleep(2)
-        mprint("MASA approved")
+        # mprint("connecting to MASA", 2)
+        # sleep(2)
+        # mprint("MASA approved")
         
-        proxy_sem.acquire()
-        registrar_sem.acquire()
+        # proxy_sem.acquire()
+        # registrar_sem.acquire()
         
-        MAP.update(tmp_answer['MAP'])
-        node_info['MAP'].update(tmp_answer['MAP'])
-        nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
-        _answer.value = cbor.dumps(node_info)
-        proxy_tagged.objective.value = cbor.dumps(node_info)
-        registrar_tagged.objective.value = cbor.dumps(node_info)
+        # MAP.update(tmp_answer['MAP'])
+        # node_info['MAP'].update(tmp_answer['MAP'])
+        # nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
+        # _answer.value = cbor.dumps(node_info)
+        # proxy_tagged.objective.value = cbor.dumps(node_info)
+        # registrar_tagged.objective.value = cbor.dumps(node_info)
 
-        proxy_sem.release()
-        registrar_sem.release()
-        
+        # proxy_sem.release()
+        # registrar_sem.release()
+        _answer.value = cbor.dumps(True)
+        mprint("allowing {} to join the domain".format(tmp_answer), 2)
     else:
         mprint("Rejecting pledge")
         _answer.value = cbor.dumps(False)
@@ -97,7 +98,7 @@ def listen_registrar(_tagged, _handle, _answer):#to get updates from nodes
 
 
     try:
-        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        _r = graspi.negotiate_step(registrar_tagged.source, _handle, _answer, 10000)
         if _old_API:
             err, temp, answer = _r
             reason = answer
@@ -143,7 +144,9 @@ def neg_registrar(_tagged, ll):
             mprint("MAP updated\n {}".format(MAP), 2)
 
             _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-
+        else:
+            #TODO
+            pass
     except Exception as e:
         mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
 

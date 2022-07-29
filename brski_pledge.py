@@ -11,6 +11,7 @@ PROXY_LOCATOR_ULA = None
 NODE_INFO = {}
 REGISTRAR_UPDATES = {}
 PORTS = {'proxy':0, 'registrar':0}
+
 node_info = {'my_ula':MY_ULA, 'ports':PORTS}
 
 asa, err = ASA_REG('brski')
@@ -74,13 +75,12 @@ def send_voucher_req(_tagged, ll):
         except Exception as e:
             mprint("there was an error occurred in neg_with_proxy with code {} - trying again".format(graspi.etext[e]), 2)
             
-
 def listen_proxy(_tagged, _handle, _answer):
     pledge_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("incoming request from pledge {}, forwarding it to registrar".format(pledge_ula), 2)
     proxy_sem.acquire()
     _tagged.objective.value = _answer.value
-    registrar_response = cbor.loads(relay(_tagged, pledge_ula))
+    registrar_response = relay(_tagged, pledge_ula)
     proxy_sem.release()
     if registrar_response == False:
         pass
@@ -107,7 +107,6 @@ def listen_proxy(_tagged, _handle, _answer):
                 mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(graspi.etext[e]), 2)
                 break
         
-
 def relay(_tagged, _p): #listen for incoming request from pledge to forward to the registrar
     mprint("forwarding pledge's {} voucher request to registrar".format(_p), 2)
     for i in range(3):
@@ -126,18 +125,6 @@ def relay(_tagged, _p): #listen for incoming request from pledge to forward to t
         except Exception as e:
             mprint("there was an error occurred in relay with code {}".format(graspi.etext[e]), 2)
             return False
-
-# def post_join():
-#     global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
-#     discover_registrar_thread = threading.Thread(target=discover_registrar, args=[registrar_tagged])
-#     discover_registrar_thread.start()
-#     discover_registrar_thread.join()
-
-#     if REGISTRAR_LOCATOR != None:
-#         threading.Thread(target=listen, args=[proxy_tagged, listen_proxy]).start()
-#     else:
-#         mprint("registrar was not found exiting process")
-#         exit()
 
 def send_map_to_registrar():
     global REGISTRAR_LOCATOR, registrar_tagged, registrar_sem, MAP, PROXY_LOCATOR_ULA

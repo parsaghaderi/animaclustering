@@ -184,7 +184,7 @@ def listen_registrar_update(_tagged, _handle, _answer): #listen to registrar for
     tmp_answer = cbor.loads(_answer.value)
     mprint("update from registrar {}".format(tmp_answer), 2)
 
-    MAP.update(tmp_answer['MAP'])
+    MAP.update(tmp_answer)
     
     
     mprint("the new map is {}".format(MAP), 2)

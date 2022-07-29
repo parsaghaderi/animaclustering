@@ -106,13 +106,61 @@ def discovery_node_handler(_tagged, _locators):
             tagged_sem.release()
     mprint(NEIGHBORS_STR, 2)
     sleep(10)
-    # threading.Thread(target=run_neg, args=[tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
+    threading.Thread(target=run_neg, args=[_tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_node_1.start()
 
 discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_handler, 2])
 discovery_1.start()
+
+def run_neg(_tagged, _locators, _next, _attempts = 1):
+    global INITIAL_NEG, PHASE
+    
+    for item in _locators:
+        threading.Thread(target=neg, args=[_tagged, item, _attempts]).start()
+    sleep(10) #TODO check if can be reduced
+    INITIAL_NEG = True
+    PHASE = _next
+
+def neg(_tagged, ll, _attempt):
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1),2)
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, NEIGHBOR_STR_TO_LOCATOR[ll], 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, NEIGHBOR_STR_TO_LOCATOR[ll], None)
+        if not err:
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(ll, _attempt-attempt+1))
+            NEIGHBOR_INFO[ll] = cbor.loads(answer.value)#√
+            mprint("neg_step value : peer {} offered {}".format(ll, NEIGHBOR_INFO[ll]))#√
+            
+            if NEIGHBOR_INFO[ll]['cluster_head'] == str(MY_ULA): #√
+                tagged_sem.acquire()
+                tagged.objective.value = cbor.loads(tagged.objective.value)
+                if not node_info['cluster_set'].__contains__(ll):
+                    node_info['cluster_set'].append(ll)
+                tagged.objective.value = cbor.dumps(node_info)
+                tagged_sem.release()
+                mprint(node_info, 2)
+            try:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m neg with {} ended successfully\033[0m".format(ll))
+                    break
+                else:
+                    mprint("\033[1;31;1m in neg_end error happened {} \033[0m".format(graspi.etext[_err]))
+            except Exception as e:
+                mprint("\033[1;31;1m in neg_neg exception happened {} \033[0m".format(e))
+            
+        else:
+            mprint("\033[1;31;1m in neg_req - neg with {} failed + {} \033[0m".format(ll, graspi.etext[err]))
+            attempt+=1
+        attempt-=1
+        sleep(3)
+    
 
 
 def control():

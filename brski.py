@@ -31,7 +31,7 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
     proxy_address = str(ipaddress.IPv6Address(_handle.id_source))
 
     tmp_answer = cbor.loads(_answer.value) #{map:..., ports:....}
-    actual_initiator_ula = list(tmp_answer['MAP'].keys())[0]
+    actual_initiator_ula = tmp_answer
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(actual_initiator_ula), 2)
 
     if (random.randint(0, 10)%4 != 0):

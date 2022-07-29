@@ -1597,27 +1597,18 @@ def req_negotiate(asa_handle, obj, peer, timeout, noloop=False):
     #create TCP socket, assemble message and send it
     #(lazy code, not checking that TCP is the right one to use)
     neg_sess = _new_session(None)
-    print("here 1")
     shandle = _session_handle(neg_sess,None)
-    print("here 2")
     sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-    print("here 3")
     if peer.locator.is_link_local:
         _ifi = peer.ifi
     else:
         _ifi = 0
-    print("here 4")
-    print("%%%%%\n{}\n{}\n{}%%%%%".format(type(peer.locator), peer.port, _ifi))
     try:
         ttprint("Sending req_negotiate to",peer.locator, peer.port)
         sock.settimeout(5) #there should always be a listener
-        print("here 5")
         sock.connect((str(peer.locator), peer.port,0,_ifi))
-        print("here 6")
         msg_bytes = _ass_message(M_REQ_NEG, neg_sess, None, obj)
-        print("here 7")
         sock.sendall(msg_bytes,0)
-        print("here 8")
 
     except OSError as ex:
         tprint("Socket error sending negotiation request", ex)

@@ -93,12 +93,12 @@ def send_voucher_req(_tagged, ll):
 def listen_proxy(_tagged, _handle, _answer):
     pledge_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("incoming request from pledge {}, forwarding it to registrar".format(pledge_ula), 2)
-    proxy_sem.acquire()
-    _tagged.objective.value = cbor.loads(_answer.value)
+    # proxy_sem.acquire()
+    _tagged.objective.value = _answer.value
     registrar_response = relay(_tagged, pledge_ula)
     if registrar_response == False:
-        proxy_sem.release()
-        
+        # proxy_sem.release()
+        pass
     else:
         mprint("returning registrar's response to the pledge")
         for i in range(3):
@@ -112,11 +112,11 @@ def listen_proxy(_tagged, _handle, _answer):
                     err, temp, answer, reason = _r
                 if (not err) and (temp == None):
                     mprint("\033[1;32;1m negotiation with pledge {} ended successfully.\033[0m".format(str(REGISTRAR_LOCATOR.locator)), 2)  
-                    proxy_sem.release()
+                    # proxy_sem.release()
                     break
                 else:
                     mprint("\033[1;31;1m negotiation in listen_proxy with pledge interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
-                    proxy_sem.release()
+                    # proxy_sem.release()
                     mprint("3s Zzz", 2)
                     sleep(3)
             except Exception as e:

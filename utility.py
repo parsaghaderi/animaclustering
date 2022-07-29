@@ -24,10 +24,10 @@ def get_node_value():
 # utility print function
 #########################
 def mprint(msg, mode = 1):
-    if mode!= 1:
-        print("\n#######################")
-        print(msg)
-        print("#######################\n")
+    # if mode!= 1:
+    print("\n#######################")
+    print(msg)
+    print("#######################\n")
 
 ##############
 # geting the locators as strings
@@ -56,7 +56,7 @@ def ASA_REG(name):
 #########################
 #Registering objectives
 #########################
-def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local = False):
+def OBJ_REG(name, value, neg, synch, loop_count, ASA, _local):
     obj = graspi.objective(name)
     obj.value = value
     obj.neg = neg
@@ -85,15 +85,15 @@ def check_alive(_neighbors):
 
 
 def listen(_tagged, _listen_handler):
-    mprint("start listening for objective {}".format(_tagged.objective.name))
+    mprint("start listening for objective {}".format(_tagged.objective.name),2)
     while True:
         err, handle, answer = graspi.listen_negotiate(_tagged.source, 
                                                       _tagged.objective)       
         if not err:
-            mprint("\033[1;32;1m incoming request \033[0m")
+            mprint("\033[1;32;1m incoming request \033[0m",2)
             threading.Thread(target=_listen_handler, args=[_tagged,handle,answer]).start()
         else:
-            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]))
+            mprint("\033[1;31;1m in listen error {} \033[0m" .format(graspi.etext[err]),2)
 
 #shouldn't be here, but whatever !!!!
 def sort_weight(_my_weight, _neighbor_info, _heavier, _heaviest, _lighter):

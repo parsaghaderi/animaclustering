@@ -35,17 +35,17 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
     actual_initiator_ula = tmp_answer['my_ula']
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(actual_initiator_ula), 2)
 
-    if (True):
+    if True:
+        proxy_sem.acquire()
         _answer.value = cbor.dumps(True)
         mprint("allowing {} to join the domain".format(tmp_answer), 2)
-        
     else:
         _answer.value = cbor.dumps(False)
         mprint("Rejecting pledge")
-
     for i in range(3):
         try:
             _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+            
             if _old_API:
                 err, temp, answer = _r
                 reason = answer
@@ -53,6 +53,7 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
                 err, temp, answer, reason = _r
             if (not err) and (temp == None):
                 mprint("\033[1;32;1m negotiation with peer {} with proxy {} ended successfully with value {}\033[0m".format(actual_initiator_ula, proxy_address,cbor.loads(_answer.value)), 2)  
+                proxy_sem.release()
                 break
             else:
                 mprint("\033[1;31;1m in listen handler - neg with peer {} with proxy {} interrupted with error code {} \033[0m".format(actual_initiator_ula, proxy_address, graspi.etext[err]), 2)
@@ -61,6 +62,8 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
                 
         except Exception as err:
             mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
+            proxy_sem.release()
+    proxy_sem.release()
 
 def listen_registrar(_tagged, _handle, _answer):#to get updates from nodes
     actual_initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))

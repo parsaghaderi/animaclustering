@@ -80,7 +80,7 @@ def listen_proxy(_tagged, _handle, _answer):
     mprint("incoming request from pledge {}, forwarding it to registrar".format(pledge_ula), 2)
     proxy_sem.acquire()
     _tagged.objective.value = _answer.value
-    registrar_response = relay(_tagged, pledge_ula)
+    registrar_response = cbor.loads(relay(_tagged, pledge_ula))
     proxy_sem.release()
     if registrar_response == False:
         pass
@@ -118,13 +118,13 @@ def relay(_tagged, _p): #listen for incoming request from pledge to forward to t
                 err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, PROXY_LOCATOR_ULA, None)
             if not err:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                return answer
+                return answer.value
             else:
                 mprint("\033[1;31;1m negotiation in relay with registrar interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
-                return False
+                return cbor.dumps(False)
         except Exception as e:
             mprint("there was an error occurred in relay with code {}".format(graspi.etext[e]), 2)
-            return False
+            return cbor.dumps(False)
 
 def send_map_to_registrar():
     global REGISTRAR_LOCATOR, registrar_tagged, registrar_sem, MAP, PROXY_LOCATOR_ULA

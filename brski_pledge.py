@@ -7,11 +7,11 @@ MAP = {MY_ULA:NEIGHBOR_ULA}
 
 REGISTRAR_LOCATOR = None
 PROXY_LOCATOR = None
-
+PROXY_LOCATOR_ULA = None
 NODE_INFO = {}
 REGISTRAR_UPDATES = {}
 PORTS = {'proxy':0, 'registrar':0}
-node_info = {'my_ula':MY_ULA}
+node_info = {'my_ula':MY_ULA, 'ports':PORTS}
 
 asa, err = ASA_REG('brski')
 
@@ -23,12 +23,13 @@ registrar_obj, err, PORTS['registrar'] = OBJ_REG('registrar', None, True, False,
 registrar_tagged = TAG_OBJ(registrar_obj, asa)
 registrar_sem = threading.Semaphore()
 
-proxy_tagged.objective.value = cbor.dumps(node_info)
-# registrar_tagged.objective.value = cbor.dumps(node_info)
-
 pledge_obj, err, pledge_port = OBJ_REG('pledge', None, True, False, 10, asa, True)#for communication with pledge only
 pledge_tagged = TAG_OBJ(pledge_obj, asa)
 pledge_sem = threading.Semaphore()
+
+
+registrar_ports = {'registrar':0, 'proxy':0}
+# proxy_tagged.objective.value = cbor.dumps({'ula':MY_ULA, 'key':True})
 
 def discover_proxy(_tagged):
     global PROXY_LOCATOR
@@ -45,8 +46,8 @@ def discover_proxy(_tagged):
             sleep(5)
 
 def send_voucher_req(_tagged, ll):
-    global registrar_tagged, REGISTRAR_LOCATOR, node_info, MAP, proxy_tagged
-    mprint("negotiating with registrar through proxy {}".format(str(ll.locator)), 2)
+    
+    mprint("negotiating with proxy {}".format(str(ll.locator)), 2)
     for i in range(2):
         try:
             if _old_API:
@@ -58,32 +59,15 @@ def send_voucher_req(_tagged, ll):
             if not err:
                 mprint("response from registrar = {}".format(cbor.loads(answer.value)),2)
                 if cbor.loads(answer.value) == True:
-                    
-                    # tmp_answer = cbor.loads(answer.value)
-
-                    # proxy_sem.acquire()
-                    # registrar_sem.acquire()
-
-                    # node_info['MAP'].update(tmp_answer['MAP'])
-                    # MAP.update(tmp_answer['MAP'])
-
-                    # proxy_tagged.objective.value = cbor.dumps(node_info)
-                    # registrar_tagged.objective.value = cbor.dumps(node_info)
-
-                    # proxy_sem.release()
-                    # registrar_sem.release()
-
                     mprint("Registrar accepted request, can join network!", 2)
                     _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-                    # post_join()
                     post_acceptance()
-                    # return
                     return
                 else:
                     mprint("registrar refused to allow me to join the network", 2)
-                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                     mprint("trying again after 10s Zzz", 2)
-                    sleep(10)
+                    _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                    sleep(5)
 
         except Exception as e:
             mprint("there was an error occurred in neg_with_proxy with code {} - trying again".format(graspi.etext[e]), 2)
@@ -92,11 +76,10 @@ def send_voucher_req(_tagged, ll):
 def listen_proxy(_tagged, _handle, _answer):
     pledge_ula = str(ipaddress.IPv6Address(_handle.id_source))
     mprint("incoming request from pledge {}, forwarding it to registrar".format(pledge_ula), 2)
-    # proxy_sem.acquire()
+    proxy_sem.acquire()
     _tagged.objective.value = _answer.value
     registrar_response = relay(_tagged, pledge_ula)
     if registrar_response == False:
-        # proxy_sem.release()
         pass
     else:
         mprint("returning registrar's response to the pledge")
@@ -111,7 +94,7 @@ def listen_proxy(_tagged, _handle, _answer):
                     err, temp, answer, reason = _r
                 if (not err) and (temp == None):
                     mprint("\033[1;32;1m negotiation with pledge {} ended successfully.\033[0m".format(str(REGISTRAR_LOCATOR.locator)), 2)  
-                    # proxy_sem.release()
+                    proxy_sem.release()
                     break
                 else:
                     mprint("\033[1;31;1m negotiation in listen_proxy with pledge interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
@@ -120,16 +103,19 @@ def listen_proxy(_tagged, _handle, _answer):
                     sleep(3)
             except Exception as e:
                 mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(graspi.etext[e]), 2)
+                proxy_sem.release()
+                break
+        proxy_sem.release()
 
 def relay(_tagged, _p): #listen for incoming request from pledge to forward to the registrar
     mprint("forwarding pledge's {} voucher request to registrar".format(_p), 2)
     for i in range(3):
         try:
             if _old_API:
-                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, REGISTRAR_LOCATOR, 10000) #TODO
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, PROXY_LOCATOR_ULA, 10000) #TODO
                 reason = answer
             else:
-                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, REGISTRAR_LOCATOR, None)
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, PROXY_LOCATOR_ULA, None)
             if not err:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
                 return answer
@@ -140,20 +126,20 @@ def relay(_tagged, _p): #listen for incoming request from pledge to forward to t
             mprint("there was an error occurred in relay with code {}".format(graspi.etext[e]), 2)
             return False
 
-def post_join():
-    global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
-    discover_registrar_thread = threading.Thread(target=discover_registrar, args=[registrar_tagged])
-    discover_registrar_thread.start()
-    discover_registrar_thread.join()
+# def post_join():
+#     global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
+#     discover_registrar_thread = threading.Thread(target=discover_registrar, args=[registrar_tagged])
+#     discover_registrar_thread.start()
+#     discover_registrar_thread.join()
 
-    if REGISTRAR_LOCATOR != None:
-        threading.Thread(target=listen, args=[proxy_tagged, listen_proxy]).start()
-    else:
-        mprint("registrar was not found exiting process")
-        exit()
+#     if REGISTRAR_LOCATOR != None:
+#         threading.Thread(target=listen, args=[proxy_tagged, listen_proxy]).start()
+#     else:
+#         mprint("registrar was not found exiting process")
+#         exit()
 
 def send_map_to_registrar():
-    global REGISTRAR_LOCATOR, registrar_tagged, registrar_sem, MAP
+    global REGISTRAR_LOCATOR, registrar_tagged, registrar_sem, MAP, PROXY_LOCATOR_ULA
     mprint("sending map to registrar at {}".format(str(REGISTRAR_LOCATOR.locator)), 2)
     try:
         registrar_sem.acquire()
@@ -165,21 +151,19 @@ def send_map_to_registrar():
             err, handle, answer, reason = graspi.request_negotiate(registrar_tagged.source,registrar_tagged.objective, REGISTRAR_LOCATOR, None)
         registrar_sem.release()
         if not err:
-            mprint("got response from registrar {}".format(str(REGISTRAR_LOCATOR.locator)), 2)
             tmp_answer = cbor.loads(answer.value)
-            mprint("the offered value from registrar {}".format(tmp_answer), 2)
-            MAP.update(tmp_answer)
+            mprint("got response from registrar at {} with value {}".format(str(REGISTRAR_LOCATOR.locator), tmp_answer), 2)
+            MAP.update(tmp_answer['MAP'])
             mprint("MAP updated", 2)
-            mprint("start listening for updates from registrar")
+            PROXY_LOCATOR_ULA = locator_maker(str(REGISTRAR_LOCATOR.locator), tmp_answer['PORTS']['proxy'], False)
             _err = graspi.end_negotiate(registrar_tagged.source, handle, True, reason="value received")
-            
+            mprint("start listening for updates from registrar")
             threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
             threading.Thread(target=listen, args=[proxy_tagged, listen_proxy]).start()
         else:
             mprint("negotiation failed due to an error", 2)
     except Exception as e:
         mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
-
 
 def post_acceptance():
     global REGISTRAR_LOCATOR, registrar_tagged, proxy_tagged
@@ -194,7 +178,6 @@ def post_acceptance():
         mprint("registrar was not found exiting process")
         exit()
 
-
 def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has already cached the locator
     global REGISTRAR_LOCATOR
     for i in range(0, 3):
@@ -202,8 +185,8 @@ def discover_registrar(_tagged): #it doesn't pass the proxy since proxy has alre
         if len(ll) != 0:
             mprint("registrar found at {}".format(str(ll[0].locator)), 2)
             REGISTRAR_LOCATOR = ll[0]
-            mprint("start listening for updates from registrar", 2)
-            threading.Thread(target=listen, args=[_tagged, listen_registrar]).start()
+            mprint("negotiating updates with registrar at {}".format(str(REGISTRAR_LOCATOR.locator)), 2)
+            threading.Thread(target=send_map_to_registrar, args=[]).start()
         else:
             mprint("no registrar found, trying again", 2)
 
@@ -211,21 +194,15 @@ def listen_registrar(_tagged, _handle, _answer): #listen to registrar for update
     global MAP
     mprint("incoming request from registrar for updates!", 2)  #registrar already has my map, so the new update includes mine as well 
     tmp_answer = cbor.loads(_answer.value)
-    mprint("tmp asnwer is {}".format(cbor.loads(_answer.value)), 2)
+    mprint("update from registrar {}".format(tmp_answer), 2)
+    
+    registrar_sem.acquire()
 
-    tmp_answer = cbor.loads(_answer.value)
+    node_info['MAP'].update(tmp_answer['MAP'])
+    MAP.update(tmp_answer['MAP'])
+    registrar_tagged.objective.value = cbor.dumps(node_info)
 
-    # proxy_sem.acquire()
-    # registrar_sem.acquire()
-
-    # node_info['MAP'].update(tmp_answer)
-    MAP.update(tmp_answer)
-
-    # proxy_tagged.objective.value = cbor.dumps(node_info)
-    # registrar_tagged.objective.value = cbor.dumps(node_info)
-
-    # proxy_sem.release()
-    # registrar_sem.release()
+    registrar_sem.release()
 
     mprint("the new map is {}".format(MAP), 2)
     _answer.value = cbor.dumps(MAP)

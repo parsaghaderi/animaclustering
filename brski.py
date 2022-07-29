@@ -7,15 +7,15 @@ MAP = {MY_ULA:NEIGHBOR_ULA} #the whole map of the network, only map
 NETWORK_INFO = {} #what info was received from each node
 nodes_locator = {}
 
-node_info = {'MAP':MAP} #my info
+node_info = {'MAP':MAP, 'PORTS':{'registrar':0, 'proxy':0}} #my info
 
 asa, err = ASA_REG('brski')
 
-proxy_obj, err, proxy_port = OBJ_REG('proxy', None, True, False, 10, asa, True) #for pledges and communication only
+proxy_obj, err, node_info['PORTS']['proxy'] = OBJ_REG('proxy', None, True, False, 10, asa, True) #for pledges and communication only
 proxy_tagged = TAG_OBJ(proxy_obj,asa)
 proxy_sem = threading.Semaphore()
 
-registrar_obj, err, registrar_port = OBJ_REG('registrar', None, True, False, 10, asa, False) #for transferring updates
+registrar_obj, err, node_info['PORTS']['registrar'] = OBJ_REG('registrar', None, True, False, 10, asa, False) #for transferring updates
 registrar_tagged = TAG_OBJ(registrar_obj, asa)
 registrar_sem = threading.Semaphore()
 
@@ -31,31 +31,18 @@ def listen_proxy(_tagged, _handle, _answer): #to join pledge
     proxy_address = str(ipaddress.IPv6Address(_handle.id_source))
 
     tmp_answer = cbor.loads(_answer.value) #{map:..., ports:....}
+
     actual_initiator_ula = tmp_answer['my_ula']
     mprint("\033[1;32;1m incoming request from {}\033[0m".format(actual_initiator_ula), 2)
 
     if (random.randint(0, 10)%4 != 0):
-        # mprint("connecting to MASA", 2)
-        # sleep(2)
-        # mprint("MASA approved")
-        
-        # proxy_sem.acquire()
-        # registrar_sem.acquire()
-        
-        # MAP.update(tmp_answer['MAP'])
-        # node_info['MAP'].update(tmp_answer['MAP'])
-        # nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
-        # _answer.value = cbor.dumps(node_info)
-        # proxy_tagged.objective.value = cbor.dumps(node_info)
-        # registrar_tagged.objective.value = cbor.dumps(node_info)
-
-        # proxy_sem.release()
-        # registrar_sem.release()
         _answer.value = cbor.dumps(True)
         mprint("allowing {} to join the domain".format(tmp_answer), 2)
+        
     else:
-        mprint("Rejecting pledge")
         _answer.value = cbor.dumps(False)
+        mprint("Rejecting pledge")
+
     for i in range(3):
         try:
             _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
@@ -80,23 +67,16 @@ def listen_registrar(_tagged, _handle, _answer):#to get updates from nodes
     mprint("incoming request from node {}".format(actual_initiator_ula), 2)
 
     tmp_answer = cbor.loads(_answer.value)
-    # MAP.update(tmp_answer['MAP'])
-    # _answer = cbor.dumps(MAP)
 
-    proxy_sem.acquire()
     registrar_sem.acquire()
 
     MAP.update(tmp_answer['MAP'])
     node_info['MAP'].update(tmp_answer['MAP'])
     nodes_locator[actual_initiator_ula] = tmp_answer['PORTS']
     _answer.value = cbor.dumps(node_info)
-    proxy_tagged.objective.value = cbor.dumps(node_info)
     registrar_tagged.objective.value = cbor.dumps(node_info)
 
-    proxy_sem.release()
     registrar_sem.release()
-
-
     try:
         _r = graspi.negotiate_step(registrar_tagged.source, _handle, _answer, 10000)
         if _old_API:
@@ -105,51 +85,40 @@ def listen_registrar(_tagged, _handle, _answer):#to get updates from nodes
         else:
             err, temp, answer, reason = _r
         if (not err) and (temp == None):
-            mprint("\033[1;32;1m negotiation with node {} for updates ended successfully with value {}\033[0m".format(str(ipaddress.IPv6Address(_handle.id_source)), cbor.loads(_answer.value)), 2)  
+            mprint("\033[1;32;1m negotiation with node {} for updates ended successfully with value {}\033[0m".format(actual_initiator_ula, cbor.loads(_answer.value)), 2)  
         else:
             mprint("\033[1;31;1m in registrar listen handler - neg with node interrupted with error code {} \033[0m".format(graspi.etext[err]), 2)
-    except Exception as err:
-        mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(err), 2)
+    except Exception as e:
+        mprint("\033[1;31;1m exception in linsten handler {} \033[0m".format(e), 2)
         
 def neg_registrar(_tagged, ll):
     global MAP
-
     mprint("sending updates to {}".format(str(ll.locator)), 2)
-    try:
-        _tagged.objective.value = cbor.dumps(MAP)
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
-            reason = answer
-        else:
-            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
-
-        if not err:
-            mprint("got response from node {}".format(str(ll.locator)), 2)
-
-            tmp_answer = cbor.loads(answer.value)
-
-            proxy_sem.acquire()
-            registrar_sem.acquire()
-
-            MAP.update(tmp_answer['MAP'])
-            node_info['MAP'].update(tmp_answer['MAP'])
-            nodes_locator[str(ll.locator)] = tmp_answer['PORTS']
-            proxy_tagged.objective.value = cbor.dumps(node_info)
-            registrar_tagged.objective.value = cbor.dumps(node_info)
-
-            proxy_sem.release()
-            registrar_sem.release()
-
-
-            mprint("MAP updated\n {}".format(MAP), 2)
-
-            _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
-        else:
-            #TODO
-            pass
-    except Exception as e:
-        mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
-
+    for i in range(2):
+        try:
+            _tagged.objective.value = cbor.dumps(MAP)
+            if _old_API:
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+                reason = answer
+            else:
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+            if not err:
+                mprint("got response from node {}".format(str(ll.locator)), 2)
+                tmp_answer = cbor.loads(answer.value)
+                registrar_sem.acquire()
+                MAP.update(tmp_answer)
+                node_info['MAP'].update(tmp_answer)
+                registrar_tagged.objective.value = cbor.dumps(node_info)
+                registrar_sem.release()
+                mprint("MAP updated\n {}".format(MAP), 2)
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                return
+            else:
+                mprint("update not received by node\ntrying again after 10s Zzz", 2)
+                sleep(10)
+        except Exception as e:
+            mprint("there was an error occurred in neg_with_proxy with code {}".format(graspi.etext[e]), 2)
+            return
 
 
 
@@ -166,8 +135,10 @@ threading.Thread(target=listen, args = [proxy_tagged    , listen_proxy])    .sta
 threading.Thread(target=listen, args = [registrar_tagged, listen_registrar]).start()
 
 def run_update(_tagged):
-    sleep(200)
+    while len(nodes_locator) < 9:
+        sleep(1)
     mprint("sending updates to nodes", 2)
+    sleep(2)
     update(_tagged)
 
-# threading.Thread(target=run_update, args=[registrar_tagged]).start()
+threading.Thread(target=run_update, args=[registrar_tagged]).start()

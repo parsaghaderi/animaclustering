@@ -29,7 +29,7 @@ pledge_sem = threading.Semaphore()
 
 
 registrar_ports = {'registrar':0, 'proxy':0}
-# proxy_tagged.objective.value = cbor.dumps({'ula':MY_ULA, 'key':True})
+proxy_tagged.objective.value = cbor.dumps({'ula':MY_ULA, 'key':True})
 
 def discover_proxy(_tagged):
     global PROXY_LOCATOR
@@ -195,7 +195,7 @@ def listen_registrar(_tagged, _handle, _answer): #listen to registrar for update
     mprint("incoming request from registrar for updates!", 2)  #registrar already has my map, so the new update includes mine as well 
     tmp_answer = cbor.loads(_answer.value)
     mprint("update from registrar {}".format(tmp_answer), 2)
-    
+
     registrar_sem.acquire()
 
     node_info['MAP'].update(tmp_answer['MAP'])

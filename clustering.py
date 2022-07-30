@@ -290,18 +290,22 @@ def check_ch_alive():
         if len(response) != 0:
             mprint("the clusterhead is still alive")
         else:
-            mprint("clusterhead is dead")
-            NEIGHBOR_INFO.pop(node_info['cluster_head'])
-            NEIGHBORS_STR.remove(node_info['cluster_head'])
-            NEIGHBOR_STR_TO_LOCATOR.pop(node_info['cluster_head'])
-            node_info['neighbors'].remove(node_info['cluster_head'])
-            node_info['cluster_head'] = False
+            try:
+                mprint("clusterhead is dead")
+                NEIGHBOR_INFO.pop(node_info['cluster_head'])
+                NEIGHBORS_STR.remove(node_info['cluster_head'])
+                NEIGHBOR_STR_TO_LOCATOR.pop(node_info['cluster_head'])
+                node_info['neighbors'].remove(node_info['cluster_head'])
+                node_info['cluster_head'] = False
+            except:
+                Pass
             tagged_sem.acquire()
             obj.value = cbor.dumps(node_info)
             tagged_sem.release()
             CLUSTERING_DONE = False
             INITIAL_NEG = False
             TO_JOIN = None
+                
             PHASE = 2
             break
         sleep(60)

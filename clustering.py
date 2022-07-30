@@ -1,5 +1,6 @@
 from ast import Pass
 from os import stat
+from urllib import response
 from utility import *
 from utility import _old_API as _old_API
 
@@ -592,6 +593,7 @@ def control():
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
                 listen_to_update_from_clusterhead_thread.start()
+                threading.Thread(target=check_ch_alive, args = []).start()
         elif PHASE == 6:
             mprint("updating clusterheads")
             clusterhead_update_thread = threading.Thread(target=run_cluster_neg_all, args=[cluster_tagged, 7, 2])
@@ -604,7 +606,17 @@ def control():
             pass
 
 def check_ch_alive():
-    mp = multiping.MultiPing([])
+    while not CLUSTER_HEAD:
+        mp = multiping.MultiPing(node_info['cluster_head'])
+        mp.send()
+        response, no_response = mp.receive(1)
+        if len(response) != 0:
+            mprint("the clusterhead is still alive")
+        else:
+            mprint("clusterhead is dead")
+            #kill all info about clusterhead
+            #run init again
+        sleep(60)
 
 threading.Thread(target=control, args = []).start()
 

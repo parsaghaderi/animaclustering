@@ -36,6 +36,8 @@ MAP_SEM = threading.Semaphore()
 CLUSTERHEAD_OBJECTIVE = {'map':TP_MAP, 'port':0}
 PHASE = 0
 
+CLUSTERHEADS_VERSIONS = {}
+
 TMP_CLUSTER_VERSION = None
 SYNCH_COUNTER = 0
 SENT_TO_CLUSTERHEADS = {}
@@ -215,6 +217,68 @@ def listen_to_updates_from_clusterhead(_tagged, _handle, _answer):
     except Exception as e:
         mprint("\033[1;31;1m exception in linsten update from clusterhead {} \033[0m".format(e))
 
+def listen_to_update_from_subcluster(_tagged, _handle, _answer):
+    initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
+    global cluster_tagged_sem, sub_cluster_sem, cluster_tagged, sub_cluster_tagged, TP_MAP
+    tmp_answer = cbor.loads(_answer.value)
+    
+    cluster_tagged_sem.acquire()
+    sub_cluster_sem.acquire()
+    TP_MAP.update(tmp_answer)
+    CLUSTERHEAD_OBJECTIVE['map'].update(tmp_answer['map'])
+    cluster_tagged.objective.value =  cbor.dumps(CLUSTERHEAD_OBJECTIVE)
+    sub_cluster_tagged.objective.value = cbor.dumps(TP_MAP)
+    _answer.value = cluster_tagged.objective.value
+    cluster_tagged_sem.release()
+    sub_cluster_sem.release()
+
+    try:
+        _r = graspi.negotiate_step(_tagged.source, _handle, _answer, 10000)
+        if _old_API:
+            err, temp, answer = _r
+            reason = answer
+        else:
+            err, temp, answer, reason = _r
+        if (not err) and (temp == None):
+           
+            mprint("\033[1;32;1m update received successfully from subcluster node {}\033[0m".format(initiator_ula))  
+        else:
+            mprint("\033[1;31;1m in clusterhead listen for update with peer {} interrupted with error code {} \033[0m".format(initiator_ula, graspi.etext[err]))
+            pass
+    except Exception as e:
+        mprint("\033[1;31;1m exception in cluster linsten handler {} \033[0m".format(e))
+
+def send_update_to_clusterhead(_tagged, ll, _attempt):
+    attempt = _attempt
+    while attempt!=0:
+        mprint("start negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1),2)
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, ll, 10000) #TODO
+            reason = answer
+        else:
+            err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, ll, None)
+        if not err:
+            mprint("update sent to clusterhead successfully")
+            tmp_answer = cbor.loads(answer.value)
+            mprint("clusterhead responded with an updated map {}".format(tmp_answer))
+            sub_cluster_sem.acquire()
+            TP_MAP.update(tmp_answer)
+            _tagged.objective.value = cbor.dumps(TP_MAP)
+            sub_cluster_sem.release()
+            try:
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m sending updates to clusterhead ended successfully\033[0m".format(ll),2)
+                    break
+                else:
+                    mprint("\033[1;31;1m in send update to clusterhead error happened {} \033[0m".format(graspi.etext[_err]),2)
+            except Exception as e:
+                mprint("\033[1;31;1m in send update to clusterhead exception happened {} \033[0m".format(e),2)
+        else:
+            mprint("\033[1;31;1m in send_update_to clusterhead failed + {} \033[0m".format(ll, graspi.etext[err]),2)
+            attempt+=1
+        attempt-=1
+        sleep(3)
 
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
@@ -285,6 +349,7 @@ def run_cluster_neg_all(_tagged, _next, _attempts = 1):
     threading.Thread(target = maintenance, args = []).start()
     PHASE = _next
 
+
 def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
     while attempt!= 0:
@@ -327,7 +392,6 @@ def neg_cluster(_tagged, ll, _attempt):
                 break
         attempt-=1
         sleep(3)
-
 
 def init(_next):
     global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
@@ -464,12 +528,18 @@ def generate_topology():
         cluster_discovery_1.start()
     else:
        pass 
+
 def maintenance():
     for item in SUBCLUSTERS:
         threading.Thread(target=send_subcluster_update, args = [item, 2]).start()
     # for item in CLUSTERHEADS:
     #     threading.Thread(target=neg_cluster, args=[cluster_tagged, item, 2]).start()
-
+def clusterhead_maintenance():
+    while CLUSTER_HEAD:
+        for item in CLUSTERHEADS:
+            if SENT_TO_CLUSTERHEADS[item] != TP_MAP:
+                threading.Thread(target=neg_cluster, args=[cluster_tagged, item, 2]).start()
+        sleep(10)
 
 def control():
     while True:
@@ -508,6 +578,8 @@ def control():
             clusterhead_update_thread = threading.Thread(target=run_cluster_neg_all, args=[cluster_tagged, 7, 2])
             clusterhead_update_thread.start()
             clusterhead_update_thread.join()
+            sleep(30)
+            threading.Thread(target = clusterhead_maintenance, args = []).start()
             # maintenance_thread = threading.Thread(target=maintenance, args = []).start()
         elif PHASE == 7:
             pass

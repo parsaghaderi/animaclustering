@@ -514,7 +514,13 @@ def on_update_rcv(_next):
                 mprint(NEIGHBOR_INFO)
                 TO_JOIN = None
                 CLUSTER_HEAD = True
-                PHASE = _next
+                if PHASE < 5:
+                        PHASE = _next
+                    else:
+                        if CLUSTER_HEAD:
+                            PHASE = 6
+                        else:
+                            PHASE = 7
                 if not cluster_listen_1.is_alive():
                     cluster_listen_1.start()
 

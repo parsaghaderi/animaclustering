@@ -649,6 +649,7 @@ def control():
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
                 listen_to_update_from_clusterhead_thread.start()
+                sleep(10)
                 # threading.Thread(target=check_ch_alive, args = []).start()
                 check_ch_alive_thread.start()
         elif PHASE == 6:

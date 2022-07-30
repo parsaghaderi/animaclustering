@@ -292,7 +292,7 @@ def check_ch_alive():
         else:
             mprint("clusterhead is dead")
             NEIGHBOR_INFO.pop(node_info['cluster_head'])
-            NEIGHBORS_STR.pop(node_info['cluster_head'])
+            NEIGHBORS_STR.remove(node_info['cluster_head'])
             NEIGHBOR_STR_TO_LOCATOR.pop(node_info['cluster_head'])
             node_info['neighbors'].remove(node_info['cluster_head'])
             node_info['cluster_head'] = False

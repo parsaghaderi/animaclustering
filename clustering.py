@@ -40,6 +40,9 @@ TMP_CLUSTER_VERSION = None
 SYNCH_COUNTER = 0
 SENT_TO_CLUSTERHEADS = {}
 UPDATE = False
+
+SUBCLUSTERS = {}
+
 '''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
 # status 1:not decided, 2:cluster-head, 3:want to join, 4:joined 5:changed (!)
@@ -79,6 +82,7 @@ def listen_handler(_tagged, _handle, _answer):
     if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contains__(initiator_ula)):
         node_info['cluster_set'].append(initiator_ula)
         mprint(node_info, 2)
+        SUBCLUSTERS[initiator_ula] = locator_maker(initiator_ula, NEIGHBOR_INFO[initiator_ula]['ports']['sub_cluster'],False)
         _tagged.objective.value = cbor.dumps(node_info)
     _answer.value = _tagged.objective.value
     tagged_sem.release()
@@ -140,6 +144,19 @@ def discovery_node_handler(_tagged, _locators):
     sleep(10)
     threading.Thread(target=run_neg, args=[_tagged, NEIGHBOR_INFO.keys(), 1, 1]).start()
 
+
+def discovery_cluster_handler(_tagged, _locators):
+    global PHASE
+    for item in _locators:
+        if str(item.locator) != MY_ULA:
+            CLUSTER_INFO[str(item.locator)] = 0
+            CLUSTER_UPDATE[str(item.locator)] = False
+            CLUSTER_STR_TO_ULA[str(item.locator)] = item
+            mprint("cluster head found at {}".format(str(item.locator)), 2)
+    sleep(20)
+    # threading.Thread(target=maintenance, args=[]).start()
+    PHASE = 6
+
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_node_1.start()
 
@@ -147,6 +164,7 @@ discovery_1 = threading.Thread(target=discovery, args=[tagged,discovery_node_han
 discovery_1.start()
 
 cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster_listener_handler])
+cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,discovery_cluster_handler, 3])
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
@@ -178,6 +196,7 @@ def neg(_tagged, ll, _attempt):
                     node_info['cluster_set'].append(ll)
                 tagged.objective.value = cbor.dumps(node_info)
                 tagged_sem.release()
+                SUBCLUSTERS[ll] = locator_maker(ll, NEIGHBOR_INFO[ll]['ports']['sub_cluster'],False)
                 mprint(node_info, 2)
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
@@ -308,7 +327,7 @@ def generate_topology():
         cluster_tagged.objective.value = cbor.dumps(TP_MAP)
         cluster_tagged_sem.release()
         sleep(15)
-        #cluster_discovery_1.start()
+        cluster_discovery_1.start()
     else:
        pass 
 

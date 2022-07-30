@@ -281,6 +281,55 @@ def send_update_to_clusterhead(_tagged, ll, _attempt):
         attempt-=1
         sleep(3)
 
+def check_ch_alive():
+    global CLUSTERING_DONE, INITIAL_NEG, TO_JOIN, PHASE
+    while not CLUSTERHEADS:
+        mp = multiping.MultiPing([node_info['cluster_head']])
+        mp.send()
+        response, no_response = mp.receive(1)
+        if len(response) != 0:
+            mprint("the clusterhead is still alive")
+        else:
+            mprint("clusterhead is dead")
+            NEIGHBOR_INFO.pop(node_info['cluster_head'])
+            NEIGHBORS_STR.pop(node_info['cluster_head'])
+            NEIGHBOR_STR_TO_LOCATOR.pop(node_info['cluster_head'])
+            node_info['neighbors'].remove(node_info['cluster_head'])
+            node_info['cluster_head'] = False
+            tagged_sem.acquire()
+            obj.value = cbor.dumps(node_info)
+            tagged_sem.release()
+            CLUSTERING_DONE = False
+            INITIAL_NEG = False
+            TO_JOIN = None
+            PHASE = 2
+            break
+        sleep(60)
+
+def check_subcluster_alive():
+    global CLUSTERING_DONE, INITIAL_NEG, TO_JOIN
+    while CLUSTER_HEAD:
+        mp = multiping.MultiPing(node_info['cluster_set'])
+        mp.send()
+        response, no_response = mp.receive(1)
+        if len(no_response) == len(node_info['cluster_set']):
+            mprint("all links down!")
+        
+        for item in no_response:
+            try:
+                node_info['cluster_set'].remove(item)
+                NEIGHBOR_INFO.pop(item)
+                NEIGHBORS_STR.pop(item)
+                NEIGHBOR_STR_TO_LOCATOR.pop(item)
+                node_info['neighbors'].remove(item)
+            except:
+                pass
+        tagged_sem.acquire()
+        obj.value = cbor.dumps(node_info)
+        tagged_sem.release()
+        #phase doesn't change
+        sleep(60)
+
 
 listen_node_1 = threading.Thread(target=listen, args=[tagged, listen_handler]) #TODO change the name
 listen_node_1.start()
@@ -292,6 +341,9 @@ cluster_listen_1 = threading.Thread(target=listen, args=[cluster_tagged, cluster
 cluster_discovery_1 = threading.Thread(target=discovery, args=[cluster_tagged,discovery_cluster_handler, 3])
 
 listen_to_update_from_clusterhead_thread = threading.Thread(target=listen, args=[sub_cluster_tagged, listen_to_updates_from_clusterhead])
+
+check_ch_alive_thread = threading.Thread(target=check_ch_alive, args=[])
+check_subcluster_alive_thread = threading.Thread(target=check_subcluster_alive, args = [])
 
 def run_neg(_tagged, _locators, _next, _attempts = 1):
     global INITIAL_NEG, PHASE
@@ -434,7 +486,6 @@ def init(_next):
     PHASE = _next     
 
 def on_update_rcv(_next):
-    
     mprint("\033[1;35;1m *********************** 1\033[0m")
 
     global node_info, CLUSTERING_DONE, SYNCH, CLUSTER_HEAD, PHASE, HEAVIEST, HEAVIER, TO_JOIN
@@ -551,6 +602,7 @@ def maintenance():
         threading.Thread(target=send_subcluster_update, args = [item, 2]).start()
     # for item in CLUSTERHEADS:
     #     threading.Thread(target=neg_cluster, args=[cluster_tagged, item, 2]).start()
+
 def clusterhead_maintenance():
     while CLUSTER_HEAD:
         try:
@@ -593,7 +645,8 @@ def control():
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
                 listen_to_update_from_clusterhead_thread.start()
-                threading.Thread(target=check_ch_alive, args = []).start()
+                # threading.Thread(target=check_ch_alive, args = []).start()
+                check_ch_alive_thread.start()
         elif PHASE == 6:
             mprint("updating clusterheads")
             clusterhead_update_thread = threading.Thread(target=run_cluster_neg_all, args=[cluster_tagged, 7, 2])
@@ -604,19 +657,6 @@ def control():
             # maintenance_thread = threading.Thread(target=maintenance, args = []).start()
         elif PHASE == 7:
             pass
-
-def check_ch_alive():
-    while not CLUSTER_HEAD:
-        mp = multiping.MultiPing([node_info['cluster_head']])
-        mp.send()
-        response, no_response = mp.receive(1)
-        if len(response) != 0:
-            mprint("the clusterhead is still alive")
-        else:
-            mprint("clusterhead is dead")
-            #kill all info about clusterhead
-            #run init again
-        sleep(60)
 
 threading.Thread(target=control, args = []).start()
 

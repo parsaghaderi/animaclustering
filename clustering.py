@@ -349,8 +349,8 @@ def run_cluster_neg_all(_tagged, _next, _attempts = 1):
     threading.Thread(target = maintenance, args = []).start()
     PHASE = _next
 
-
 def neg_cluster(_tagged, ll, _attempt):
+    global CLUSTER_STR_TO_ULA, CLUSTER_INFO, CLUSTER_NODES, CLUSTER_UPDATE, CLUSTERHEADS
     attempt = _attempt
     while attempt!= 0:
         mprint("start cluster negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1))
@@ -392,6 +392,16 @@ def neg_cluster(_tagged, ll, _attempt):
                 break
         attempt-=1
         sleep(3)
+    if attempt == 0:
+        mprint("removing clusterhead from the list of clusterheads")
+        try:
+            CLUSTER_STR_TO_ULA.pop(ll)
+            CLUSTER_INFO.pop(ll)
+            CLUSTER_UPDATE.pop(ll) 
+            CLUSTERHEADS.pop(ll)
+            TP_MAP.pop(ll)
+        except:
+            pass
 
 def init(_next):
     global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE

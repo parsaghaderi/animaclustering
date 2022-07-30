@@ -607,7 +607,7 @@ def control():
 
 def check_ch_alive():
     while not CLUSTER_HEAD:
-        mp = multiping.MultiPing(node_info['cluster_head'])
+        mp = multiping.MultiPing([node_info['cluster_head']])
         mp.send()
         response, no_response = mp.receive(1)
         if len(response) != 0:

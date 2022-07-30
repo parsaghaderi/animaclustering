@@ -546,10 +546,13 @@ def maintenance():
     #     threading.Thread(target=neg_cluster, args=[cluster_tagged, item, 2]).start()
 def clusterhead_maintenance():
     while CLUSTER_HEAD:
-        for item in CLUSTERHEADS:
-            if SENT_TO_CLUSTERHEADS[item] != TP_MAP:
-                threading.Thread(target=neg_cluster, args=[cluster_tagged, item, 2]).start()
-        sleep(10)
+        try:
+            for item in CLUSTERHEADS:
+                if SENT_TO_CLUSTERHEADS[item] != TP_MAP:
+                    threading.Thread(target=neg_cluster, args=[cluster_tagged, item, 2]).start()
+            sleep(10)
+        except:
+            sleep(10)
 
 def control():
     while True:
@@ -594,5 +597,8 @@ def control():
         elif PHASE == 7:
             pass
 
+def check_ch_alive():
+    mp = multiping.MultiPing([])
 
 threading.Thread(target=control, args = []).start()
+

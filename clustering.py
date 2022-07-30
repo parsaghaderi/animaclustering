@@ -234,14 +234,15 @@ def neg_cluster(_tagged, ll, _attempt):
     attempt = _attempt
     while attempt!= 0:
         mprint("start cluster negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1))
-        if _old_API:
-            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, CLUSTERHEADS[ll], 10000) #TODO - clustertostr
-            reason = answer
-        else:
-            try:
-                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, CLUSTERHEADS[ll], None)
-            except Exception as e:
-                mprint("exception in neg_cluster req_neg with {} with code {}".format(ll, graspi.etext[e]), 2)
+        try:
+            if _old_API:
+                err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, CLUSTERHEADS[ll], 10000) #TODO - clustertostr
+                reason = answer
+            else:
+                    err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, CLUSTERHEADS[ll], None)
+        except Exception as e:
+            mprint("exception in neg_cluster req_neg with {} with code {}".format(ll, graspi.etext[e]), 2)
+
         if not err:
             SENT_TO_CLUSTERHEADS[ll] = TP_MAP
             tmp_answer = cbor.loads(answer.value)
@@ -389,7 +390,7 @@ def on_update_rcv(_next):
                     cluster_listen_1.start()
 
 def generate_topology():
-    global TP_MAP
+    global TP_MAP, CLUSTERHEAD_OBJECTIVE
     tmp_map = {}
     tmp_tagged = cbor.loads(tagged.objective.value)
     if len(tmp_tagged['cluster_set']) != 0:
@@ -399,9 +400,10 @@ def generate_topology():
                     tmp_map[item] = NEIGHBOR_INFO[locators]['neighbors']
         tmp_map.update({str(MY_ULA):node_info['neighbors']})
         mprint("\033[1;36;1m topology of the cluster is \n{} \033[0m".format(tmp_map))
-        TP_MAP = {MY_ULA:tmp_map}
         cluster_tagged_sem.acquire()
-        cluster_tagged.objective.value = cbor.dumps(TP_MAP)
+        TP_MAP = {MY_ULA:tmp_map}
+        CLUSTERHEAD_OBJECTIVE['map'] = TP_MAP 
+        cluster_tagged.objective.value = cbor.dumps(CLUSTERHEAD_OBJECTIVE)
         cluster_tagged_sem.release()
         sleep(15)
         cluster_discovery_1.start()

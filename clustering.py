@@ -33,7 +33,7 @@ CLUSTER_INFO  = {}
 CLUSTER_UPDATE = {}
 TP_MAP = {}
 MAP_SEM = threading.Semaphore()
-
+CLUSTERHEAD_OBJECTIVE = {'map':TP_MAP, 'port':0}
 PHASE = 0
 
 TMP_CLUSTER_VERSION = None
@@ -42,6 +42,7 @@ SENT_TO_CLUSTERHEADS = {}
 UPDATE = False
 
 SUBCLUSTERS = {}
+CLUSTERHEADS = {}
 
 '''
 # node_info['weight'] is run once, that's why we don't need a tmp variable to store node's weight
@@ -63,13 +64,14 @@ tagged_sem = threading.Semaphore()
 cluster_obj1, err, node_info['ports']['cluster'] = OBJ_REG("cluster_head", cbor.dumps(TP_MAP), True, False, 10, asa, False)
 cluster_tagged = TAG_OBJ(cluster_obj1, asa)
 cluster_tagged_sem = threading.Semaphore()
+CLUSTERHEAD_OBJECTIVE['port'] = node_info['ports']['cluster']
 
 sub_cluster_obj, err, node_info['ports']['sub_cluster'] = OBJ_REG("sub_cluster", cbor.dumps(TP_MAP), True, False, 10, asa, False)
 sub_cluster_tagged = TAG_OBJ(sub_cluster_obj, asa)
 cluster_tagged_sem = threading.Semaphore()
 
 obj.value = cbor.dumps(node_info)
-
+cluster_tagged.objective.value  = cbor.dumps(CLUSTERHEAD_OBJECTIVE)
 def listen_handler(_tagged, _handle, _answer):
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
@@ -108,10 +110,16 @@ def cluster_listener_handler(_tagged, _handle, _answer):
     mprint("req_neg initial cluster value: peer {} offered {}".format(initiator_ula, tmp_answer), 2)
     cluster_tagged_sem.acquire()
     
-    CLUSTER_INFO[initiator_ula] = tmp_answer
-    
-    TP_MAP.update(tmp_answer)
-    cluster_tagged.objective.value =  cbor.dumps(TP_MAP)
+    if list(CLUSTER_INFO.keys()).__contains__(initiator_ula):
+        CLUSTER_INFO[initiator_ula] = tmp_answer
+        CLUSTER_UPDATE[initiator_ula] = False
+        if not list(CLUSTERHEADS.keys()).__contains__(initiator_ula):
+            CLUSTERHEADS[initiator_ula] = locator_maker(initiator_ula, tmp_answer['port'], False)
+            CLUSTER_STR_TO_ULA[initiator_ula] = CLUSTERHEADS[initiator_ula]
+
+    TP_MAP.update(tmp_answer['map'])
+    CLUSTERHEAD_OBJECTIVE['map'].update(tmp_answer['map'])
+    cluster_tagged.objective.value =  cbor.dumps(CLUSTERHEAD_OBJECTIVE)
     _answer.value = cluster_tagged.objective.value
     cluster_tagged_sem.release()
     try:
@@ -152,6 +160,7 @@ def discovery_cluster_handler(_tagged, _locators):
             CLUSTER_INFO[str(item.locator)] = 0
             CLUSTER_UPDATE[str(item.locator)] = False
             CLUSTER_STR_TO_ULA[str(item.locator)] = item
+            CLUSTERHEADS[str(item.locator)] = item
             mprint("cluster head found at {}".format(str(item.locator)), 2)
     sleep(20)
     # threading.Thread(target=maintenance, args=[]).start()
@@ -213,6 +222,57 @@ def neg(_tagged, ll, _attempt):
         attempt-=1
         sleep(3)
     
+def run_cluster_neg_all(_tagged, _next, _attempts = 1):
+    global PHASE, CLUSTERHEADS
+    # for i in range(len(_locators)):
+    for item in CLUSTERHEADS:
+        threading.Thread(target=neg_cluster, args = [_tagged, item, _attempts]).start()
+    sleep(20)
+    mprint("topology of the domain  - phase 1\n{}".format(TP_MAP))
+    PHASE = _next
+def neg_cluster(_tagged, ll, _attempt):
+    attempt = _attempt
+    while attempt!= 0:
+        mprint("start cluster negotiating with {} for {}th time - try {}".format(ll, attempt, _attempt-attempt+1))
+        if _old_API:
+            err, handle, answer = graspi.req_negotiate(_tagged.source,_tagged.objective, CLUSTERHEADS[ll], 10000) #TODO - clustertostr
+            reason = answer
+        else:
+            try:
+                err, handle, answer, reason = graspi.request_negotiate(_tagged.source,_tagged.objective, CLUSTERHEADS[ll], None)
+            except Exception as e:
+                mprint("exception in neg_cluster req_neg with {} with code {}".format(ll, graspi.etext[e]), 2)
+        if not err:
+            SENT_TO_CLUSTERHEADS[ll] = TP_MAP
+            tmp_answer = cbor.loads(answer.value)
+            mprint("\033[1;32;1m got answer form peer {} on try {}\033[0m".format(ll, _attempt-attempt+1), 2)
+            CLUSTER_INFO[ll] = cbor.loads(answer.value)
+            # mprint("cluster_neg_step value : peer {} offered {}".format(str(ll.locator), CLUSTER_INFO[ll]))#
+            cluster_tagged_sem.acquire()
+            TP_MAP.update(tmp_answer['map'])
+            CLUSTERHEAD_OBJECTIVE['map'].update(tmp_answer['map'])
+            cluster_tagged.objective.value = cbor.dumps(CLUSTERHEAD_OBJECTIVE)
+        
+            cluster_tagged_sem.release()
+            try:
+                mprint("\033[1;32;1m replying to {} \033[0m".format(ll))
+                _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")
+                if not _err:
+                    mprint("\033[1;32;1m cluster neg with {} ended successfully\033[0m".format(ll), 2)
+                    break
+                else:
+                    mprint("\033[1;31;1m in cluster_neg_end error happened {} \033[0m".format(graspi.etext[_err]), 2)
+            except Exception as e:
+                mprint("\033[1;31;1m in cluster_neg_neg exception happened {} \033[0m".format(e), 2)
+            
+        else:
+            mprint("\033[1;31;1m in cluster_neg_req - neg with {} failed + {} \033[0m".format(ll, graspi.etext[err]), 2)
+            if attempt == 1:
+                break
+        attempt-=1
+        sleep(3)
+
+
 def init(_next):
     global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
     
@@ -363,8 +423,12 @@ def control():
             else:
                 mprint("\033[1;35;1m I joined {} \033[0m".format(node_info['cluster_head']))
         elif PHASE == 6:
-            # mprint("entering maintenance phase")
+            mprint("updating clusterheads")
+            clusterhead_update_thread = threading.Thread(target=run_cluster_neg_all, args=[cluster_tagged, 7, 2])
+            clusterhead_update_thread.start()
+            clusterhead_update_thread.join()
             # maintenance_thread = threading.Thread(target=maintenance, args = []).start()
+        elif PHASE == 7:
             pass
 
 threading.Thread(target=control, args = []).start()

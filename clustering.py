@@ -325,10 +325,13 @@ def on_update_rcv(_next):
             tagged_sem.release()
             mprint(NEIGHBOR_INFO)
             CLUSTERING_DONE = True
-            if CLUSTER_HEAD:
-                PHASE = 6
+            if PHASE < 5:
+                PHASE = _next
             else:
-                PHASE = 7
+                if CLUSTER_HEAD:
+                    PHASE = 6
+                else:
+                    PHASE = 7
         elif NEIGHBOR_INFO[HEAVIEST]['cluster_head'] != True and NEIGHBOR_INFO[HEAVIEST]['status'] == 4:
             mprint("\033[1;35;1m &&&&&&&&&&&&&&&&&&&&&& 1\033[0m")
             tmp_ch = find_next_heaviest(HEAVIEST, HEAVIER) #TODO check
@@ -346,22 +349,26 @@ def on_update_rcv(_next):
                     mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
                     tagged_sem.release()
                     mprint(NEIGHBOR_INFO)
-                    if CLUSTER_HEAD:
-                        PHASE = 6
+                    if PHASE < 5:
+                        PHASE = _next
                     else:
-                        PHASE = 7
-                    break
+                        if CLUSTER_HEAD:
+                            PHASE = 6
+                        else:
+                            PHASE = 7
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and NEIGHBOR_INFO[tmp_ch]['status'] == 4:
                     mprint("\033[1;35;1m next heaviest 1\033[0m")
                     tmp_ch = find_next_heaviest(tmp_ch, HEAVIER)
                 elif NEIGHBOR_INFO[tmp_ch]['cluster_head'] != True and ( NEIGHBOR_INFO[tmp_ch]['status'] == 1 or NEIGHBOR_INFO[tmp_ch]['status'] == 3):
                     #wait for an update message
                     mprint("\033[1;35;1m waiting for update from tmp_heaviest node1\033[0m")
-                    if CLUSTER_HEAD:
-                        PHASE = 6
+                    if PHASE < 5:
+                        PHASE = _next
                     else:
-                        PHASE = 7
-                    break
+                        if CLUSTER_HEAD:
+                            PHASE = 6
+                        else:
+                            PHASE = 7
             if tmp_ch == None:
                 mprint("\033[1;35;1m $$$$$$$$$$$$$$$$$$$$$$$$$$ 1\033[0m")
 

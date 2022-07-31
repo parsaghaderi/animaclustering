@@ -98,6 +98,7 @@ def listen_handler(_tagged, _handle, _answer):
     tagged_sem.acquire()
     if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contains__(initiator_ula)):
         node_info['cluster_set'].append(initiator_ula)
+        TP_MAP[MY_ULA][MY_ULA].append(initiator_ula) #try 1
         mprint(node_info, 2)
         SUBCLUSTERS[initiator_ula] = locator_maker(initiator_ula, NEIGHBOR_INFO[initiator_ula]['ports']['sub_cluster'],False)
         _tagged.objective.value = cbor.dumps(node_info)
@@ -388,9 +389,11 @@ def neg(_tagged, ll, _attempt):
                 tagged.objective.value = cbor.loads(tagged.objective.value)
                 if not node_info['cluster_set'].__contains__(ll):
                     node_info['cluster_set'].append(ll)
+                    TP_MAP[MY_ULA][MY_ULA].append(ll) #try 1
                 tagged.objective.value = cbor.dumps(node_info)
                 tagged_sem.release()
                 SUBCLUSTERS[ll] = locator_maker(ll, NEIGHBOR_INFO[ll]['ports']['sub_cluster'],False)
+
                 mprint(node_info, 2)
             try:
                 _err = graspi.end_negotiate(_tagged.source, handle, True, reason="value received")

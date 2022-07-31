@@ -82,7 +82,7 @@ def listen_handler(_tagged, _handle, _answer):
     #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[initiator_ula] = tmp_answer
     
-    if tmp_answer['cluster_head'] == True and tmp_answer['weight'] > HEAVIEST and CLUSTER_HEAD == False:
+    if tmp_answer['cluster_head'] == True and tmp_answer['weight'] > NEIGHBOR_INFO[HEAVIER] and CLUSTER_HEAD == False:
         tagged_sem.acquire()
         CLUSTERING_DONE = True
         node_info['cluster_head'] = initiator_ula
@@ -94,7 +94,7 @@ def listen_handler(_tagged, _handle, _answer):
         tagged_sem.release()
         PHASE = 5
         return
-        
+
     tagged_sem.acquire()
     if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contains__(initiator_ula)):
         node_info['cluster_set'].append(initiator_ula)

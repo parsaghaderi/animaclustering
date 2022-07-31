@@ -76,13 +76,25 @@ obj.value = cbor.dumps(node_info)
 cluster_tagged.objective.value  = cbor.dumps(CLUSTERHEAD_OBJECTIVE)
 
 def listen_handler(_tagged, _handle, _answer):
+    global CLUSTERING_DONE, PHASE
     initiator_ula = str(ipaddress.IPv6Address(_handle.id_source))
     tmp_answer = cbor.loads(_answer.value)
     #mprint("req_neg initial value : peer {} offered {}".format(initiator_ula, tmp_answer))
     NEIGHBOR_INFO[initiator_ula] = tmp_answer
-    if node_info['cluster_set'].__contains__(initiator_ula):
-        mprint("*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n*\n&\n")
     
+    if tmp_answer['cluster_head'] == True and tmp_answer['weight'] > HEAVIEST and CLUSTER_HEAD == False:
+        tagged_sem.acquire()
+        CLUSTERING_DONE = True
+        node_info['cluster_head'] = initiator_ula
+        node_info['cluster_set'] = []
+        node_info['status'] = 4
+        tagged.objective.value = cbor.dumps(node_info)
+        mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+        mprint("joined {}".format(initiator_ula))
+        tagged_sem.release()
+        PHASE = 5
+        return
+        
     tagged_sem.acquire()
     if tmp_answer['cluster_head'] == str(MY_ULA) and (not node_info['cluster_set'].__contains__(initiator_ula)):
         node_info['cluster_set'].append(initiator_ula)

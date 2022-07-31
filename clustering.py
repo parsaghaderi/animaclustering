@@ -469,9 +469,9 @@ def init(_next):
     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
 
     if HEAVIEST == None:
-        tmp_heavier = []
+        tmp_heavier = {}
         tmp_heaviest = None
-        tmp_lighter = []
+        tmp_lighter = {}
         tmp_heavier, tmp_heaviest, tmp_lighter =  sort_weight(0, NEIGHBOR_INFO, tmp_heavier, tmp_heaviest, tmp_lighter)
         for item in tmp_heavier:
             if len(NEIGHBOR_INFO[item]['cluster_set']) >= len(NEIGHBOR_INFO) and NEIGHBOR_INFO[item]['cluster_set'] == True:

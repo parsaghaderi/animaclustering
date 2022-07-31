@@ -460,14 +460,40 @@ def neg_cluster(_tagged, ll, _attempt):
             pass
 
 def init(_next):
-    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE
+    global HEAVIER, HEAVIEST, LIGHTER, node_info, INITIAL_NEG, TO_JOIN, CLUSTER_HEAD, PHASE, CLUSTERING_DONE,tagged_sem
     
     while not INITIAL_NEG:
         pass
     
     mprint("entering init phase - deciding role")
     HEAVIER, HEAVIEST, LIGHTER = sort_weight(node_info['weight'], NEIGHBOR_INFO, HEAVIER, HEAVIEST, LIGHTER)
-    
+
+    if HEAVIEST == None:
+        tmp_heavier = []
+        tmp_heaviest = None
+        tmp_lighter = []
+        tmp_heavier, tmp_heaviest, tmp_lighter =  sort_weight(0, NEIGHBOR_INFO, tmp_heavier, tmp_heaviest, tmp_lighter)
+        for item in tmp_heavier:
+            if len(NEIGHBOR_INFO[item]['cluster_set']) >= len(NEIGHBOR_INFO) and NEIGHBOR_INFO[item]['cluster_set'] == True:
+                mprint("I joined late; joining node {} over greater cluster size although I'm heavier :(   :)))!!!!".format(item))
+                tagged_sem.acquire()
+                CLUSTERING_DONE = True
+                node_info['cluster_head'] = item
+                node_info['cluster_set'] = []
+                node_info['status'] = 4
+                tagged.objective.value = cbor.dumps(node_info)
+                mprint("\033[1;35;1m {} 1\033[0m".format(cbor.loads(tagged.objective.value)))
+                tagged_sem.release()
+                mprint(NEIGHBOR_INFO)
+                if PHASE < 5:
+                    PHASE = _next
+                else:
+                    if CLUSTER_HEAD:
+                        PHASE = 6
+                    else:
+                        PHASE = 7
+                return
+
     if HEAVIEST == None:
         mprint("I'm clusterhead")
         tagged_sem.acquire()
